@@ -1,5 +1,6 @@
 package net.zerobone.grammax.grammar.id;
 
+import net.zerobone.grammax.grammar.iterators.NonTerminalIdIterator;
 import net.zerobone.grammax.grammar.iterators.NonTerminalIterator;
 import net.zerobone.grammax.grammar.point.Point;
 import net.zerobone.grammax.utils.zerolist.ZeroList;
@@ -68,11 +69,23 @@ public abstract class IdGrammar {
         return productions.get(productionId);
     }
 
-    public Iterator<IdProduction> nonTerminalProductionsIterator(int nonTerminal) {
+    public Iterator<IdProduction> nonTerminalProductions(int nonTerminal) {
 
-        final ArrayList<Integer> nonTerminalProductions = productionMap.get(nonTerminal);
+        final ArrayList<Integer> prods = productionMap.get(nonTerminal);
 
-        return new NonTerminalIterator(nonTerminalProductions, this);
+        assert prods != null : "invalid non-terminal";
+
+        return new NonTerminalIterator(prods, this);
+
+    }
+
+    public Iterator<Integer> nonTerminalProductionsIds(int nonTerminal) {
+
+        final ArrayList<Integer> prods = productionMap.get(nonTerminal);
+
+        assert prods != null : "invalid non-terminal";
+
+        return new NonTerminalIdIterator(prods);
 
     }
 

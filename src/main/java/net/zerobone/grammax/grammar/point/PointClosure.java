@@ -58,10 +58,11 @@ public class PointClosure {
 
             int nonTerminal = pendingNonTerminals.poll();
 
-            for (Iterator<IdProduction> it = grammar.nonTerminalProductionsIterator(nonTerminal); it.hasNext(); ) {
-                IdProduction production = it.next();
+            for (Iterator<Integer> it = grammar.nonTerminalProductionsIds(nonTerminal); it.hasNext();) {
 
-                // closure.add(new Point(nonTerminal, 0));
+                int productionId = it.next();
+
+                closure.add(new Point(productionId, 0));
 
             }
 
