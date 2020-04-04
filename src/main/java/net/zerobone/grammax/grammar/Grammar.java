@@ -3,7 +3,6 @@ package net.zerobone.grammax.grammar;
 import net.zerobone.grammax.grammar.id.IdGrammar;
 import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
-import net.zerobone.grammax.grammar.point.Point;
 import net.zerobone.grammax.utils.BijectiveMap;
 
 import java.util.*;
@@ -205,6 +204,10 @@ public class Grammar extends IdGrammar {
         return nonTerminals.size();
     }
 
+    public ArrayList<Integer> debug_getProductionsFor(int nonTerminal) {
+        return productionMap.get(nonTerminal);
+    }
+
     public String toString(boolean debug) {
 
         StringBuilder sb = new StringBuilder();
@@ -218,7 +221,7 @@ public class Grammar extends IdGrammar {
             int labelId = pair.getKey();
 
             String label =
-                (labelId == getStartSymbol() ? "(START) " : "") +
+                (labelId == getStartSymbol() ? "S" : " ") +
                 (debug ? "(" + labelId + ") " : "") +
                 nonTerminalToSymbol(labelId);
 
@@ -230,9 +233,20 @@ public class Grammar extends IdGrammar {
             // assert productionIterator.hasNext();
 
             if (productionIterator.hasNext()) {
+
                 while (true) {
 
-                    IdProduction ip = getProduction(productionIterator.next());
+                    int productionId = productionIterator.next();
+
+                    IdProduction ip = getProduction(productionId);
+
+                    assert ip != null;
+
+                    if (debug) {
+                        sb.append("<");
+                        sb.append(productionId);
+                        sb.append("> ");
+                    }
 
                     sb.append(ip.toString(this));
 
@@ -247,6 +261,7 @@ public class Grammar extends IdGrammar {
                     sb.append("  | ");
 
                 }
+
             }
 
             sb.append(';');

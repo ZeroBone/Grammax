@@ -11,4 +11,9 @@ public class Point {
         this.position = position;
     }
 
+    @Override
+    public String toString() {
+        return "(" + productionId + ", " + position + ")";
+    }
+
 }

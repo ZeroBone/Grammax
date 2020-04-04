@@ -64,6 +64,32 @@ public class PointClosure {
 
                 closure.add(new Point(productionId, 0));
 
+                IdProduction production = grammar.getProduction(productionId);
+
+                assert production != null;
+
+                if (production.body.isEmpty()) {
+                    continue;
+                }
+
+                IdSymbol firstSymbol = production.body.get(0);
+
+                if (firstSymbol.isTerminal()) {
+                    continue;
+                }
+
+                // first symbol is a non-terminal
+
+                int firstSymbolIndex = Grammar.nonTerminalToIndex(firstSymbol.id);
+
+                if (added[firstSymbolIndex]) {
+                    continue;
+                }
+
+                pendingNonTerminals.add(firstSymbol.id);
+
+                added[firstSymbolIndex] = true;
+
             }
 
         }
