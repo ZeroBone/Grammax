@@ -1,9 +1,12 @@
 package net.zerobone.grammax.grammar.id;
 
+import net.zerobone.grammax.grammar.iterators.NonTerminalIterator;
+import net.zerobone.grammax.grammar.point.Point;
 import net.zerobone.grammax.utils.zerolist.ZeroList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public abstract class IdGrammar {
 
@@ -46,8 +49,31 @@ public abstract class IdGrammar {
         return startSymbol;
     }
 
-    protected IdProduction getProduction(int productionId) {
+    public IdSymbol getSymbolAfter(Point point) {
+
+        IdProduction production = getProduction(point.productionId);
+
+        assert production != null;
+
+        try {
+            return production.body.get(point.position);
+        }
+        catch (IndexOutOfBoundsException ignored) {
+            return null;
+        }
+
+    }
+
+    public IdProduction getProduction(int productionId) {
         return productions.get(productionId);
+    }
+
+    public Iterator<IdProduction> nonTerminalProductionsIterator(int nonTerminal) {
+
+        final ArrayList<Integer> nonTerminalProductions = productionMap.get(nonTerminal);
+
+        return new NonTerminalIterator(nonTerminalProductions, this);
+
     }
 
 }

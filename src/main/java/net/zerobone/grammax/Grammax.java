@@ -43,7 +43,10 @@ public class Grammax {
 
         System.out.println(grammar.toString(true));
 
-        Augmentor.augment(grammar);
+        {
+            Augmentor augmentor = new Augmentor(grammar);
+            augmentor.augment();
+        }
 
         System.out.println("Augmented grammar:");
         System.out.println(grammar.toString(true));

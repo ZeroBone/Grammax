@@ -87,14 +87,10 @@ public class ZeroList<T extends ZeroListable> {
     public T get(int id) {
 
         try {
-
             return elements.get(id);
-
         }
         catch (IndexOutOfBoundsException e) {
-
             return null;
-
         }
 
     }

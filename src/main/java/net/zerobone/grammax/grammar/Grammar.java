@@ -3,6 +3,7 @@ package net.zerobone.grammax.grammar;
 import net.zerobone.grammax.grammar.id.IdGrammar;
 import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.point.Point;
 import net.zerobone.grammax.utils.BijectiveMap;
 
 import java.util.*;
@@ -263,6 +264,14 @@ public class Grammar extends IdGrammar {
     @Override
     public String toString() {
         return toString(false);
+    }
+
+    public static int nonTerminalToIndex(int nonTerminal) {
+        return -nonTerminal - 1;
+    }
+
+    public static int terminalToIndex(int terminal) {
+        return terminal - 1;
     }
 
 }

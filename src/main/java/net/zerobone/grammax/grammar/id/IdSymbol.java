@@ -2,7 +2,7 @@ package net.zerobone.grammax.grammar.id;
 
 public class IdSymbol {
 
-    int id;
+    public final int id;
 
     public final String argumentName;
 
@@ -11,7 +11,7 @@ public class IdSymbol {
         this.argumentName = argumentName;
     }
 
-    boolean isTerminal() {
+    public boolean isTerminal() {
         return id > 0;
     }
 
