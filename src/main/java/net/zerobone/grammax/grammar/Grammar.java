@@ -33,6 +33,14 @@ public class Grammar extends IdGrammar {
         return nonTerminals.containsKey(symbol) || terminals.containsKey(symbol);
     }
 
+    public Collection<Integer> nonTerminals() {
+        return nonTerminals.values();
+    }
+
+    public Collection<Integer> terminals() {
+        return terminals.values();
+    }
+
     public String nonTerminalToSymbol(int id) {
         assert id < 0 : "non-terminal expected";
         assert nonTerminals.mapValue(id) != null : "Non-terminal " + id + " is not defined";

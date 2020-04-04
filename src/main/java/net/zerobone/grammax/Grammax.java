@@ -8,8 +8,8 @@ import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
-import net.zerobone.grammax.grammar.point.Point;
-import net.zerobone.grammax.grammar.point.PointClosure;
+import net.zerobone.grammax.grammar.utils.Point;
+import net.zerobone.grammax.grammar.utils.ClosureCalculation;
 import net.zerobone.grammax.grammar.utils.Augmentor;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
@@ -63,7 +63,7 @@ public class Grammax {
 
             assert kernel.size() == 1;
 
-            PointClosure c = new PointClosure(grammar);
+            ClosureCalculation c = new ClosureCalculation(grammar);
             System.out.println(c.closure(kernel));
         }
 

@@ -2,7 +2,7 @@ package net.zerobone.grammax.grammar.id;
 
 import net.zerobone.grammax.grammar.iterators.NonTerminalIdIterator;
 import net.zerobone.grammax.grammar.iterators.NonTerminalIterator;
-import net.zerobone.grammax.grammar.point.Point;
+import net.zerobone.grammax.grammar.utils.Point;
 import net.zerobone.grammax.utils.zerolist.ZeroList;
 
 import java.util.ArrayList;

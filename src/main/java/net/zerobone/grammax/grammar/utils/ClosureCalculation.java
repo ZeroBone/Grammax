@@ -1,4 +1,4 @@
-package net.zerobone.grammax.grammar.point;
+package net.zerobone.grammax.grammar.utils;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.id.IdProduction;
@@ -9,11 +9,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class PointClosure {
+public class ClosureCalculation {
 
     private final Grammar grammar;
 
-    public PointClosure(Grammar grammar) {
+    public ClosureCalculation(Grammar grammar) {
         this.grammar = grammar;
     }
 
