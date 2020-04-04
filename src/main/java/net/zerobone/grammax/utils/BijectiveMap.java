@@ -82,4 +82,8 @@ public class BijectiveMap<K, V> {
         return keyToValue.entrySet();
     }
 
+    public int size() {
+        return keyToValue.size();
+    }
+
 }

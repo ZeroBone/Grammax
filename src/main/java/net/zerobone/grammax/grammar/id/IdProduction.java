@@ -1,27 +1,42 @@
-package net.zerobone.grammax.grammar;
+package net.zerobone.grammax.grammar.id;
+
+import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.utils.zerolist.ZeroListable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-class InnerProduction {
+public class IdProduction implements ZeroListable {
 
-    String code;
+    private int id = 0;
 
-    ArrayList<InnerSymbol> body = new ArrayList<>();
+    public String code;
 
-    public InnerProduction(String code) {
+    public ArrayList<IdSymbol> body = new ArrayList<>();
+
+    public IdProduction(String code) {
         this.code = code;
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String toString(Grammar grammar) {
 
         StringBuilder sb = new StringBuilder();
 
-        Iterator<InnerSymbol> it = body.iterator();
+        Iterator<IdSymbol> it = body.iterator();
 
         while (it.hasNext()) {
 
-            InnerSymbol symbol = it.next();
+            IdSymbol symbol = it.next();
 
             sb.append(grammar.idToSymbol(symbol.id));
 

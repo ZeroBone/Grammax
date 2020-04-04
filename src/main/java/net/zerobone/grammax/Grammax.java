@@ -27,7 +27,7 @@ public class Grammax {
 
     private Grammar grammar;
 
-    private HashMap<String, String> typeMap; // TODO: use type map
+    private final HashMap<String, String> typeMap; // TODO: use type map
 
     private Grammax(Grammar grammar, HashMap<String, String> typeMap) {
         this.grammar = grammar;
@@ -35,6 +35,8 @@ public class Grammax {
     }
 
     public void run() {
+
+        System.out.println("Grammax version: " + VERSION);
 
         System.out.println(grammar.toString(true));
 
@@ -49,6 +51,54 @@ public class Grammax {
         }
 
         return production;
+
+    }
+
+    private static void run(TranslationUnitNode translationUnit) {
+
+        Grammar grammar = null;
+
+        HashMap<String, String> typeMap = new HashMap<>();
+
+        for (StatementNode stmt : translationUnit.statements) {
+
+            if (stmt instanceof ProductionStatementNode) {
+
+                ProductionStatementNode production = (ProductionStatementNode)stmt;
+
+                if (grammar == null) {
+                    grammar = new Grammar(production.nonTerminal, convertProduction(production));
+                }
+                else {
+                    grammar.addProduction(production.nonTerminal, convertProduction(production));
+                }
+
+            }
+            else if (stmt instanceof TypeStatementNode) {
+
+                String symbol = ((TypeStatementNode)stmt).symbol;
+
+                String type = ((TypeStatementNode)stmt).type;
+
+                if (typeMap.containsKey(symbol)) {
+                    System.err.println("Error: Duplicate type declaration for symbol '" + symbol + "'.");
+                    return;
+                }
+
+                typeMap.put(symbol, type);
+
+            }
+
+        }
+
+        if (grammar == null) {
+            System.err.println("Error: could not find start symbol in grammar.");
+            return;
+        }
+
+        Grammax grammax = new Grammax(grammar, typeMap);
+
+        grammax.run();
 
     }
 
@@ -115,49 +165,7 @@ public class Grammax {
 
             assert translationUnit != null;
 
-            Grammar grammar = null;
-
-            HashMap<String, String> typeMap = new HashMap<>();
-
-            for (StatementNode stmt : translationUnit.statements) {
-
-                if (stmt instanceof ProductionStatementNode) {
-
-                    ProductionStatementNode production = (ProductionStatementNode)stmt;
-
-                    if (grammar == null) {
-                        grammar = new Grammar(production.nonTerminal, convertProduction(production));
-                    }
-                    else {
-                        grammar.addProduction(production.nonTerminal, convertProduction(production));
-                    }
-
-                }
-                else if (stmt instanceof TypeStatementNode) {
-
-                    String symbol = ((TypeStatementNode)stmt).symbol;
-
-                    String type = ((TypeStatementNode)stmt).type;
-
-                    if (typeMap.containsKey(symbol)) {
-                        System.err.println("Error: Duplicate type declaration for symbol '" + symbol + "'.");
-                        return;
-                    }
-
-                    typeMap.put(symbol, type);
-
-                }
-
-            }
-
-            if (grammar == null) {
-                System.err.println("Error: could not find start symbol in grammar.");
-                return;
-            }
-
-            Grammax grammax = new Grammax(grammar, typeMap);
-
-            grammax.run();
+            run(translationUnit);
 
             return;
 

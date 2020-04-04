@@ -1,12 +1,12 @@
-package net.zerobone.grammax.grammar;
+package net.zerobone.grammax.grammar.id;
 
-class InnerSymbol {
+public class IdSymbol {
 
     int id;
 
     public final String argumentName;
 
-    public InnerSymbol(int id, String argumentName) {
+    public IdSymbol(int id, String argumentName) {
         this.id = id;
         this.argumentName = argumentName;
     }
