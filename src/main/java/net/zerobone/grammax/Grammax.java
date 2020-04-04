@@ -8,6 +8,7 @@ import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.utils.Augmentor;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
@@ -38,6 +39,13 @@ public class Grammax {
 
         System.out.println("Grammax version: " + VERSION);
 
+        // TODO: check that all the non-terminals are reachable from the start symbol
+
+        System.out.println(grammar.toString(true));
+
+        Augmentor.augment(grammar);
+
+        System.out.println("Augmented grammar:");
         System.out.println(grammar.toString(true));
 
     }
@@ -96,9 +104,7 @@ public class Grammax {
             return;
         }
 
-        Grammax grammax = new Grammax(grammar, typeMap);
-
-        grammax.run();
+        new Grammax(grammar, typeMap).run();
 
     }
 

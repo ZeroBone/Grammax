@@ -146,9 +146,7 @@ public class Grammar extends IdGrammar {
 
     }
 
-    int createNonTerminal(int analogyNonTerminal) {
-
-        String newSymbol = nonTerminalToSymbol(analogyNonTerminal) + "'";
+    public int createNonTerminal(String newSymbol) {
 
         if (nonTerminals.containsKey(newSymbol)) {
 
@@ -167,7 +165,15 @@ public class Grammar extends IdGrammar {
 
     }
 
-    void addProduction(int symbolId, IdProduction production) {
+    public int createNonTerminal(int analogyNonTerminal) {
+
+        String newSymbol = nonTerminalToSymbol(analogyNonTerminal) + "'";
+
+        return createNonTerminal(newSymbol);
+
+    }
+
+    public void addProduction(int symbolId, IdProduction production) {
 
         assert production.getId() == 0;
 
@@ -208,7 +214,12 @@ public class Grammar extends IdGrammar {
 
             Map.Entry<Integer, ArrayList<Integer>> pair = it.next();
 
-            String label = (debug ? "(" + pair.getKey() + ") " : "") + nonTerminalToSymbol(pair.getKey());
+            int labelId = pair.getKey();
+
+            String label =
+                (labelId == getStartSymbol() ? "(START) " : "") +
+                (debug ? "(" + labelId + ") " : "") +
+                nonTerminalToSymbol(labelId);
 
             sb.append(label);
             sb.append(" -> ");

@@ -42,6 +42,10 @@ public abstract class IdGrammar {
         this.startSymbol = startSymbol;
     }
 
+    public int getStartSymbol() {
+        return startSymbol;
+    }
+
     protected IdProduction getProduction(int productionId) {
         return productions.get(productionId);
     }
