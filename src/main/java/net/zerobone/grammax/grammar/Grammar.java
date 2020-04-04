@@ -33,21 +33,21 @@ public class Grammar extends IdGrammar {
         return nonTerminals.containsKey(symbol) || terminals.containsKey(symbol);
     }
 
-    public String idToSymbol(int id) {
+    public String nonTerminalToSymbol(int id) {
+        assert id < 0 : "non-terminal expected";
+        assert nonTerminals.mapValue(id) != null : "Non-terminal " + id + " is not defined";
+        return nonTerminals.mapValue(id);
+    }
 
+    public String terminalToSymbol(int id) {
+        assert id >= 0 : "terminal expected";
         assert id != FOLLOW_SET_EOF : "eof-to-symbol convertion is restricted";
-
-        if (id < 0) {
-            // non-terminal
-            assert nonTerminals.mapValue(id) != null : "Non-terminal " + id + " is not defined";
-            return nonTerminals.mapValue(id);
-        }
-
-        // terminal
-
         assert terminals.mapValue(id) != null : "Terminal " + id + " is not defined";
         return terminals.mapValue(id);
+    }
 
+    public String idToSymbol(int id) {
+        return id < 0 ? nonTerminalToSymbol(id) : terminalToSymbol(id);
     }
 
     private Integer symbolToId(Symbol symbol) {
@@ -148,7 +148,7 @@ public class Grammar extends IdGrammar {
 
     int createNonTerminal(int analogyNonTerminal) {
 
-        String newSymbol = idToSymbol(analogyNonTerminal) + "'";
+        String newSymbol = nonTerminalToSymbol(analogyNonTerminal) + "'";
 
         if (nonTerminals.containsKey(newSymbol)) {
 
@@ -208,7 +208,7 @@ public class Grammar extends IdGrammar {
 
             Map.Entry<Integer, ArrayList<Integer>> pair = it.next();
 
-            String label = (debug ? "(" + pair.getKey() + ") " : "") + idToSymbol(pair.getKey());
+            String label = (debug ? "(" + pair.getKey() + ") " : "") + nonTerminalToSymbol(pair.getKey());
 
             sb.append(label);
             sb.append(" -> ");
