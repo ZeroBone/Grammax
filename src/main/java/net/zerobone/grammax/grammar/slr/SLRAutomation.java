@@ -1,14 +1,14 @@
-package net.zerobone.grammax.grammar.lr;
+package net.zerobone.grammax.grammar.slr;
 
 import net.zerobone.grammax.grammar.Grammar;
 
 import java.util.ArrayList;
 
-public class LRAutomation {
+public class SLRAutomation {
 
     private ArrayList<int[]> states = new ArrayList<>();
 
-    public LRAutomation(Grammar grammar) {
+    public SLRAutomation(Grammar grammar) {
 
 
 

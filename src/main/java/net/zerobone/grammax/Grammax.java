@@ -9,8 +9,6 @@ import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.lr.LRItems;
-import net.zerobone.grammax.grammar.utils.Point;
-import net.zerobone.grammax.grammar.utils.ClosureCalculation;
 import net.zerobone.grammax.grammar.utils.Augmentor;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
@@ -24,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class Grammax {
 
@@ -39,7 +36,7 @@ public class Grammax {
         this.typeMap = typeMap;
     }
 
-    public void run() {
+    private void run() {
 
         System.out.println("Grammax version: " + VERSION);
 
@@ -56,19 +53,6 @@ public class Grammax {
         System.out.println(grammar.toString(true));
 
         LRItems items = new LRItems(grammar);
-
-        /*{
-            HashSet<Point> kernel = new HashSet<>();
-
-            for (int productionId : grammar.debug_getProductionsFor(grammar.getStartSymbol())) {
-                kernel.add(new Point(productionId, 0));
-            }
-
-            assert kernel.size() == 1;
-
-            ClosureCalculation c = new ClosureCalculation(grammar);
-            System.out.println(c.closure(kernel));
-        }*/
 
     }
 

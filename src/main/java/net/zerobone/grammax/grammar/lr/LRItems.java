@@ -12,6 +12,8 @@ public class LRItems {
 
     private final Queue<HashSet<Point>> toDerive = new LinkedList<>();
 
+    private final ArrayList<LRItemTransition> transitions = new ArrayList<>();
+
     private int stateCount = 0;
 
     public LRItems(Grammar grammar) {
@@ -71,6 +73,8 @@ public class LRItems {
 
             System.out.println(stateId + " / " + grammar.idToSymbol(grammarSymbol) + " = " + derivativeStateId);
 
+            transitions.add(new LRItemTransition(stateId, grammarSymbol, derivativeStateId));
+
         }
 
     }
@@ -85,6 +89,14 @@ public class LRItems {
 
         } while (!toDerive.isEmpty());
 
+    }
+
+    public ArrayList<LRItemTransition> getTransitions() {
+        return transitions;
+    }
+
+    public int getStateCount() {
+        return stateCount - 1;
     }
 
 }
