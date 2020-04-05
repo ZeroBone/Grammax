@@ -17,11 +17,10 @@ import net.zerobone.grammax.parser.ParseError;
 import net.zerobone.grammax.parser.ParseUtils;
 import net.zerobone.grammax.parser.Parser;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class Grammax {
 
@@ -44,15 +43,124 @@ public class Grammax {
 
         System.out.println(grammar.toString(true));
 
-        {
-            Augmentor augmentor = new Augmentor(grammar);
-            augmentor.augment();
-        }
+        grammar.augment();
 
         System.out.println("Augmented grammar:");
         System.out.println(grammar.toString(true));
 
+        try {
+            exportDebugInfo();
+        }
+        catch (IOException e) {
+            System.err.println("I/O error: " + e.getMessage());
+            return;
+        }
+
         LRItems items = new LRItems(grammar);
+
+    }
+
+    private void exportDebugInfo() throws IOException {
+
+        BufferedWriter debugLogWriter = new BufferedWriter(new FileWriter("debug.log"));
+
+        debugLogWriter.write("Grammar:");
+        debugLogWriter.newLine();
+        debugLogWriter.newLine();
+
+        debugLogWriter.write(grammar.toString(true));
+
+        debugLogWriter.newLine();
+        debugLogWriter.newLine();
+
+        debugLogWriter.write("First sets:");
+        debugLogWriter.newLine();
+
+        HashMap<Integer, HashSet<Integer>> firstSets = grammar.firstSets();
+
+        for (HashMap.Entry<Integer, HashSet<Integer>> entry : firstSets.entrySet()) {
+
+            debugLogWriter.write("FIRST(");
+            debugLogWriter.write(grammar.idToSymbol(entry.getKey()));
+            debugLogWriter.write(") = {");
+
+            Iterator<Integer> firstSetIterator = entry.getValue().iterator();
+
+            if (firstSetIterator.hasNext()) {
+
+                while (true) {
+
+                    int id = firstSetIterator.next();
+
+                    if (id != Grammar.FIRST_FOLLOW_SET_EPSILON) {
+
+                        debugLogWriter.write(grammar.idToSymbol(id));
+
+                    }
+
+                    if (!firstSetIterator.hasNext()) {
+                        break;
+                    }
+
+                    debugLogWriter.write(", ");
+
+                }
+
+            }
+
+            debugLogWriter.write('}');
+
+            debugLogWriter.newLine();
+
+        }
+
+        debugLogWriter.newLine();
+
+        /*debugLogWriter.write("Follow sets:");
+        debugLogWriter.newLine();
+
+        HashMap<Integer, HashSet<Integer>> followSets = grammar.getFollowSets();
+
+        for (HashMap.Entry<Integer, HashSet<Integer>> entry : followSets.entrySet()) {
+
+            debugLogWriter.write("FOLLOW(");
+            debugLogWriter.write(grammar.idToSymbol(entry.getKey()));
+            debugLogWriter.write(") = {");
+
+            Iterator<Integer> followSetIterator = entry.getValue().iterator();
+
+            if (followSetIterator.hasNext()) {
+
+                while (true) {
+
+                    int id = followSetIterator.next();
+
+                    if (id == Grammar.FOLLOW_SET_EOF) {
+                        debugLogWriter.write("$");
+                    }
+                    else if (id != Grammar.FIRST_FOLLOW_SET_EPSILON) {
+
+                        debugLogWriter.write(grammar.idToSymbol(id));
+
+                    }
+
+                    if (!followSetIterator.hasNext()) {
+                        break;
+                    }
+
+                    debugLogWriter.write(", ");
+
+                }
+
+            }
+
+            debugLogWriter.write('}');
+
+            debugLogWriter.newLine();
+
+        }*/
+
+        debugLogWriter.close();
 
     }
 

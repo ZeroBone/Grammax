@@ -15,17 +15,9 @@ public class DerivativeCalculation {
         this.grammar = grammar;
     }
 
-    private HashSet<Point> calculateClosure(HashSet<Point> kernels) {
-
-        ClosureCalculation closureCalculation = new ClosureCalculation(grammar);
-
-        return closureCalculation.closure(kernels);
-
-    }
-
     public HashMap<Integer, HashSet<Point>> calculateAllDerivatives(HashSet<Point> kernels) {
 
-        HashSet<Point> closure = calculateClosure(kernels);
+        HashSet<Point> closure = grammar.lr0PointClosure(kernels);
 
         HashMap<Integer, HashSet<Point>> derivatives = new HashMap<>();
 

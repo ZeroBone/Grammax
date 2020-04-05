@@ -5,7 +5,6 @@ import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -58,9 +57,7 @@ public class ClosureCalculation {
 
             int nonTerminal = pendingNonTerminals.poll();
 
-            for (Iterator<Integer> it = grammar.nonTerminalProductionsIds(nonTerminal); it.hasNext();) {
-
-                int productionId = it.next();
+            for (int productionId : grammar.getProductionsFor(nonTerminal)) {
 
                 closure.add(new Point(productionId, 0));
 

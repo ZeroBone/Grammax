@@ -3,6 +3,7 @@ package net.zerobone.grammax.grammar;
 import net.zerobone.grammax.grammar.id.IdGrammar;
 import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.utils.*;
 import net.zerobone.grammax.utils.BijectiveMap;
 
 import java.util.*;
@@ -18,6 +19,10 @@ public class Grammar extends IdGrammar {
     private BijectiveMap<String, Integer> nonTerminals = new BijectiveMap<>();
 
     private BijectiveMap<String, Integer> terminals = new BijectiveMap<>();
+
+    private HashMap<Integer, HashSet<Integer>> cachedFirstSets = null;
+
+    private HashMap<Integer, HashSet<Integer>> cachedFollowSets = null;
 
     public Grammar(String startSymbol, Production startProduction) {
 
@@ -212,8 +217,31 @@ public class Grammar extends IdGrammar {
         return nonTerminals.size();
     }
 
-    public ArrayList<Integer> debug_getProductionsFor(int nonTerminal) {
-        return productionMap.get(nonTerminal);
+    public void augment() {
+        new Augmentor(this).augment();
+    }
+
+    public HashSet<Point> lr0PointClosure(HashSet<Point> kernels) {
+        return new ClosureCalculation(this)
+            .closure(kernels);
+    }
+
+    public HashMap<Integer, HashSet<Point>> calculateAllLr0Derivatives(HashSet<Point> kernels) {
+        return new DerivativeCalculation(this)
+            .calculateAllDerivatives(kernels);
+    }
+
+    public HashMap<Integer, HashSet<Integer>> firstSets() {
+
+        if (cachedFirstSets != null) {
+            return cachedFirstSets;
+        }
+
+        cachedFirstSets = new FirstCalculation(this)
+            .computeFirstSets();
+
+        return cachedFirstSets;
+
     }
 
     public String toString(boolean debug) {

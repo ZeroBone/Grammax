@@ -1,7 +1,6 @@
 package net.zerobone.grammax.grammar.lr;
 
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.utils.DerivativeCalculation;
 import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.*;
@@ -23,13 +22,16 @@ public class LRItems {
 
     private void addInitialState(Grammar grammar) {
 
-        Iterator<Integer> it = grammar.nonTerminalProductionsIds(grammar.getStartSymbol());
+        int productionId;
 
-        assert it.hasNext();
+        {
+            ArrayList<Integer> startSymbolProductions = grammar.getProductionsFor(grammar.getStartSymbol());
 
-        int productionId = it.next();
+            assert startSymbolProductions.size() == 1 : "grammar is not augmented";
 
-        assert !it.hasNext();
+            productionId = startSymbolProductions.get(0);
+
+        }
 
         HashSet<Point> initialKernels = new HashSet<>(1);
 
@@ -47,8 +49,7 @@ public class LRItems {
 
         int stateId = states.get(state);
 
-        HashMap<Integer, HashSet<Point>> derivatives = new DerivativeCalculation(grammar)
-            .calculateAllDerivatives(state);
+        HashMap<Integer, HashSet<Point>> derivatives = grammar.calculateAllLr0Derivatives(state);
 
         for (HashMap.Entry<Integer, HashSet<Point>> derivativeEntry : derivatives.entrySet()) {
 
