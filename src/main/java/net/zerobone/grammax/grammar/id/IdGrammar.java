@@ -3,10 +3,7 @@ package net.zerobone.grammax.grammar.id;
 import net.zerobone.grammax.grammar.utils.Point;
 import net.zerobone.grammax.utils.zerolist.ZeroList;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class IdGrammar {
 
@@ -70,6 +67,10 @@ public abstract class IdGrammar {
 
     public Set<Map.Entry<Integer, ArrayList<Integer>>> getProductions() {
         return productionMap.entrySet();
+    }
+
+    public Collection<ArrayList<Integer>> getProductionIds() {
+        return productionMap.values();
     }
 
     public ArrayList<Integer> getProductionsFor(int nonTerminal) {

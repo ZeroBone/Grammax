@@ -16,7 +16,7 @@ public class FirstCalculation {
         this.grammar = grammar;
     }
 
-    public HashMap<Integer, HashSet<Integer>> computeFirstSets() {
+    public void computeFirstSets() {
 
         for (Map.Entry<Integer, ArrayList<Integer>> pair : grammar.getProductions()) {
 
@@ -31,8 +31,6 @@ public class FirstCalculation {
                 break;
             }
         }
-
-        return firstSets;
 
     }
 
@@ -117,6 +115,10 @@ public class FirstCalculation {
 
         return modified;
 
+    }
+
+    public HashMap<Integer, HashSet<Integer>> getFirstSets() {
+        return firstSets;
     }
 
 }

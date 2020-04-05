@@ -217,8 +217,17 @@ public class Grammar extends IdGrammar {
         return nonTerminals.size();
     }
 
+    private void invalidateCaches() {
+        cachedFirstSets = null;
+        cachedFollowSets = null;
+    }
+
     public void augment() {
+
         new Augmentor(this).augment();
+
+        invalidateCaches();
+
     }
 
     public HashSet<Point> lr0PointClosure(HashSet<Point> kernels) {
@@ -237,10 +246,29 @@ public class Grammar extends IdGrammar {
             return cachedFirstSets;
         }
 
-        cachedFirstSets = new FirstCalculation(this)
-            .computeFirstSets();
+        FirstCalculation fc = new FirstCalculation(this);
+
+        fc.computeFirstSets();
+
+        cachedFirstSets = fc.getFirstSets();
 
         return cachedFirstSets;
+
+    }
+
+    public HashMap<Integer, HashSet<Integer>> followSets() {
+
+        if (cachedFollowSets != null) {
+            return cachedFollowSets;
+        }
+
+        FollowCalculation fc = new FollowCalculation(this);
+
+        fc.computeFollowSets();
+
+        cachedFollowSets = fc.getFollowSets();
+
+        return cachedFollowSets;
 
     }
 

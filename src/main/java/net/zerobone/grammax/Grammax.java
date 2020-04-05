@@ -9,7 +9,6 @@ import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.lr.LRItems;
-import net.zerobone.grammax.grammar.utils.Augmentor;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
@@ -116,10 +115,10 @@ public class Grammax {
 
         debugLogWriter.newLine();
 
-        /*debugLogWriter.write("Follow sets:");
+        debugLogWriter.write("Follow sets:");
         debugLogWriter.newLine();
 
-        HashMap<Integer, HashSet<Integer>> followSets = grammar.getFollowSets();
+        HashMap<Integer, HashSet<Integer>> followSets = grammar.followSets();
 
         for (HashMap.Entry<Integer, HashSet<Integer>> entry : followSets.entrySet()) {
 
@@ -158,7 +157,7 @@ public class Grammax {
 
             debugLogWriter.newLine();
 
-        }*/
+        }
 
         debugLogWriter.close();
 
