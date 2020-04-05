@@ -8,7 +8,11 @@ import java.util.*;
 
 public class LRItems {
 
-    public final HashSet<HashSet<Point>> states = new HashSet<>();
+    private final HashMap<HashSet<Point>, Integer> states = new HashMap<>();
+
+    private final Queue<HashSet<Point>> toDerive = new LinkedList<>();
+
+    private int stateCount = 0;
 
     public LRItems(Grammar grammar) {
         addInitialState(grammar);
@@ -29,49 +33,57 @@ public class LRItems {
 
         initialKernels.add(new Point(productionId, 0));
 
-        states.add(initialKernels);
+        toDerive.add(initialKernels);
+
+        states.put(initialKernels, stateCount++);
+
+    }
+
+    private void calculateDerivations(Grammar grammar, HashSet<Point> state) {
+
+        assert states.containsKey(state) : "undefined states should not be added to the queue";
+
+        int stateId = states.get(state);
+
+        HashMap<Integer, HashSet<Point>> derivatives = new DerivativeCalculation(grammar)
+            .calculateAllDerivatives(state);
+
+        for (HashMap.Entry<Integer, HashSet<Point>> derivativeEntry : derivatives.entrySet()) {
+
+            int grammarSymbol = derivativeEntry.getKey();
+
+            // kernels of the new state
+            HashSet<Point> derivative = derivativeEntry.getValue();
+
+            Integer derivativeStateId = states.get(derivative);
+
+            if (derivativeStateId == null) {
+
+                // new derivative
+
+                toDerive.add(derivative);
+
+                derivativeStateId = stateCount++;
+
+                states.put(derivative, derivativeStateId);
+
+            }
+
+            System.out.println(stateId + " / " + grammar.idToSymbol(grammarSymbol) + " = " + derivativeStateId);
+
+        }
 
     }
 
     private void populate(Grammar grammar) {
 
-        DerivativeCalculation derivativeCalculation = new DerivativeCalculation(grammar);
+        do {
 
-        ArrayList<HashSet<Point>> newSets = new ArrayList<>();
+            HashSet<Point> kernels = toDerive.poll();
 
-        while (true) {
+            calculateDerivations(grammar, kernels);
 
-            for (Iterator<HashSet<Point>> it = states.iterator(); it.hasNext();) {
-
-                HashSet<Point> state = it.next();
-
-                HashMap<Integer, HashSet<Point>> derivatives = derivativeCalculation.calculateAllDerivatives(state);
-
-                for (HashMap.Entry<Integer, HashSet<Point>> entry : derivatives.entrySet()) {
-
-                    int grammarSymbol = entry.getKey();
-
-                    // kernels of the new state
-                    HashSet<Point> newState = entry.getValue();
-
-                    if (states.contains(newState)) {
-
-                    }
-                    else {
-                        newSets.add(newState);
-                    }
-
-                }
-
-            }
-
-            if (newSets.isEmpty()) {
-                break;
-            }
-
-            newSets.clear();
-
-        }
+        } while (!toDerive.isEmpty());
 
     }
 

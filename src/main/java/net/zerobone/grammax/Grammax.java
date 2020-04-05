@@ -8,6 +8,7 @@ import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.lr.LRItems;
 import net.zerobone.grammax.grammar.utils.Point;
 import net.zerobone.grammax.grammar.utils.ClosureCalculation;
 import net.zerobone.grammax.grammar.utils.Augmentor;
@@ -54,7 +55,9 @@ public class Grammax {
         System.out.println("Augmented grammar:");
         System.out.println(grammar.toString(true));
 
-        {
+        LRItems items = new LRItems(grammar);
+
+        /*{
             HashSet<Point> kernel = new HashSet<>();
 
             for (int productionId : grammar.debug_getProductionsFor(grammar.getStartSymbol())) {
@@ -65,7 +68,7 @@ public class Grammax {
 
             ClosureCalculation c = new ClosureCalculation(grammar);
             System.out.println(c.closure(kernel));
-        }
+        }*/
 
     }
 
