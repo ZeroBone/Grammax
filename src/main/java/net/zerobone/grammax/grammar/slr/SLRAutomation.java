@@ -182,6 +182,8 @@ public class SLRAutomation {
         sb.append(stateCount - 1);
         sb.append(" )\n\n");
 
+        // action table
+
         sb.append("Action table:\n");
 
         sb.append(String.format("%5s", "STATE"));
@@ -229,6 +231,50 @@ public class SLRAutomation {
                 else {
                     sb.append(String.format("%12s", "r" + decodeProductionId(code)));
                 }
+
+            }
+
+            sb.append('\n');
+
+        }
+
+        // goto table
+
+        sb.append("\n\nGoto table:\n");
+
+        sb.append(String.format("%5s", "STATE"));
+
+        for (int nt = 0; nt < nonTerminalCount; nt++) {
+
+            sb.append(" |");
+
+            String nonTerminal = nonTerminals.get(nt);
+
+            sb.append(String.format("%12s", nonTerminal));
+
+        }
+
+        sb.append('\n');
+
+        for (int s = 0; s < stateCount; s++) {
+
+            sb.append(String.format("%4d", s));
+
+            sb.append(' ');
+
+            for (int t = 0; t < nonTerminalCount; t++) {
+
+                sb.append(' ');
+                sb.append('|');
+
+                int entry = gotoTable[s * nonTerminalCount + t];
+
+                if (entry == 0) {
+                    sb.append(" -----------");
+                    continue;
+                }
+
+                sb.append(String.format("%12s", entry));
 
             }
 
