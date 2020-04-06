@@ -36,24 +36,29 @@ public class IdProduction implements ZeroListable {
 
         Iterator<IdSymbol> it = body.iterator();
 
-        while (it.hasNext()) {
+        if (it.hasNext()) {
+            while (true) {
 
-            IdSymbol symbol = it.next();
+                IdSymbol symbol = it.next();
 
-            sb.append(grammar.idToSymbol(symbol.id));
+                sb.append(grammar.idToSymbol(symbol.id));
 
-            if (symbol.argumentName != null) {
+                if (symbol.argumentName != null) {
 
-                sb.append('(');
-                sb.append(symbol.argumentName);
-                sb.append(')');
+                    sb.append('(');
+                    sb.append(symbol.argumentName);
+                    sb.append(')');
+
+                }
+
+                if (it.hasNext()) {
+                    sb.append(' ');
+                    continue;
+                }
+
+                break;
 
             }
-
-            if (it.hasNext()) {
-                sb.append(' ');
-            }
-
         }
 
         if (code != null) {
@@ -63,6 +68,46 @@ public class IdProduction implements ZeroListable {
             sb.append(code.replace('\n', ' '));
             sb.append(" }");
 
+        }
+
+        return sb.toString();
+
+    }
+
+    public String stringifyWithPointMarker(Grammar grammar, int pointPosition) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(grammar.nonTerminalToSymbol(nonTerminal));
+
+        sb.append(" -> ");
+
+        if (!body.isEmpty()) {
+
+            for (int i = 0;; i++) {
+
+                if (i == pointPosition) {
+                    sb.append("* ");
+                }
+
+                IdSymbol symbol = body.get(i);
+
+                sb.append(grammar.idToSymbol(symbol.id));
+
+                if (i != body.size() - 1) {
+                    assert i < body.size() - 1;
+                    sb.append(' ');
+                    continue;
+                }
+
+                break;
+
+            }
+
+        }
+
+        if (body.size() == pointPosition) {
+            sb.append(" *");
         }
 
         return sb.toString();

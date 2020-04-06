@@ -44,9 +44,7 @@ public class Grammax {
 
         grammar.augment();
 
-        LRItems items = new LRItems(grammar);
-
-        Automation automation = new Automation(grammar, items);
+        Automation automation = new Automation(grammar);
 
         try {
             exportDebugInfo(automation);

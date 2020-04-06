@@ -44,29 +44,21 @@ public class Automation {
      */
     public final int[] actionTable;
 
-    private final Object[] parserStates; // array of HashSet<Point>
+    private final String[] parserStateDescriptions; // array of HashSet<Point>
 
     private final ArrayList<Conflict> conflicts = new ArrayList<>();
 
-    public Automation(Grammar grammar, LRItems items) {
+    public Automation(Grammar grammar) {
+
+        LRItems items = new LRItems(grammar);
 
         // states
 
         stateCount = items.getStateCount();
 
-        parserStates = new Object[stateCount];
+        parserStateDescriptions = new String[stateCount];
 
-        // initialize states
-
-        for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
-
-            HashSet<Point> derivative = entry.getKey();
-
-            int stateId = entry.getValue();
-
-            parserStates[stateId] = derivative;
-
-        }
+        initializeStates(grammar, items);
 
         // counts
 
@@ -113,6 +105,36 @@ public class Automation {
         writeShifts(items);
 
         writeReduces(grammar, items);
+
+    }
+
+    private void initializeStates(Grammar grammar, LRItems items) {
+
+        for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
+
+            HashSet<Point> kernels = entry.getKey();
+
+            int stateId = entry.getValue();
+
+            HashSet<Point> closure = grammar.lr0PointClosure(kernels);
+
+            StringBuilder sb = new StringBuilder();
+
+            for (Point point : closure) {
+
+                IdProduction production = grammar.getProduction(point.productionId);
+
+                sb.append("    ");
+
+                sb.append(production.stringifyWithPointMarker(grammar, point.position));
+
+                sb.append('\n');
+
+            }
+
+            parserStateDescriptions[stateId] = sb.toString();
+
+        }
 
     }
 
@@ -317,13 +339,9 @@ public class Automation {
         return conflicts;
     }
 
-    public HashSet<Point> getParsingState(int state) {
-
+    public String getParsingStateDescription(int state) {
         assert state >= 0;
-
-        //noinspection unchecked
-        return (HashSet<Point>)parserStates[state];
-
+        return parserStateDescriptions[state];
     }
 
     @Override
@@ -442,6 +460,21 @@ public class Automation {
             }
 
             sb.append('\n');
+
+        }
+
+        // states
+
+        sb.append('\n');
+
+        for (int s = 0; s < stateCount; s++) {
+
+            sb.append('\n');
+
+            sb.append("State ");
+            sb.append(s);
+            sb.append(":\n");
+            sb.append(getParsingStateDescription(s));
 
         }
 
