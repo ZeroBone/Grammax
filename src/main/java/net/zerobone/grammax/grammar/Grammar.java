@@ -30,7 +30,7 @@ public class Grammar extends IdGrammar {
 
         nonTerminals.put(startSymbol, START_SYMBOL_ID);
 
-        createFirstProduction(START_SYMBOL_ID, convertProduction(startProduction));
+        createFirstProduction(START_SYMBOL_ID, convertProduction(START_SYMBOL_ID, startProduction));
 
     }
 
@@ -104,9 +104,11 @@ public class Grammar extends IdGrammar {
 
     }
 
-    private IdProduction convertProduction(Production production) {
+    private IdProduction convertProduction(int nonTerminal, Production production) {
 
         IdProduction idProduction = new IdProduction(production.getCode());
+
+        idProduction.setNonTerminal(nonTerminal);
 
         for (Symbol symbol : production.getBody()) {
             idProduction.body.add(convertSymbol(symbol));
@@ -126,7 +128,7 @@ public class Grammar extends IdGrammar {
 
             nonTerminals.put(symbol, nonTerminalCounter);
 
-            createFirstProduction(nonTerminalCounter, convertProduction(production));
+            createFirstProduction(nonTerminalCounter, convertProduction(nonTerminalCounter, production));
 
             nonTerminalCounter--;
 
@@ -140,13 +142,13 @@ public class Grammar extends IdGrammar {
         ArrayList<Integer> correspondingProductions = productionMap.get(symbolId);
 
         if (correspondingProductions == null) {
-            createFirstProduction(symbolId, convertProduction(production));
+            createFirstProduction(symbolId, convertProduction(symbolId, production));
             return;
         }
 
         // add to existing production
 
-        IdProduction convertedProduction = convertProduction(production);
+        IdProduction convertedProduction = convertProduction(symbolId, production);
 
         assert convertedProduction.getId() == 0;
 
@@ -187,6 +189,10 @@ public class Grammar extends IdGrammar {
     }
 
     public void addProduction(int symbolId, IdProduction production) {
+
+        assert production.getNonTerminal() == 0 : "production has already set is't non-terminal label";
+
+        production.setNonTerminal(symbolId);
 
         assert production.getId() == 0;
 
@@ -269,6 +275,26 @@ public class Grammar extends IdGrammar {
         cachedFollowSets = fc.getFollowSets();
 
         return cachedFollowSets;
+
+    }
+
+    public HashSet<Integer> followSet(int nonTerminal) {
+
+        HashMap<Integer, HashSet<Integer>> followSets = followSets();
+
+        assert followSets.containsKey(nonTerminal);
+
+        return followSets.get(nonTerminal);
+
+    }
+
+    public HashSet<Integer> firstSet(int nonTerminal) {
+
+        HashMap<Integer, HashSet<Integer>> firstSets = firstSets();
+
+        assert firstSets.containsKey(nonTerminal);
+
+        return firstSets.get(nonTerminal);
 
     }
 

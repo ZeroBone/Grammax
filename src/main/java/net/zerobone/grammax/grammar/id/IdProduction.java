@@ -8,6 +8,8 @@ import java.util.Iterator;
 
 public class IdProduction implements ZeroListable {
 
+    private int nonTerminal = 0;
+
     private int id = 0;
 
     public String code;
@@ -65,6 +67,14 @@ public class IdProduction implements ZeroListable {
 
         return sb.toString();
 
+    }
+
+    public int getNonTerminal() {
+        return nonTerminal;
+    }
+
+    public void setNonTerminal(int nonTerminal) {
+        this.nonTerminal = nonTerminal;
     }
 
 }

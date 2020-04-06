@@ -100,4 +100,8 @@ public class LRItems {
         return stateCount;
     }
 
+    public Set<Map.Entry<HashSet<Point>, Integer>> getStates() {
+        return states.entrySet();
+    }
+
 }

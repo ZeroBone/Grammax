@@ -1,10 +1,13 @@
 package net.zerobone.grammax.grammar.slr;
 
 import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.lr.LRItemTransition;
 import net.zerobone.grammax.grammar.lr.LRItems;
+import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class SLRAutomation {
 
@@ -38,7 +41,11 @@ public class SLRAutomation {
 
         gotoTable = new int[nonTerminalCount * stateCount];
 
+        // fill the tables
+
         writeShifts(items);
+
+        writeReduces(grammar, items);
 
     }
 
@@ -89,6 +96,45 @@ public class SLRAutomation {
 
     }
 
+    private void writeReduces(Grammar grammar, LRItems items) {
+
+        for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
+
+            HashSet<Point> derivative = entry.getKey();
+
+            int stateId = entry.getValue();
+
+            for (Point kernelPoint : derivative) {
+
+                IdProduction pointProduction = grammar.getProduction(kernelPoint.productionId);
+
+                assert kernelPoint.position <= pointProduction.body.size();
+
+                if (kernelPoint.position != pointProduction.body.size()) {
+                    // if the point is not at the end of the production
+                    continue;
+                }
+
+                int nonTerminal = grammar.getProduction(kernelPoint.productionId).getNonTerminal();
+
+                System.out.println("Non-terminal: " + grammar.nonTerminalToSymbol(nonTerminal) + " State: " + stateId);
+
+                // compute the follow set of the label of the production with the point at the end
+
+                for (int terminalOrEof : grammar.followSet(nonTerminal)) {
+
+                    writeReduce(stateId, terminalOrEof, kernelPoint.productionId);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    // helper methods
+
     private void writeShift(int state, int terminal, int targetState) {
         // TODO: check if the table cell is already occupied
         actionTable[terminalCount * state + Grammar.terminalToIndex(terminal)] = targetState;
@@ -114,6 +160,8 @@ public class SLRAutomation {
         sb.append(" ( 0 - ");
         sb.append(stateCount - 1);
         sb.append(" )\n");
+
+        sb.append("Action table:\n");
 
         sb.append(String.format("%5s", "STATE"));
 
@@ -153,7 +201,7 @@ public class SLRAutomation {
                     sb.append(String.format("%12s", "s" + code));
                 }
                 else {
-                    sb.append(String.format("%12s", "r" + code));
+                    sb.append(String.format("%12s", "r" + decodeProductionId(code)));
                 }
 
             }

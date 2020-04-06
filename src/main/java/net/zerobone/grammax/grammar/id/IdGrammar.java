@@ -22,7 +22,7 @@ public abstract class IdGrammar {
         this.startSymbol = startSymbol;
     }
 
-    protected void createFirstProduction(int nonTerminalId, IdProduction production) {
+    protected void createFirstProduction(int nonTerminal, IdProduction production) {
 
         productions.add(production);
 
@@ -30,7 +30,7 @@ public abstract class IdGrammar {
 
         createdProductions.add(production.getId());
 
-        productionMap.put(nonTerminalId, createdProductions);
+        productionMap.put(nonTerminal, createdProductions);
 
     }
 
