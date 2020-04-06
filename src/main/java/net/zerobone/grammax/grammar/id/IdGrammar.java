@@ -10,7 +10,7 @@ public abstract class IdGrammar {
     // terminals are represented as positive integers, so this one should be negative
     public static final int FIRST_FOLLOW_SET_EPSILON = -1; // aka empty string
 
-    public static final int FOLLOW_SET_EOF = 0; // aka dollar sign
+    public static final int TERMINAL_EOF = 0; // aka dollar sign
 
     protected HashMap<Integer, ArrayList<Integer>> productionMap = new HashMap<>();
 

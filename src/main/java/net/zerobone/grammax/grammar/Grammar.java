@@ -54,7 +54,7 @@ public class Grammar extends IdGrammar {
 
     public String terminalToSymbol(int id) {
         assert id >= 0 : "terminal expected";
-        assert id != FOLLOW_SET_EOF : "eof-to-symbol convertion is restricted";
+        assert id != TERMINAL_EOF : "eof-to-symbol convertion is restricted";
         assert terminals.mapValue(id) != null : "Terminal " + id + " is not defined";
         return terminals.mapValue(id);
     }

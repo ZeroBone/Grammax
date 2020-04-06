@@ -8,7 +8,6 @@ import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
-import net.zerobone.grammax.grammar.lr.LRItems;
 import net.zerobone.grammax.grammar.slr.SLRAutomation;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
@@ -132,7 +131,7 @@ public class Grammax {
 
                     int id = followSetIterator.next();
 
-                    if (id == Grammar.FOLLOW_SET_EOF) {
+                    if (id == Grammar.TERMINAL_EOF) {
                         debugLogWriter.write("$");
                     }
                     else if (id != Grammar.FIRST_FOLLOW_SET_EPSILON) {

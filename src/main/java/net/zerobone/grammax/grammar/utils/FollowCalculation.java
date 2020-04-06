@@ -31,7 +31,7 @@ public class FollowCalculation {
 
         followSets
             .get(grammar.getStartSymbol())
-            .add(Grammar.FOLLOW_SET_EOF);
+            .add(Grammar.TERMINAL_EOF);
 
         while (true) {
             if (!updateFollowSets()) {

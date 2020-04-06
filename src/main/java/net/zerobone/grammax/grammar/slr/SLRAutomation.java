@@ -11,6 +11,8 @@ import java.util.HashSet;
 
 public class SLRAutomation {
 
+    public static final int ACTION_ACCEPT = -1;
+
     public final int[] actionTable;
 
     public final int[] gotoTable;
@@ -117,8 +119,14 @@ public class SLRAutomation {
 
                 int nonTerminal = grammar.getProduction(kernelPoint.productionId).getNonTerminal();
 
-                System.out.println("Non-terminal: " + grammar.nonTerminalToSymbol(nonTerminal) + " State: " + stateId);
+                if (nonTerminal == grammar.getStartSymbol()) {
 
+                    writeAccept(stateId);
+
+                    continue;
+                }
+
+                System.out.println("[LOG]: Ending point for label '" + grammar.nonTerminalToSymbol(nonTerminal) + "' found in state " + stateId);
                 // compute the follow set of the label of the production with the point at the end
 
                 for (int terminalOrEof : grammar.followSet(nonTerminal)) {
@@ -145,6 +153,11 @@ public class SLRAutomation {
         actionTable[terminalCount * state + Grammar.terminalToIndex(terminal)] = encodeProductionId(productionId);
     }
 
+    private void writeAccept(int state) {
+        // TODO: check if the table cell is already occupied
+        actionTable[terminalCount * state + Grammar.TERMINAL_EOF] = ACTION_ACCEPT;
+    }
+
     private void writeGoto(int state, int nonTerminal, int targetState) {
         // TODO: check if the table cell is already occupied
         gotoTable[nonTerminalCount * state + Grammar.nonTerminalToIndex(nonTerminal)] = targetState;
@@ -155,11 +168,19 @@ public class SLRAutomation {
 
         StringBuilder sb = new StringBuilder();
 
+        sb.append("Non-terminal count: ");
+        sb.append(nonTerminalCount);
+        sb.append('\n');
+
+        sb.append("Terminal count: ");
+        sb.append(terminalCount);
+        sb.append('\n');
+
         sb.append("State count: ");
         sb.append(stateCount);
         sb.append(" ( 0 - ");
         sb.append(stateCount - 1);
-        sb.append(" )\n");
+        sb.append(" )\n\n");
 
         sb.append("Action table:\n");
 
@@ -196,6 +217,11 @@ public class SLRAutomation {
                     continue;
                 }
 
+                if (code == ACTION_ACCEPT) {
+                    sb.append(String.format("%12s", "accept"));
+                    continue;
+                }
+
                 if (code > 0) {
                     // shift
                     sb.append(String.format("%12s", "s" + code));
@@ -215,7 +241,7 @@ public class SLRAutomation {
     }
 
     private static int encodeProductionId(int productionId) {
-        return -productionId - 1;
+        return -productionId - 2;
     }
 
     private static int decodeProductionId(int code) {

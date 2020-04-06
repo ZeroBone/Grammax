@@ -72,7 +72,7 @@ public class LRItems {
 
             }
 
-            System.out.println(stateId + " / " + grammar.idToSymbol(grammarSymbol) + " = " + derivativeStateId);
+            System.out.println("[LOG]: Deriving: " + stateId + " / " + grammar.idToSymbol(grammarSymbol) + " = " + derivativeStateId);
 
             transitions.add(new LRItemTransition(stateId, grammarSymbol, derivativeStateId));
 
