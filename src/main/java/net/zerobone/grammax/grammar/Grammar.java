@@ -38,11 +38,11 @@ public class Grammar extends IdGrammar {
         return nonTerminals.containsKey(symbol) || terminals.containsKey(symbol);
     }
 
-    public Collection<Integer> nonTerminals() {
+    public Collection<Integer> getNonTerminals() {
         return nonTerminals.values();
     }
 
-    public Collection<Integer> terminals() {
+    public Collection<Integer> getTerminals() {
         return terminals.values();
     }
 
@@ -350,7 +350,11 @@ public class Grammar extends IdGrammar {
     }
 
     public static int terminalToIndex(int terminal) {
-        return terminal - 1;
+        return terminal;
+    }
+
+    public static boolean symbolIsTerminal(int id) {
+        return id > 0;
     }
 
 }

@@ -9,6 +9,7 @@ import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.lr.LRItems;
+import net.zerobone.grammax.grammar.slr.SLRAutomation;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
@@ -40,12 +41,7 @@ public class Grammax {
 
         // TODO: check that all the non-terminals are reachable from the start symbol
 
-        System.out.println(grammar.toString(true));
-
         grammar.augment();
-
-        System.out.println("Augmented grammar:");
-        System.out.println(grammar.toString(true));
 
         try {
             exportDebugInfo();
@@ -55,7 +51,9 @@ public class Grammax {
             return;
         }
 
-        LRItems items = new LRItems(grammar);
+        SLRAutomation automation = new SLRAutomation(grammar);
+
+        System.out.println(automation);
 
     }
 

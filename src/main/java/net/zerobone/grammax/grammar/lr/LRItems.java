@@ -97,7 +97,7 @@ public class LRItems {
     }
 
     public int getStateCount() {
-        return stateCount - 1;
+        return stateCount;
     }
 
 }
