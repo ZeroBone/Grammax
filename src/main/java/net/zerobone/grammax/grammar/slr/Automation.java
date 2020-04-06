@@ -1,21 +1,23 @@
 package net.zerobone.grammax.grammar.slr;
 
 import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.grammar.slr.conflict.Conflict;
+import net.zerobone.grammax.grammar.slr.conflict.ReduceAcceptConflict;
+import net.zerobone.grammax.grammar.slr.conflict.ReduceReduceConflict;
+import net.zerobone.grammax.grammar.slr.conflict.ShiftReduceConflict;
 import net.zerobone.grammax.grammar.id.IdProduction;
+import net.zerobone.grammax.grammar.id.IdSymbol;
 import net.zerobone.grammax.grammar.lr.LRItemTransition;
 import net.zerobone.grammax.grammar.lr.LRItems;
 import net.zerobone.grammax.grammar.utils.Point;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class SLRAutomation {
+public class Automation {
 
     public static final int ACTION_ACCEPT = -1;
-
-    public final int[] actionTable;
-
-    public final int[] gotoTable;
 
     private final int stateCount;
 
@@ -23,21 +25,67 @@ public class SLRAutomation {
 
     private final int nonTerminalCount;
 
-    private final HashMap<Integer, String> nonTerminals = new HashMap<>();
+    public final AutomationProduction[] productions;
 
-    private final HashMap<Integer, String> terminals = new HashMap<>();
+    private final String[] nonTerminals;
 
-    public SLRAutomation(Grammar grammar) {
+    private final String[] terminals;
 
-        initializeSymbols(grammar);
+    /**
+     * Invariants:
+     * 0 => empty (error transition)
+     * > 0 => state id
+     */
+    public final int[] gotoTable;
 
-        LRItems items = new LRItems(grammar);
+    /**
+     * Invariants:
+     * 0 => empty (error transition)
+     * -1 => accept
+     * < -1 => reduce
+     * > 0 => shift
+     */
+    public final int[] actionTable;
+
+    private final ArrayList<Conflict> conflicts = new ArrayList<>();
+
+    public Automation(Grammar grammar, LRItems items) {
 
         stateCount = items.getStateCount();
 
         nonTerminalCount = grammar.getNonTerminalCount();
 
         terminalCount = grammar.getTerminalCount() + 1;
+
+        // productions
+
+        productions = new AutomationProduction[grammar.getProductionCount()];
+
+        // initialize non-terminals
+
+        nonTerminals = new String[nonTerminalCount];
+
+        for (int nonTerminal : grammar.getNonTerminals()) {
+
+            nonTerminals[Grammar.nonTerminalToIndex(nonTerminal)] = grammar.nonTerminalToSymbol(nonTerminal);
+
+        }
+
+        // initialize terminals
+
+        terminals = new String[terminalCount];
+
+        for (int terminal : grammar.getTerminals()) {
+
+            terminals[Grammar.terminalToIndex(terminal)] = grammar.terminalToSymbol(terminal);
+
+        }
+
+        assert terminals[0] == null;
+
+        terminals[Grammar.TERMINAL_EOF] = "$";
+
+        // initialize tables
 
         actionTable = new int[terminalCount * stateCount];
 
@@ -51,30 +99,12 @@ public class SLRAutomation {
 
     }
 
-    private void initializeSymbols(Grammar grammar) {
+    public String nonTerminalToSymbol(int nonTerminalIndex) {
+        return nonTerminals[nonTerminalIndex];
+    }
 
-        for (int nonTerminal : grammar.getNonTerminals()) {
-
-            nonTerminals.put(
-                Grammar.nonTerminalToIndex(nonTerminal),
-                grammar.nonTerminalToSymbol(nonTerminal)
-            );
-
-        }
-
-        for (int terminal : grammar.getTerminals()) {
-
-            terminals.put(
-                Grammar.terminalToIndex(terminal),
-                grammar.terminalToSymbol(terminal)
-            );
-
-        }
-
-        assert !terminals.containsKey(0);
-
-        terminals.put(0, "$");
-
+    public String terminalToSymbol(int terminalIndex) {
+        return terminals[terminalIndex];
     }
 
     private void writeShifts(LRItems items) {
@@ -127,11 +157,12 @@ public class SLRAutomation {
                 }
 
                 System.out.println("[LOG]: Ending point for label '" + grammar.nonTerminalToSymbol(nonTerminal) + "' found in state " + stateId);
+
                 // compute the follow set of the label of the production with the point at the end
 
                 for (int terminalOrEof : grammar.followSet(nonTerminal)) {
 
-                    writeReduce(stateId, terminalOrEof, kernelPoint.productionId);
+                    writeReduce(grammar, stateId, terminalOrEof, kernelPoint.productionId);
 
                 }
 
@@ -143,24 +174,125 @@ public class SLRAutomation {
 
     // helper methods
 
-    private void writeShift(int state, int terminal, int targetState) {
-        // TODO: check if the table cell is already occupied
-        actionTable[terminalCount * state + Grammar.terminalToIndex(terminal)] = targetState;
+    private AutomationProduction convertProduction(IdProduction idProduction) {
+
+        AutomationProduction production = new AutomationProduction(
+            Grammar.nonTerminalToIndex(idProduction.getNonTerminal()),
+            idProduction.code,
+            idProduction.body.size()
+        );
+
+        int i = 0;
+
+        for (IdSymbol symbol : idProduction.body) {
+
+            production.body[i++] = new AutomationSymbol(
+                symbol.isTerminal(),
+                symbol.isTerminal() ? Grammar.terminalToIndex(symbol.id) : Grammar.nonTerminalToIndex(symbol.id),
+                symbol.argumentName
+            );
+
+        }
+
+        return production;
+
     }
 
-    private void writeReduce(int state, int terminal, int productionId) {
-        // TODO: check if the table cell is already occupied
-        actionTable[terminalCount * state + Grammar.terminalToIndex(terminal)] = encodeProductionId(productionId);
+    private void writeShift(int state, int terminal, int targetState) {
+
+        assert targetState >= 0: "negative target state";
+        assert targetState != 0: "initial state cannot have incoming edges";
+
+        int terminalIndex = Grammar.terminalToIndex(terminal);
+
+        if (actionTable[terminalCount * state + terminalIndex] != 0) {
+
+            int code = actionTable[terminalCount * state + terminalIndex];
+
+            assert code != ACTION_ACCEPT;
+            assert actionTable[terminalCount * state + terminalIndex] > 0 : "shift-shift conflict cannot occur";
+
+            conflicts.add(new ShiftReduceConflict(
+                decodeProductionId(code),
+                terminal
+            ));
+
+            return;
+        }
+
+        actionTable[terminalCount * state + terminalIndex] = targetState;
+
+    }
+
+    private void writeReduce(Grammar grammar, int state, int terminal, int productionId) {
+
+        assert productionId >= 0;
+
+        int terminalIndex = Grammar.terminalToIndex(terminal);
+
+        if (actionTable[terminalCount * state + terminalIndex] != 0) {
+
+            int code = actionTable[terminalCount * state + terminalIndex];
+
+            if (code == ACTION_ACCEPT) {
+                // reduce-accept conflict (actually this is a special case of a reduce/reduce conflict)
+                conflicts.add(new ReduceAcceptConflict(
+                    productionId
+                ));
+            }
+            else if (code < 0) {
+                // reduce-reduce conflict
+                conflicts.add(new ReduceReduceConflict(
+                    decodeProductionId(code),
+                    productionId
+                ));
+            }
+            else {
+                // code > 0
+                // shift-reduce conflict
+                conflicts.add(new ShiftReduceConflict(productionId, terminal));
+            }
+
+            return;
+        }
+
+        productions[productionId] = convertProduction(grammar.getProduction(productionId));
+
+        actionTable[terminalCount * state + terminalIndex] = encodeProductionId(productionId);
+
     }
 
     private void writeAccept(int state) {
-        // TODO: check if the table cell is already occupied
+
+        if (actionTable[terminalCount * state + Grammar.TERMINAL_EOF] != 0) {
+            // TODO
+            conflicts.add(null);
+            return;
+        }
+
         actionTable[terminalCount * state + Grammar.TERMINAL_EOF] = ACTION_ACCEPT;
+
     }
 
     private void writeGoto(int state, int nonTerminal, int targetState) {
-        // TODO: check if the table cell is already occupied
-        gotoTable[nonTerminalCount * state + Grammar.nonTerminalToIndex(nonTerminal)] = targetState;
+
+        assert targetState >= 0 : "invalid target state.";
+        assert targetState != 0 : "there cannot be any transitions to zero state";
+
+        int nonTerminalIndex = Grammar.nonTerminalToIndex(nonTerminal);
+
+        if (gotoTable[nonTerminalCount * state + nonTerminalIndex] != 0) {
+            // TODO
+            conflicts.add(null);
+            return;
+        }
+
+        gotoTable[nonTerminalCount * state + nonTerminalIndex] = targetState;
+
+    }
+
+    public ArrayList<Conflict> getConflicts() {
+        return conflicts;
     }
 
     @Override
@@ -178,9 +310,9 @@ public class SLRAutomation {
 
         sb.append("State count: ");
         sb.append(stateCount);
-        sb.append(" ( 0 - ");
+        sb.append(" (0 - ");
         sb.append(stateCount - 1);
-        sb.append(" )\n\n");
+        sb.append(")\n\n");
 
         // action table
 

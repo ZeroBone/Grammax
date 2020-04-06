@@ -77,4 +77,8 @@ public abstract class IdGrammar {
         return productionMap.get(nonTerminal);
     }
 
+    public int getProductionCount() {
+        return productions.length();
+    }
+
 }

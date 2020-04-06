@@ -8,7 +8,9 @@ import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
-import net.zerobone.grammax.grammar.slr.SLRAutomation;
+import net.zerobone.grammax.grammar.lr.LRItems;
+import net.zerobone.grammax.grammar.slr.conflict.Conflict;
+import net.zerobone.grammax.grammar.slr.Automation;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
@@ -42,26 +44,39 @@ public class Grammax {
 
         grammar.augment();
 
+        LRItems items = new LRItems(grammar);
+
+        Automation automation = new Automation(grammar, items);
+
         try {
-            exportDebugInfo();
+            exportDebugInfo(automation);
         }
         catch (IOException e) {
             System.err.println("I/O error: " + e.getMessage());
             return;
         }
 
-        SLRAutomation automation = new SLRAutomation(grammar);
+        if (!automation.getConflicts().isEmpty()) {
 
-        System.out.println(automation);
+            for (Conflict conflict : automation.getConflicts()) {
+
+                System.err.println("[CONFLICT]: " + conflict.toString(automation));
+
+            }
+
+            return;
+
+        }
+
+        System.out.println("Success");
 
     }
 
-    private void exportDebugInfo() throws IOException {
+    private void exportDebugInfo(Automation automation) throws IOException {
 
         BufferedWriter debugLogWriter = new BufferedWriter(new FileWriter("debug.log"));
 
         debugLogWriter.write("Grammar:");
-        debugLogWriter.newLine();
         debugLogWriter.newLine();
 
         debugLogWriter.write(grammar.toString(true));
@@ -155,6 +170,12 @@ public class Grammax {
             debugLogWriter.newLine();
 
         }
+
+        debugLogWriter.newLine();
+        debugLogWriter.write("Automation:");
+        debugLogWriter.newLine();
+
+        debugLogWriter.write(automation.toString());
 
         debugLogWriter.close();
 
