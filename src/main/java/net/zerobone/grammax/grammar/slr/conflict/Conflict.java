@@ -15,6 +15,12 @@ public final class Conflict {
 
     public String toString(Automation automation) {
 
+        return firstOption.getShortName() + "/" +
+            secondOption.getShortName() +
+            " conflict - cannot decide which of the following actions to choose: '" +
+            firstOption.toString(automation) + "' or '" +
+            secondOption.toString(automation) + "'";
+
     }
 
 }

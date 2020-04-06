@@ -1,10 +1,7 @@
 package net.zerobone.grammax.grammar.slr;
 
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.slr.conflict.Conflict;
-import net.zerobone.grammax.grammar.slr.conflict.ReduceAcceptConflict;
-import net.zerobone.grammax.grammar.slr.conflict.ReduceReduceConflict;
-import net.zerobone.grammax.grammar.slr.conflict.ShiftReduceConflict;
+import net.zerobone.grammax.grammar.slr.conflict.*;
 import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
 import net.zerobone.grammax.grammar.lr.LRItemTransition;
@@ -198,6 +195,27 @@ public class Automation {
 
     }
 
+    private ConflictOption codeToConflictOption(int actionTableIndex) {
+
+        int actionTableCode = actionTable[actionTableIndex];
+
+        assert actionTableCode != 0;
+
+        if (actionTableCode == ACTION_ACCEPT) {
+            return new AcceptOption();
+        }
+
+        if (actionTableCode < 0) {
+            // reduce
+            return new ReduceOption(decodeProductionId(actionTableCode));
+        }
+
+        // code > 0
+        // shift
+        return new ShiftOption(actionTableIndex % terminalCount);
+
+    }
+
     private void writeShift(int state, int terminal, int targetState) {
 
         assert targetState >= 0: "negative target state";
@@ -207,14 +225,9 @@ public class Automation {
 
         if (actionTable[terminalCount * state + terminalIndex] != 0) {
 
-            int code = actionTable[terminalCount * state + terminalIndex];
-
-            assert code != ACTION_ACCEPT;
-            assert actionTable[terminalCount * state + terminalIndex] > 0 : "shift-shift conflict cannot occur";
-
-            conflicts.add(new ShiftReduceConflict(
-                decodeProductionId(code),
-                terminal
+            conflicts.add(new Conflict(
+                new ShiftOption(terminalIndex),
+                codeToConflictOption(terminalCount * state + terminalIndex)
             ));
 
             return;
@@ -232,28 +245,15 @@ public class Automation {
 
         if (actionTable[terminalCount * state + terminalIndex] != 0) {
 
-            int code = actionTable[terminalCount * state + terminalIndex];
+            System.out.println(terminalIndex);
 
-            if (code == ACTION_ACCEPT) {
-                // reduce-accept conflict (actually this is a special case of a reduce/reduce conflict)
-                conflicts.add(new ReduceAcceptConflict(
-                    productionId
-                ));
-            }
-            else if (code < 0) {
-                // reduce-reduce conflict
-                conflicts.add(new ReduceReduceConflict(
-                    decodeProductionId(code),
-                    productionId
-                ));
-            }
-            else {
-                // code > 0
-                // shift-reduce conflict
-                conflicts.add(new ShiftReduceConflict(productionId, terminal));
-            }
+            conflicts.add(new Conflict(
+                codeToConflictOption(terminalCount * state + terminalIndex),
+                new ReduceOption(productionId)
+            ));
 
             return;
+
         }
 
         productions[productionId] = convertProduction(grammar.getProduction(productionId));
@@ -265,9 +265,14 @@ public class Automation {
     private void writeAccept(int state) {
 
         if (actionTable[terminalCount * state + Grammar.TERMINAL_EOF] != 0) {
-            // TODO
-            conflicts.add(null);
+
+            conflicts.add(new Conflict(
+                new AcceptOption(),
+                codeToConflictOption(terminalCount * state + Grammar.TERMINAL_EOF)
+            ));
+
             return;
+
         }
 
         actionTable[terminalCount * state + Grammar.TERMINAL_EOF] = ACTION_ACCEPT;
@@ -281,11 +286,7 @@ public class Automation {
 
         int nonTerminalIndex = Grammar.nonTerminalToIndex(nonTerminal);
 
-        if (gotoTable[nonTerminalCount * state + nonTerminalIndex] != 0) {
-            // TODO
-            conflicts.add(null);
-            return;
-        }
+        assert gotoTable[nonTerminalCount * state + nonTerminalIndex] == 0;
 
         gotoTable[nonTerminalCount * state + nonTerminalIndex] = targetState;
 
@@ -325,7 +326,7 @@ public class Automation {
             sb.append(' ');
             sb.append('|');
 
-            String terminal = terminals.get(t);
+            String terminal = terminals[t];
 
             sb.append(String.format("%12s", terminal));
 
@@ -380,7 +381,7 @@ public class Automation {
 
             sb.append(" |");
 
-            String nonTerminal = nonTerminals.get(nt);
+            String nonTerminal = nonTerminals[nt];
 
             sb.append(String.format("%12s", nonTerminal));
 

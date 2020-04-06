@@ -26,7 +26,11 @@ public class AutomationProduction {
 
                 AutomationSymbol symbol = body[i];
 
-                sb.append(automation.idToSymbol(symbol.index));
+                sb.append(
+                    symbol.isTerminal ?
+                    automation.terminalToSymbol(symbol.index) :
+                    automation.nonTerminalToSymbol(symbol.index)
+                );
 
                 if (symbol.argumentName != null) {
 

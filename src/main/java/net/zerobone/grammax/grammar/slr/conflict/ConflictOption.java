@@ -26,4 +26,8 @@ public abstract class ConflictOption {
 
     public abstract String toString(Automation automation);
 
+    public String getShortName() {
+        return shortNames[shortName];
+    }
+
 }
