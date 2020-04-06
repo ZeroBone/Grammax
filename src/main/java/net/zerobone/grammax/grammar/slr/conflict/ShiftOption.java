@@ -13,7 +13,7 @@ public class ShiftOption extends ConflictOption {
 
     @Override
     public String toString(Automation automation) {
-        return "shift " + automation.terminalToSymbol(terminalIndex);
+        return "shift '" + automation.terminalToSymbol(terminalIndex) + "'";
     }
 
 }

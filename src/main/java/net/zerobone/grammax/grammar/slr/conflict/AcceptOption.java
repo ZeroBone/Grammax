@@ -10,7 +10,7 @@ public class AcceptOption extends ConflictOption {
 
     @Override
     public String toString(Automation automation) {
-        return "reduce to the starting symbol (accept)";
+        return "accept";
     }
 
 }

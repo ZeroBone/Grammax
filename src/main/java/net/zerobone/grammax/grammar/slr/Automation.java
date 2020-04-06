@@ -44,11 +44,31 @@ public class Automation {
      */
     public final int[] actionTable;
 
+    private final Object[] parserStates; // array of HashSet<Point>
+
     private final ArrayList<Conflict> conflicts = new ArrayList<>();
 
     public Automation(Grammar grammar, LRItems items) {
 
+        // states
+
         stateCount = items.getStateCount();
+
+        parserStates = new Object[stateCount];
+
+        // initialize states
+
+        for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
+
+            HashSet<Point> derivative = entry.getKey();
+
+            int stateId = entry.getValue();
+
+            parserStates[stateId] = derivative;
+
+        }
+
+        // counts
 
         nonTerminalCount = grammar.getNonTerminalCount();
 
@@ -227,7 +247,8 @@ public class Automation {
 
             conflicts.add(new Conflict(
                 new ShiftOption(terminalIndex),
-                codeToConflictOption(terminalCount * state + terminalIndex)
+                codeToConflictOption(terminalCount * state + terminalIndex),
+                state
             ));
 
             return;
@@ -245,11 +266,10 @@ public class Automation {
 
         if (actionTable[terminalCount * state + terminalIndex] != 0) {
 
-            System.out.println(terminalIndex);
-
             conflicts.add(new Conflict(
                 codeToConflictOption(terminalCount * state + terminalIndex),
-                new ReduceOption(productionId)
+                new ReduceOption(productionId),
+                state
             ));
 
             return;
@@ -268,7 +288,8 @@ public class Automation {
 
             conflicts.add(new Conflict(
                 new AcceptOption(),
-                codeToConflictOption(terminalCount * state + Grammar.TERMINAL_EOF)
+                codeToConflictOption(terminalCount * state + Grammar.TERMINAL_EOF),
+                state
             ));
 
             return;
@@ -294,6 +315,15 @@ public class Automation {
 
     public ArrayList<Conflict> getConflicts() {
         return conflicts;
+    }
+
+    public HashSet<Point> getParsingState(int state) {
+
+        assert state >= 0;
+
+        //noinspection unchecked
+        return (HashSet<Point>)parserStates[state];
+
     }
 
     @Override

@@ -1,0 +1,2 @@
+s = s PLUS s;
+s = NUM;

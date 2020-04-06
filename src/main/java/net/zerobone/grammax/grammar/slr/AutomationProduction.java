@@ -50,17 +50,6 @@ public class AutomationProduction {
             }
         }
 
-        sb.append(';');
-
-        if (code != null) {
-
-            sb.append("    ");
-            sb.append("{ ");
-            sb.append(code.replace('\n', ' '));
-            sb.append(" }");
-
-        }
-
         return sb.toString();
 
     }

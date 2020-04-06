@@ -13,7 +13,7 @@ public class ReduceOption extends ConflictOption {
 
     @Override
     public String toString(Automation automation) {
-        return "reduce " + automation.productions[productionIndex].toString(automation);
+        return "reduce '" + automation.productions[productionIndex].toString(automation) + "'";
     }
 
 }
