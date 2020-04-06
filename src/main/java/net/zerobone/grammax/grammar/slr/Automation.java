@@ -70,6 +70,10 @@ public class Automation {
 
         productions = new AutomationProduction[grammar.getProductionCount()];
 
+        for (int productionId = 0; productionId < productions.length; productionId++) {
+            productions[productionId] = convertProduction(grammar.getProduction(productionId));
+        }
+
         // initialize non-terminals
 
         nonTerminals = new String[nonTerminalCount];
@@ -297,8 +301,6 @@ public class Automation {
             return;
 
         }
-
-        productions[productionId] = convertProduction(grammar.getProduction(productionId));
 
         actionTable[terminalCount * state + terminalIndex] = encodeProductionId(productionId);
 

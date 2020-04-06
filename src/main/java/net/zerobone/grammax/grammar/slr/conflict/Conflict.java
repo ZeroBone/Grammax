@@ -20,9 +20,9 @@ public final class Conflict {
 
         return firstOption.getShortName() + "/" +
             secondOption.getShortName() +
-            ": should the parser " +
+            " conflict - should the parser " +
             firstOption.toString(automation) + " or " +
-            secondOption.toString(automation) + " in the following state:\n" +
+            secondOption.toString(automation) + " in the following state?\n" +
             automation.getParsingStateDescription(state);
 
     }

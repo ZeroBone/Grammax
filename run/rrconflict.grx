@@ -1,2 +1,6 @@
-s = s PLUS s;
-s = NUM;
+e = e PLUS t;
+e = t;
+t = t MUL f;
+t = f;
+f = e RPAREN;
+f = NUM;

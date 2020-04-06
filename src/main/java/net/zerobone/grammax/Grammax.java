@@ -8,7 +8,6 @@ import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
-import net.zerobone.grammax.grammar.lr.LRItems;
 import net.zerobone.grammax.grammar.slr.conflict.Conflict;
 import net.zerobone.grammax.grammar.slr.Automation;
 import net.zerobone.grammax.lexer.Lexer;
@@ -41,6 +40,7 @@ public class Grammax {
         System.out.println("Grammax version: " + VERSION);
 
         // TODO: check that all the non-terminals are reachable from the start symbol
+        // TODO: check that all the symbols are defined
 
         grammar.augment();
 
@@ -50,7 +50,7 @@ public class Grammax {
             exportDebugInfo(automation);
         }
         catch (IOException e) {
-            System.err.println("I/O error: " + e.getMessage());
+            System.err.println("[ERR]: I/O error: " + e.getMessage());
             return;
         }
 
@@ -58,7 +58,8 @@ public class Grammax {
 
             for (Conflict conflict : automation.getConflicts()) {
 
-                System.err.println("[CONFLICT]: " + conflict.toString(automation));
+                System.err.print("[ERR]: ");
+                System.err.println(conflict.toString(automation));
 
             }
 
@@ -247,7 +248,7 @@ public class Grammax {
                 is = new FileInputStream(args[0]);
             }
             catch (FileNotFoundException e) {
-                System.out.println("I/O error: File '" + args[0] + "' was not found!");
+                System.out.println("[ERR]: I/O error: File '" + args[0] + "' was not found!");
                 return;
             }
 
@@ -265,11 +266,11 @@ public class Grammax {
 
             }
             catch (LexerException e) {
-                System.err.println("Syntax error: " + e.getMessage());
+                System.err.println("[ERR]: Syntax error: " + e.getMessage());
                 return;
             }
             catch (IOException e) {
-                System.err.println("I/O error: " + e.getMessage());
+                System.err.println("[ERR]: I/O error: " + e.getMessage());
                 return;
             }
 
