@@ -23,7 +23,7 @@
             <artifactId>javapoet</artifactId>
             <version>1.12.1</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/javapoet-1.12.1.jar</systemPath>
+            <systemPath>${project.basedir}/lib/javapoet-1.12.1.jar</systemPath>
         </dependency>
     </dependencies>
     <build>
