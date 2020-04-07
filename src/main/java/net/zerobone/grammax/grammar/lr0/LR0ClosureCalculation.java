@@ -1,34 +1,31 @@
-package net.zerobone.grammax.grammar.utils;
+package net.zerobone.grammax.grammar.lr0;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ClosureCalculation {
+public class LR0ClosureCalculation {
 
-    private final Grammar grammar;
+    private LR0ClosureCalculation() {}
 
-    public ClosureCalculation(Grammar grammar) {
-        this.grammar = grammar;
-    }
-
-    public HashSet<Point> closure(HashSet<Point> kernels) {
-        return calculateClosure(kernels, false);
+    public static HashSet<Point> closure(Grammar grammar, HashSet<Point> kernels) {
+        return calculateClosure(grammar, kernels, false);
     }
 
     // calculates the closure with only productions which have a point at the end
     // because all the productions in the closure have the point at the start,
     // this could only happen if we have an epsilon production
     // so in other words this method calculates the closure with the epsilon productions
-    public HashSet<Point> endPointClosure(HashSet<Point> kernels) {
-        return calculateClosure(kernels, true);
+    public static HashSet<Point> endPointClosure(Grammar grammar, HashSet<Point> kernels) {
+        return calculateClosure(grammar, kernels, true);
     }
 
-    private HashSet<Point> calculateClosure(HashSet<Point> kernels, boolean onlyEndPoint) {
+    private static HashSet<Point> calculateClosure(Grammar grammar, HashSet<Point> kernels, boolean onlyEndPoint) {
 
         boolean[] added = new boolean[grammar.getNonTerminalCount()];
 

@@ -1,4 +1,4 @@
-package net.zerobone.grammax.grammar.slr;
+package net.zerobone.grammax.grammar.automation;
 
 public class AutomationProduction {
 

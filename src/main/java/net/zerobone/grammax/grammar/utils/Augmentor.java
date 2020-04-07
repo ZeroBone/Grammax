@@ -6,13 +6,9 @@ import net.zerobone.grammax.grammar.id.IdSymbol;
 
 public class Augmentor {
 
-    private final Grammar grammar;
+    private Augmentor() {}
 
-    public Augmentor(Grammar grammar) {
-        this.grammar = grammar;
-    }
-
-    public void augment() {
+    public static void augment(Grammar grammar) {
 
         int newNonTerminal = grammar.createNonTerminal(grammar.getStartSymbol());
 

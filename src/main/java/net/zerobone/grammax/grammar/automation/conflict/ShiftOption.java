@@ -1,6 +1,6 @@
-package net.zerobone.grammax.grammar.slr.conflict;
+package net.zerobone.grammax.grammar.automation.conflict;
 
-import net.zerobone.grammax.grammar.slr.Automation;
+import net.zerobone.grammax.grammar.automation.Automation;
 
 public class ShiftOption extends ConflictOption {
 

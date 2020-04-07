@@ -1,21 +1,18 @@
-package net.zerobone.grammax.grammar.utils;
+package net.zerobone.grammax.grammar.lr0;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class DerivativeCalculation {
+public class LR0DerivativeCalculation {
 
-    private final Grammar grammar;
+    private LR0DerivativeCalculation() {}
 
-    public DerivativeCalculation(Grammar grammar) {
-        this.grammar = grammar;
-    }
-
-    public HashMap<Integer, HashSet<Point>> calculateAllDerivatives(HashSet<Point> kernels) {
+    public static HashMap<Integer, HashSet<Point>> calculateAllDerivatives(Grammar grammar, HashSet<Point> kernels) {
 
         HashSet<Point> closure = grammar.lr0PointClosure(kernels);
 

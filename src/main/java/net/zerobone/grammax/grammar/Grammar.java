@@ -3,6 +3,8 @@ package net.zerobone.grammax.grammar;
 import net.zerobone.grammax.grammar.id.IdGrammar;
 import net.zerobone.grammax.grammar.id.IdProduction;
 import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.lr0.LR0ClosureCalculation;
+import net.zerobone.grammax.grammar.lr0.LR0DerivativeCalculation;
 import net.zerobone.grammax.grammar.utils.*;
 import net.zerobone.grammax.utils.BijectiveMap;
 
@@ -230,25 +232,22 @@ public class Grammar extends IdGrammar {
 
     public void augment() {
 
-        new Augmentor(this).augment();
+        Augmentor.augment(this);
 
         invalidateCaches();
 
     }
 
     public HashSet<Point> lr0PointClosure(HashSet<Point> kernels) {
-        return new ClosureCalculation(this)
-            .closure(kernels);
+        return LR0ClosureCalculation.closure(this, kernels);
     }
 
     public HashSet<Point> lr0EndPointClosure(HashSet<Point> kernels) {
-        return new ClosureCalculation(this)
-            .endPointClosure(kernels);
+        return LR0ClosureCalculation.endPointClosure(this, kernels);
     }
 
     public HashMap<Integer, HashSet<Point>> calculateAllLr0Derivatives(HashSet<Point> kernels) {
-        return new DerivativeCalculation(this)
-            .calculateAllDerivatives(kernels);
+        return LR0DerivativeCalculation.calculateAllDerivatives(this, kernels);
     }
 
     public HashMap<Integer, HashSet<Integer>> firstSets() {
