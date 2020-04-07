@@ -1,10 +1,9 @@
 package net.zerobone.grammax.utils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
-
-import static org.junit.Assert.*;
 
 public class BijectiveMapTest {
 
@@ -13,11 +12,11 @@ public class BijectiveMapTest {
 
         BijectiveMap<Integer, Integer> map = new BijectiveMap<>();
 
-        assertEquals(0, map.size());
+        Assertions.assertEquals(0, map.size());
 
-        assertTrue(map.keys().isEmpty());
+        Assertions.assertTrue(map.keys().isEmpty());
 
-        assertTrue(map.values().isEmpty());
+        Assertions.assertTrue(map.values().isEmpty());
 
     }
 
@@ -27,31 +26,31 @@ public class BijectiveMapTest {
         BijectiveMap<Integer, Integer> map = new BijectiveMap<>();
 
         map.put(3, 4);
-        assertEquals(1, map.size());
+        Assertions.assertEquals(1, map.size());
         map.put(1, 2);
-        assertEquals(2, map.size());
+        Assertions.assertEquals(2, map.size());
         map.put(2, 3);
-        assertEquals(3, map.size());
+        Assertions.assertEquals(3, map.size());
 
-        assertEquals(3, (int)map.mapKey(2));
-        assertEquals(2, (int)map.mapKey(1));
-        assertEquals(4, (int)map.mapKey(3));
+        Assertions.assertEquals(3, (int)map.mapKey(2));
+        Assertions.assertEquals(2, (int)map.mapKey(1));
+        Assertions.assertEquals(4, (int)map.mapKey(3));
 
-        assertEquals(1, (int)map.mapValue(2));
-        assertEquals(2, (int)map.mapValue(3));
-        assertEquals(3, (int)map.mapValue(4));
+        Assertions.assertEquals(1, (int)map.mapValue(2));
+        Assertions.assertEquals(2, (int)map.mapValue(3));
+        Assertions.assertEquals(3, (int)map.mapValue(4));
 
-        assertTrue(map.containsKey(1));
-        assertTrue(map.containsKey(2));
-        assertTrue(map.containsKey(3));
-        assertFalse(map.containsKey(0));
-        assertFalse(map.containsKey(4));
+        Assertions.assertTrue(map.containsKey(1));
+        Assertions.assertTrue(map.containsKey(2));
+        Assertions.assertTrue(map.containsKey(3));
+        Assertions.assertFalse(map.containsKey(0));
+        Assertions.assertFalse(map.containsKey(4));
 
-        assertTrue(map.containsValue(2));
-        assertTrue(map.containsValue(3));
-        assertTrue(map.containsValue(4));
-        assertFalse(map.containsValue(1));
-        assertFalse(map.containsValue(5));
+        Assertions.assertTrue(map.containsValue(2));
+        Assertions.assertTrue(map.containsValue(3));
+        Assertions.assertTrue(map.containsValue(4));
+        Assertions.assertFalse(map.containsValue(1));
+        Assertions.assertFalse(map.containsValue(5));
 
     }
 
@@ -71,7 +70,7 @@ public class BijectiveMapTest {
 
             map.put(count, values[count]);
 
-            assertEquals(count + 1, map.size());
+            Assertions.assertEquals(count + 1, map.size());
 
         }
 
@@ -79,8 +78,8 @@ public class BijectiveMapTest {
 
             int value = values[i];
 
-            assertEquals(i, (int)map.mapValue(value));
-            assertEquals(value, (int)map.mapKey(i));
+            Assertions.assertEquals(i, (int)map.mapValue(value));
+            Assertions.assertEquals(value, (int)map.mapKey(i));
 
         }
 

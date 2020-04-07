@@ -19,10 +19,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13</version>
-            <scope>test</scope>
+            <groupId>com.squareup.javapoet</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>1.12.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/javapoet-1.12.1.jar</systemPath>
         </dependency>
     </dependencies>
     <build>

@@ -1,19 +1,18 @@
 package net.zerobone.grammax;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Assertions;
 
 public class GrammaxTest {
 
-    @Before
+    @BeforeAll
     public void setUp() {
         System.out.println("setUp");
     }
 
-    @After
+    @AfterAll
     public void tearDown() {
         System.out.println("tearDown");
     }
@@ -21,14 +20,16 @@ public class GrammaxTest {
     @Test
     public void testSomething() {
 
-        assertEquals(1, 1);
+        Assertions.assertEquals(1, 1);
 
     }
 
     @Test
     public void testSomethingElse() {
 
-        assertEquals(4, 2 + 2);
+        int v = 2 + 2;
+
+        Assertions.assertEquals(4, v);
 
     }
 
