@@ -1,0 +1,24 @@
+package net.zerobone.grammax.generator;
+
+import com.squareup.javapoet.JavaFile;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class Generator {
+
+    public static void generate(GeneratorContext context) throws IOException {
+        {
+            JavaFile javaFile = JavaFile
+                .builder(context.packageName, ParserGenerator.generate(context).build())
+                .indent("\t")
+                .build();
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter("Parser.java"));
+            javaFile.writeTo(writer);
+            writer.close();
+        }
+    }
+
+}
