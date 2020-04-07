@@ -241,6 +241,11 @@ public class Grammar extends IdGrammar {
             .closure(kernels);
     }
 
+    public HashSet<Point> lr0EndPointClosure(HashSet<Point> kernels) {
+        return new ClosureCalculation(this)
+            .endPointClosure(kernels);
+    }
+
     public HashMap<Integer, HashSet<Point>> calculateAllLr0Derivatives(HashSet<Point> kernels) {
         return new DerivativeCalculation(this)
             .calculateAllDerivatives(kernels);

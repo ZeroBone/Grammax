@@ -122,6 +122,8 @@ public class Automation {
 
             HashSet<Point> closure = grammar.lr0PointClosure(kernels);
 
+            // System.out.println("Closure of state " + stateId + ": " + closure);
+
             StringBuilder sb = new StringBuilder();
 
             for (Point point : closure) {
@@ -179,7 +181,11 @@ public class Automation {
 
             int stateId = entry.getValue();
 
-            for (Point kernelPoint : derivative) {
+            HashSet<Point> fullDerivative = grammar.lr0EndPointClosure(derivative);
+
+            System.out.println("[LOG]: State: " + stateId + " End point derivative: " + fullDerivative);
+
+            for (Point kernelPoint : fullDerivative) {
 
                 IdProduction pointProduction = grammar.getProduction(kernelPoint.productionId);
 
@@ -199,7 +205,8 @@ public class Automation {
                     continue;
                 }
 
-                System.out.println("[LOG]: Ending point for label '" + grammar.nonTerminalToSymbol(nonTerminal) + "' found in state " + stateId);
+                // System.out.println("[LOG]: " + pointProduction.stringifyWithPointMarker(grammar, kernelPoint.position));
+                // System.out.println("[LOG]: Ending point for label '" + grammar.nonTerminalToSymbol(nonTerminal) + "' found in state " + stateId);
 
                 // compute the follow set of the label of the production with the point at the end
 

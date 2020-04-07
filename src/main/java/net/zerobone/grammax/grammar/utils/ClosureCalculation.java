@@ -17,6 +17,18 @@ public class ClosureCalculation {
     }
 
     public HashSet<Point> closure(HashSet<Point> kernels) {
+        return calculateClosure(kernels, false);
+    }
+
+    // calculates the closure with only productions which have a point at the end
+    // because all the productions in the closure have the point at the start,
+    // this could only happen if we have an epsilon production
+    // so in other words this method calculates the closure with the epsilon productions
+    public HashSet<Point> endPointClosure(HashSet<Point> kernels) {
+        return calculateClosure(kernels, true);
+    }
+
+    private HashSet<Point> calculateClosure(HashSet<Point> kernels, boolean onlyEndPoint) {
 
         boolean[] added = new boolean[grammar.getNonTerminalCount()];
 
@@ -49,7 +61,32 @@ public class ClosureCalculation {
 
         }
 
-        HashSet<Point> closure = new HashSet<>(kernels);
+        HashSet<Point> closure;
+
+        if (onlyEndPoint) {
+
+            closure = new HashSet<>();
+
+            for (Point kernel : kernels) {
+
+                IdProduction production = grammar.getProduction(kernel.productionId);
+
+                assert kernel.position <= production.body.size();
+
+                if (kernel.position != production.body.size()) {
+                    assert kernel.position < production.body.size();
+                    continue;
+                }
+
+                // the point is at the end of the production
+                closure.add(kernel);
+
+            }
+
+        }
+        else {
+            closure = new HashSet<>(kernels);
+        }
 
         // bfs
 
@@ -59,11 +96,13 @@ public class ClosureCalculation {
 
             for (int productionId : grammar.getProductionsFor(nonTerminal)) {
 
-                closure.add(new Point(productionId, 0));
-
                 IdProduction production = grammar.getProduction(productionId);
 
                 assert production != null;
+
+                if (!onlyEndPoint || production.body.isEmpty()) {
+                    closure.add(new Point(productionId, 0));
+                }
 
                 if (production.body.isEmpty()) {
                     continue;
