@@ -1,6 +1,6 @@
-e = e PLUS t;
-e = t;
-t = t MUL f;
-t = f;
-f = e RPAREN;
-f = NUM;
+// example of a reduce/reduce conflict
+e = e n;
+e = n;
+e = ;
+n = NUM;
+n = ;

@@ -110,11 +110,6 @@ public class FollowCalculation {
                         continue;
                     }
 
-                    if (symbol.id == productionLabel) {
-                        i++;
-                        continue;
-                    }
-
                     // we found a production either of the form alpha A beta
                     // or alpha A
                     // examine the next symbol to find out

@@ -43,6 +43,18 @@ public class LRItems {
 
     }
 
+    private void populate(Grammar grammar) {
+
+        do {
+
+            HashSet<Point> kernels = toDerive.poll();
+
+            calculateDerivations(grammar, kernels);
+
+        } while (!toDerive.isEmpty());
+
+    }
+
     private void calculateDerivations(Grammar grammar, HashSet<Point> state) {
 
         assert states.containsKey(state) : "undefined states should not be added to the queue";
@@ -77,18 +89,6 @@ public class LRItems {
             transitions.add(new LRItemTransition(stateId, grammarSymbol, derivativeStateId));
 
         }
-
-    }
-
-    private void populate(Grammar grammar) {
-
-        do {
-
-            HashSet<Point> kernels = toDerive.poll();
-
-            calculateDerivations(grammar, kernels);
-
-        } while (!toDerive.isEmpty());
 
     }
 

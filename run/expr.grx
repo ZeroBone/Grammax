@@ -1,3 +1,5 @@
+// this is a grammar for parsing arithmetic expressions
+// it is SLR(1), not LR(0)
 e = e PLUS t;
 e = t;
 t = t MUL f;

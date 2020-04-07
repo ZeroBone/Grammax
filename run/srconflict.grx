@@ -1,3 +1,4 @@
+// example of a shift/reduce conflict
 s = l EQUALS r;
 s = r;
 l = MUL r;
