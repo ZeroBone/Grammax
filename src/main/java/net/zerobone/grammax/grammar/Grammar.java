@@ -256,11 +256,7 @@ public class Grammar extends IdGrammar {
             return cachedFirstSets;
         }
 
-        FirstCalculation fc = new FirstCalculation(this);
-
-        fc.computeFirstSets();
-
-        cachedFirstSets = fc.getFirstSets();
+        cachedFirstSets = FirstCalculation.firstSets(this);
 
         return cachedFirstSets;
 
@@ -272,11 +268,7 @@ public class Grammar extends IdGrammar {
             return cachedFollowSets;
         }
 
-        FollowCalculation fc = new FollowCalculation(this);
-
-        fc.computeFollowSets();
-
-        cachedFollowSets = fc.getFollowSets();
+        cachedFollowSets = FollowCalculation.followSets(this);
 
         return cachedFollowSets;
 

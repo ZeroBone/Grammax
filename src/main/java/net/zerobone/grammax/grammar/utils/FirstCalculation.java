@@ -12,11 +12,11 @@ public class FirstCalculation {
 
     private final HashMap<Integer, HashSet<Integer>> firstSets = new HashMap<>();
 
-    public FirstCalculation(Grammar grammar) {
+    private FirstCalculation(Grammar grammar) {
         this.grammar = grammar;
     }
 
-    public void computeFirstSets() {
+    private void computeFirstSets() {
 
         for (Map.Entry<Integer, ArrayList<Integer>> pair : grammar.getProductions()) {
 
@@ -117,8 +117,14 @@ public class FirstCalculation {
 
     }
 
-    public HashMap<Integer, HashSet<Integer>> getFirstSets() {
-        return firstSets;
+    public static HashMap<Integer, HashSet<Integer>> firstSets(Grammar grammar) {
+
+        FirstCalculation calculation = new FirstCalculation(grammar);
+
+        calculation.computeFirstSets();
+
+        return calculation.firstSets;
+
     }
 
 }

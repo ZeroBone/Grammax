@@ -15,11 +15,11 @@ public class FollowCalculation {
 
     private final HashMap<Integer, HashSet<Integer>> followSets = new HashMap<>();
 
-    public FollowCalculation(Grammar grammar) {
+    private FollowCalculation(Grammar grammar) {
         this.grammar = grammar;
     }
 
-    public void computeFollowSets() {
+    private void computeFollowSets() {
 
         for (Map.Entry<Integer, ArrayList<Integer>> pair : grammar.getProductions()) {
 
@@ -181,8 +181,14 @@ public class FollowCalculation {
 
     }
 
-    public HashMap<Integer, HashSet<Integer>> getFollowSets() {
-        return followSets;
+    public static HashMap<Integer, HashSet<Integer>> followSets(Grammar grammar) {
+
+        FollowCalculation calculation = new FollowCalculation(grammar);
+
+        calculation.computeFollowSets();
+
+        return calculation.followSets;
+
     }
 
 }
