@@ -22,7 +22,7 @@ public final class Conflict {
             secondOption.getShortName() +
             " conflict - should the parser " +
             firstOption.toString(automation) + " or " +
-            secondOption.toString(automation) + " in the following state?\n" +
+            secondOption.toString(automation) + " in state " + state + "?\n" +
             automation.getParsingStateDescription(state);
 
     }

@@ -9,16 +9,6 @@ public class BijectiveMap<K, V> {
     private HashMap<K, V> keyToValue = new HashMap<>();
     private HashMap<V, K> valueToKey = new HashMap<>();
 
-    public static class Entry<K, V> {
-        public K key;
-        public V value;
-
-        public Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-    }
-
     public BijectiveMap() {}
 
     public void put(K key, V value) {
