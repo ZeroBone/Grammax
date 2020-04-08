@@ -1,5 +1,7 @@
 package net.zerobone.parser;
 
+import java.lang.Object;
+
 public final class Parser {
 	public static final int T_EOF = 0;
 
@@ -56,5 +58,20 @@ public final class Parser {
 
 	public Parser() {
 		System.out.println(0xff);
+	}
+
+	private static final class StackEntry {
+		private final int previousState;
+
+		private final Object payload;
+
+		StackEntry(int previousState, Object payload) {
+			this.previousState = previousState;
+			this.payload = payload;
+		}
+	}
+
+	private final interface Reductor {
+		Object reduce();
 	}
 }
