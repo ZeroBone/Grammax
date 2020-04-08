@@ -128,6 +128,10 @@ class MetaGenerator {
 
             sb.append('{');
 
+            sb.append(production.nonTerminal);
+
+            sb.append(',');
+
             for (AutomationSymbol symbol : production.body) {
 
                 int id = symbol.isTerminal ? symbol.index : -symbol.index - 1;
@@ -138,9 +142,7 @@ class MetaGenerator {
 
             }
 
-            if (production.body.length != 0) {
-                sb.deleteCharAt(sb.length() - 1);
-            }
+            sb.deleteCharAt(sb.length() - 1);
 
             sb.append('}');
             sb.append(',');

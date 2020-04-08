@@ -50,15 +50,19 @@ public class SLRParser {
         -6,-6,-6,0,-6,0};
 
     private static final int[][] productions = {
-        {-1,1,-2},
-        {-2},
-        {-2,2,-3},
-        {-3},
-        {3,-1,4},
-        {5},
-        {-1}};
+        {0,-1,1,-2},
+        {0,-2},
+        {1,-2,2,-3},
+        {1,-3},
+        {2,3,-1,4},
+        {2,5},
+        {3,-1}};
 
     private Stack<Integer> stack = new Stack<>();
+
+    public SLRParser() {
+        stack.push(0);
+    }
 
     private static void debug_printAction(int action) {
 
@@ -66,6 +70,11 @@ public class SLRParser {
 
         if (action == 0) {
             System.out.println("error");
+            return;
+        }
+
+        if (action == -1) {
+            System.out.println("accept");
             return;
         }
 
@@ -84,7 +93,9 @@ public class SLRParser {
 
     public void parse(int token, String value) {
 
-        int state = stack.isEmpty() ? 0 : stack.peek();
+        assert !stack.isEmpty();
+
+        int state = stack.peek();
 
         int action = actionTable[terminalCount * state + token];
 
@@ -92,6 +103,11 @@ public class SLRParser {
 
         if (action == 0) {
             throw new RuntimeException("Action = 0");
+        }
+
+        if (action == -1) {
+            System.out.println("Parsing succeeded: string accepted");
+            return;
         }
 
         if (action > 0) {
@@ -109,19 +125,33 @@ public class SLRParser {
 
         int[] production = productions[productionIndex];
 
+        int productionLabel = production[0];
+
+        assert productionLabel >= 0;
+
         // take as many symbols from the stack as there are in the production
 
-        assert stack.size() >= production.length;
+        assert stack.size() >= production.length - 1;
 
-        for (int i = 0; i < production.length; i++) {
+        for (int i = 1; i < production.length; i++) {
             stack.pop();
         }
 
-        int newState = stack.isEmpty() ? 0 : stack.peek();
+        // the new state is what is now on top of the stack
+
+        assert !stack.isEmpty();
+
+        int newState = stack.peek();
 
         // compute the next state
 
-        int nextState = gotoTable[newState * nonTerminalCount];
+        int nextState = gotoTable[newState * nonTerminalCount + productionLabel];
+
+        System.out.println("GOTO " + nextState);
+
+        stack.push(nextState);
+
+        parse(token, value);
 
     }
 

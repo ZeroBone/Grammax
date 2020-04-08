@@ -46,13 +46,13 @@ public final class Parser {
 	-6,-6,-6,0,-6,0};
 
 	private static final int[][] productions = {
-	{-1,1,-2},
-	{-2},
-	{-2,2,-3},
-	{-3},
-	{3,-1,4},
-	{5},
-	{-1}};
+	{0,-1,1,-2},
+	{0,-2},
+	{1,-2,2,-3},
+	{1,-3},
+	{2,3,-1,4},
+	{2,5},
+	{3,-1}};
 
 	public Parser() {
 		System.out.println(0xff);
