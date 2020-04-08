@@ -116,44 +116,31 @@ public class MetaGenerator {
 
     }
 
-    public static FieldSpec constructProductionTable(Automation automation) {
+    public static FieldSpec constructProductionLabelTable(Automation automation) {
 
         StringBuilder sb = new StringBuilder();
 
         sb.append('{');
 
-        for (AutomationProduction production : automation.productions) {
+        assert automation.productions.length != 0;
 
-            sb.append('\n');
+        for (int i = 0;;i++) {
 
-            sb.append('{');
+            AutomationProduction production = automation.productions[i];
 
             sb.append(production.nonTerminal);
 
-            sb.append(',');
-
-            for (AutomationSymbol symbol : production.body) {
-
-                int id = symbol.isTerminal ? symbol.index : -symbol.index - 1;
-
-                sb.append(id);
-
-                sb.append(',');
-
+            if (i == automation.productions.length - 1) {
+                break;
             }
 
-            sb.deleteCharAt(sb.length() - 1);
-
-            sb.append('}');
             sb.append(',');
 
         }
 
-        sb.deleteCharAt(sb.length() - 1);
-
         sb.append('}');
 
-        return FieldSpec.builder(int[][].class, "productions")
+        return FieldSpec.builder(int[].class, "productionLabels")
             .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
             .initializer("$L", sb.toString())
             .build();

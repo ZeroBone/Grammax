@@ -49,33 +49,62 @@ public class SLRParserAlgorithm {
         -4,-4,-4,0,-4,0,
         -6,-6,-6,0,-6,0};
 
-    private static final int[][] productions = {
-        {0,-1,1,-2},
-        {0,-2},
-        {1,-2,2,-3},
-        {1,-3},
-        {2,3,-1,4},
-        {2,5},
-        {3,-1}};
+    private static final int[] productionLabels = {0,0,1,1,2,2,3};
 
     private interface Reductor {
         Object reduce(Stack<StackEntry> grx_stack);
     }
 
-    private static final Reductor[] reductions = new Reductor[] {
-        (Stack<StackEntry> grx_stack) -> {
-            return null;
-        },
-        (Stack<StackEntry> grx_stack) -> {
-            return null;
-        },
-        (Stack<StackEntry> grx_stack) -> {
-            return null;
-        },
-        (Stack<StackEntry> grx_stack) -> {
+    @SuppressWarnings("Convert2Lambda")
+    private static final Reductor[] reductions = {new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            _grx_stack.pop();
+            _grx_stack.pop();
             return null;
         }
-    };
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            return null;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            _grx_stack.pop();
+            _grx_stack.pop();
+            return null;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            return null;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            _grx_stack.pop();
+            _grx_stack.pop();
+            return null;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            return null;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            return null;
+        }
+    }};
 
     private static final class StackEntry {
 
@@ -119,9 +148,7 @@ public class SLRParserAlgorithm {
 
         int productionIndex = -action - 2;
 
-        int[] production = productions[productionIndex];
-
-        System.out.println("reduce " + productionIndex + " ( production = " + Arrays.toString(production) + " )");
+        System.out.println("reduce " + productionIndex);
 
     }
 
@@ -170,19 +197,11 @@ public class SLRParserAlgorithm {
 
             int productionIndex = -action - 2;
 
-            int[] production = productions[productionIndex];
+            int productionLabel = productionLabels[productionIndex];
 
-            int productionLabel = production[0];
-
-            assert productionLabel >= 0;
-
-            // take as many symbols from the stack as there are in the production
-
-            assert stack.size() >= production.length - 1;
-
-            for (int i = 1; i < production.length; i++) {
-                stack.pop();
-            }
+            // this will take as many symbols from the stack as there are in the production
+            // and reduce the production with the rule attached to the production
+            reductions[productionIndex].reduce(stack);
 
             // the new state is what is now on top of the stack
 

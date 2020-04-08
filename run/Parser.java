@@ -1,6 +1,8 @@
 package net.zerobone.parser;
 
 import java.lang.Object;
+import java.lang.Override;
+import java.util.Stack;
 
 public final class Parser {
 	public static final int T_EOF = 0;
@@ -47,14 +49,57 @@ public final class Parser {
 	-4,-4,-4,0,-4,0,
 	-6,-6,-6,0,-6,0};
 
-	private static final int[][] productions = {
-	{0,-1,1,-2},
-	{0,-2},
-	{1,-2,2,-3},
-	{1,-3},
-	{2,3,-1,4},
-	{2,5},
-	{3,-1}};
+	private static final int[] productionLabels = {0,0,1,1,2,2,3};
+
+	private static final Reductor[] reductions = {new Reductor() {
+		@Override
+		public Object reduce(Stack<StackEntry> _grx_stack) {
+			_grx_stack.pop();
+			_grx_stack.pop();
+			_grx_stack.pop();
+			return null;
+		}
+	},new Reductor() {
+		@Override
+		public Object reduce(Stack<StackEntry> _grx_stack) {
+			_grx_stack.pop();
+			return null;
+		}
+	},new Reductor() {
+		@Override
+		public Object reduce(Stack<StackEntry> _grx_stack) {
+			_grx_stack.pop();
+			_grx_stack.pop();
+			_grx_stack.pop();
+			return null;
+		}
+	},new Reductor() {
+		@Override
+		public Object reduce(Stack<StackEntry> _grx_stack) {
+			_grx_stack.pop();
+			return null;
+		}
+	},new Reductor() {
+		@Override
+		public Object reduce(Stack<StackEntry> _grx_stack) {
+			_grx_stack.pop();
+			_grx_stack.pop();
+			_grx_stack.pop();
+			return null;
+		}
+	},new Reductor() {
+		@Override
+		public Object reduce(Stack<StackEntry> _grx_stack) {
+			_grx_stack.pop();
+			return null;
+		}
+	},new Reductor() {
+		@Override
+		public Object reduce(Stack<StackEntry> _grx_stack) {
+			_grx_stack.pop();
+			return null;
+		}
+	}};
 
 	public Parser() {
 		System.out.println(0xff);
@@ -65,13 +110,13 @@ public final class Parser {
 
 		private final Object payload;
 
-		StackEntry(int previousState, Object payload) {
+		private StackEntry(int previousState, Object payload) {
 			this.previousState = previousState;
 			this.payload = payload;
 		}
 	}
 
-	private final interface Reductor {
+	private interface Reductor {
 		Object reduce();
 	}
 }

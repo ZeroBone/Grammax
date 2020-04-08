@@ -12,11 +12,11 @@ public class SLRGenerator {
     public static void generate(GeneratorContext context) throws IOException {
         {
             JavaFile javaFile = JavaFile
-                .builder(context.packageName, SLRParserGenerator.generate(context).build())
+                .builder(context.packageName, SLRParserClassGenerator.generate(context).build())
                 .indent("\t")
                 .build();
 
-            BufferedWriter writer = new BufferedWriter(new FileWriter("Parser.java"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(context.className + ".java"));
             javaFile.writeTo(writer);
             writer.close();
         }
