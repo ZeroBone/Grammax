@@ -16,11 +16,11 @@ public class Automation {
 
     public static final int ACTION_ACCEPT = -1;
 
-    private final int stateCount;
+    public final int stateCount;
 
-    private final int terminalCount;
+    public final int terminalCount;
 
-    private final int nonTerminalCount;
+    public final int nonTerminalCount;
 
     public final AutomationProduction[] productions;
 

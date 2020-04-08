@@ -14,6 +14,16 @@ class ParserGenerator {
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder("Parser")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
+        // fields
+
+        MetaGenerator.writeConstants(context.automation, classBuilder);
+
+        classBuilder.addField(MetaGenerator.constructGotoTable(context.automation));
+
+        classBuilder.addField(MetaGenerator.constructActionTable(context.automation));
+
+        classBuilder.addField(MetaGenerator.constructProductionTable(context.automation));
+
         // methods
 
         classBuilder.addMethod(

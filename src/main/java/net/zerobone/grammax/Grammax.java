@@ -70,7 +70,7 @@ public class Grammax {
         }
 
         try {
-            Generator.generate(new GeneratorContext("net.zerobone.parser"));
+            Generator.generate(new GeneratorContext("net.zerobone.parser", automation));
         }
         catch (IOException e) {
             e.printStackTrace();
