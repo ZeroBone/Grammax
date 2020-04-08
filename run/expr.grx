@@ -1,8 +1,8 @@
 // this is a grammar for parsing arithmetic expressions
 // it is SLR(1), not LR(0)
-e = e PLUS t;
-e = t;
-t = t MUL f;
-t = f;
-f = LPAREN e RPAREN;
-f = NUM;
+e = e(expr) PLUS t(term); { v = v = (int)expr + (int)term; }
+e = t(term); { v = term; }
+t = t(term) MUL f(factor); { v = (int)term * (int)factor; }
+t = f(factor); { v = factor; }
+f = LPAREN e(expr) RPAREN; { v = expr; }
+f = NUM(n); { v = n; }

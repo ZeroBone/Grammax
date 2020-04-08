@@ -1,6 +1,5 @@
 package net.zerobone.grammax.slr;
 
-import java.util.Arrays;
 import java.util.Stack;
 
 public class SLRParserAlgorithm {
@@ -59,44 +58,56 @@ public class SLRParserAlgorithm {
     private static final Reductor[] reductions = {new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object term = _grx_stack.pop().payload;
             _grx_stack.pop();
+            Object expr = _grx_stack.pop().payload;
+            Object v;
+            { v = v = (int)expr + (int)term; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object term = _grx_stack.pop().payload;
+            Object v;
+            { v = term; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object factor = _grx_stack.pop().payload;
             _grx_stack.pop();
-            _grx_stack.pop();
-            return null;
+            Object term = _grx_stack.pop().payload;
+            Object v;
+            { v = (int)term * (int)factor; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object factor = _grx_stack.pop().payload;
+            Object v;
+            { v = factor; }
+            return v;
         }
     },new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
             _grx_stack.pop();
-            return null;
+            Object expr = _grx_stack.pop().payload;
+            _grx_stack.pop();
+            Object v;
+            { v = expr; }
+            return v;
         }
     },new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
-            _grx_stack.pop();
-            _grx_stack.pop();
-            _grx_stack.pop();
-            return null;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            _grx_stack.pop();
-            return null;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            _grx_stack.pop();
-            _grx_stack.pop();
-            _grx_stack.pop();
-            return null;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            _grx_stack.pop();
-            return null;
+            Object n = _grx_stack.pop().payload;
+            Object v;
+            { v = n; }
+            return v;
         }
     },new Reductor() {
         @Override
@@ -178,8 +189,6 @@ public class SLRParserAlgorithm {
 
                 payload = stack.peek().payload;
 
-                System.out.println("Parsing succeeded: string accepted");
-
                 return;
 
             }
@@ -201,7 +210,7 @@ public class SLRParserAlgorithm {
 
             // this will take as many symbols from the stack as there are in the production
             // and reduce the production with the rule attached to the production
-            reductions[productionIndex].reduce(stack);
+            Object reducedProduction = reductions[productionIndex].reduce(stack);
 
             // the new state is what is now on top of the stack
 
@@ -213,11 +222,11 @@ public class SLRParserAlgorithm {
 
             int nextState = gotoTable[newState.previousState * nonTerminalCount + productionLabel];
 
-            System.out.println("GOTO " + nextState);
+            // System.out.println("GOTO " + nextState);
 
             assert nextState != 0;
 
-            stack.push(new StackEntry(nextState, null));
+            stack.push(new StackEntry(nextState, reducedProduction));
 
         }
 
@@ -236,16 +245,23 @@ public class SLRParserAlgorithm {
 
         SLRParserAlgorithm parser = new SLRParserAlgorithm();
 
-        parser.parse(SLRParserAlgorithm.T_NUM, "2");
+        parser.parse(SLRParserAlgorithm.T_NUM, 2);
         parser.parse(SLRParserAlgorithm.T_MUL, "*");
-        // parser.parse(SLRParser.T_LPAREN, "(");
-        parser.parse(SLRParserAlgorithm.T_NUM, "5");
+        // parser.parse(SLRParserAlgorithm.T_LPAREN, "(");
+        parser.parse(SLRParserAlgorithm.T_NUM, 5);
         parser.parse(SLRParserAlgorithm.T_PLUS, "+");
-        parser.parse(SLRParserAlgorithm.T_NUM, "7");
-        // parser.parse(SLRParser.T_RPAREN, ")");
+        parser.parse(SLRParserAlgorithm.T_NUM, 7);
+        // parser.parse(SLRParserAlgorithm.T_RPAREN, ")");
         parser.parse(SLRParserAlgorithm.T_EOF, "eof");
 
-        System.out.println("done");
+        if (parser.successfullyParsed()) {
+            System.out.println("Done: success");
+            System.out.println(parser.getValue());
+        }
+        else {
+            System.err.println("Done: error while parsing");
+        }
+
     }
 
 }

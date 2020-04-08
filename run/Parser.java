@@ -52,54 +52,66 @@ public final class Parser {
 	private static final int[] productionLabels = {0,0,1,1,2,2,3};
 
 	private static final Reductor[] reductions = {new Reductor() {
-		@Override
-		public Object reduce(Stack<StackEntry> _grx_stack) {
-			_grx_stack.pop();
-			_grx_stack.pop();
-			_grx_stack.pop();
-			return null;
-		}
-	},new Reductor() {
-		@Override
-		public Object reduce(Stack<StackEntry> _grx_stack) {
-			_grx_stack.pop();
-			return null;
-		}
-	},new Reductor() {
-		@Override
-		public Object reduce(Stack<StackEntry> _grx_stack) {
-			_grx_stack.pop();
-			_grx_stack.pop();
-			_grx_stack.pop();
-			return null;
-		}
-	},new Reductor() {
-		@Override
-		public Object reduce(Stack<StackEntry> _grx_stack) {
-			_grx_stack.pop();
-			return null;
-		}
-	},new Reductor() {
-		@Override
-		public Object reduce(Stack<StackEntry> _grx_stack) {
-			_grx_stack.pop();
-			_grx_stack.pop();
-			_grx_stack.pop();
-			return null;
-		}
-	},new Reductor() {
-		@Override
-		public Object reduce(Stack<StackEntry> _grx_stack) {
-			_grx_stack.pop();
-			return null;
-		}
-	},new Reductor() {
-		@Override
-		public Object reduce(Stack<StackEntry> _grx_stack) {
-			_grx_stack.pop();
-			return null;
-		}
-	}};
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object term = _grx_stack.pop().payload;
+            _grx_stack.pop();
+            Object expr = _grx_stack.pop().payload;
+            Object v;
+            { v = v = (int)expr + (int)term; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object term = _grx_stack.pop().payload;
+            Object v;
+            { v = term; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object factor = _grx_stack.pop().payload;
+            _grx_stack.pop();
+            Object term = _grx_stack.pop().payload;
+            Object v;
+            { v = (int)term * (int)factor; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object factor = _grx_stack.pop().payload;
+            Object v;
+            { v = factor; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            Object expr = _grx_stack.pop().payload;
+            _grx_stack.pop();
+            Object v;
+            { v = expr; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object n = _grx_stack.pop().payload;
+            Object v;
+            { v = n; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            _grx_stack.pop();
+            return null;
+        }
+    }};
 
 	public Parser() {
 		System.out.println(0xff);

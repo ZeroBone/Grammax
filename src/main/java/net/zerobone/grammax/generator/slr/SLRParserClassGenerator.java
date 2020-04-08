@@ -95,11 +95,15 @@ class SLRParserClassGenerator {
                 continue;
             }
 
-            builder.addStatement("Object " + symbol.argumentName + " = _grx_stack.pop()");
+            builder.addStatement("Object " + symbol.argumentName + " = _grx_stack.pop().payload");
 
         }
 
-        builder.addStatement("return null");
+        builder.addStatement("Object v");
+
+        builder.addCode("{$L}\n", production.code);
+
+        builder.addStatement("return v");
 
         return builder.build();
 
@@ -147,6 +151,7 @@ class SLRParserClassGenerator {
 
         final ClassName reductor = context.getClassName().nestedClass("Reductor");
 
+        //noinspection ConfusingArgumentToVarargsMethod
         return FieldSpec.builder(ArrayTypeName.of(reductor), "reductions")
             .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
             .initializer(maskSb.toString(), reductors)
