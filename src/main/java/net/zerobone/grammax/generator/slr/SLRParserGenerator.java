@@ -1,13 +1,15 @@
-package net.zerobone.grammax.generator;
+package net.zerobone.grammax.generator.slr;
 
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import net.zerobone.grammax.generator.GeneratorContext;
+import net.zerobone.grammax.generator.MetaGenerator;
 
 import javax.lang.model.element.Modifier;
 
-class ParserGenerator {
+class SLRParserGenerator {
 
-    private ParserGenerator() {}
+    private SLRParserGenerator() {}
 
     static TypeSpec.Builder generate(GeneratorContext context) {
 

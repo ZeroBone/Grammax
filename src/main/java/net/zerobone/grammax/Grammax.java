@@ -5,7 +5,7 @@ import net.zerobone.grammax.ast.entities.ProductionSymbol;
 import net.zerobone.grammax.ast.statements.ProductionStatementNode;
 import net.zerobone.grammax.ast.statements.StatementNode;
 import net.zerobone.grammax.ast.statements.TypeStatementNode;
-import net.zerobone.grammax.generator.Generator;
+import net.zerobone.grammax.generator.slr.SLRGenerator;
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
@@ -70,7 +70,7 @@ public class Grammax {
         }
 
         try {
-            Generator.generate(new GeneratorContext("net.zerobone.parser", automation));
+            SLRGenerator.generate(new GeneratorContext("net.zerobone.parser", automation));
         }
         catch (IOException e) {
             e.printStackTrace();

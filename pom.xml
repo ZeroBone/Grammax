@@ -26,11 +26,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.squareup.javapoet</groupId>
+            <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
             <version>1.12.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/javapoet-1.12.1.jar</systemPath>
         </dependency>
     </dependencies>
     <build>

@@ -8,9 +8,9 @@ import net.zerobone.grammax.grammar.automation.AutomationSymbol;
 
 import javax.lang.model.element.Modifier;
 
-class MetaGenerator {
+public class MetaGenerator {
 
-    static void writeConstants(Automation automation, TypeSpec.Builder classBuilder) {
+    public static void writeConstants(Automation automation, TypeSpec.Builder classBuilder) {
 
         {
             // T_EOF = 0
@@ -54,7 +54,7 @@ class MetaGenerator {
 
     }
 
-    static FieldSpec constructGotoTable(Automation automation) {
+    public static FieldSpec constructGotoTable(Automation automation) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -85,7 +85,7 @@ class MetaGenerator {
 
     }
 
-    static FieldSpec constructActionTable(Automation automation) {
+    public static FieldSpec constructActionTable(Automation automation) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -116,7 +116,7 @@ class MetaGenerator {
 
     }
 
-    static FieldSpec constructProductionTable(Automation automation) {
+    public static FieldSpec constructProductionTable(Automation automation) {
 
         StringBuilder sb = new StringBuilder();
 
