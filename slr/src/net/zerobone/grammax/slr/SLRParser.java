@@ -93,65 +93,69 @@ public class SLRParser {
 
     public void parse(int token, String value) {
 
-        assert !stack.isEmpty();
+        while (true) {
 
-        int state = stack.peek();
+            assert !stack.isEmpty();
 
-        int action = actionTable[terminalCount * state + token];
+            int state = stack.peek();
 
-        debug_printAction(action);
+            int action = actionTable[terminalCount * state + token];
 
-        if (action == 0) {
-            throw new RuntimeException("Action = 0");
+            debug_printAction(action);
+
+            if (action == 0) {
+                throw new RuntimeException("Action = 0");
+            }
+
+            if (action == -1) {
+                System.out.println("Parsing succeeded: string accepted");
+                return;
+            }
+
+            if (action > 0) {
+                // shift action
+
+                stack.push(action);
+
+                return;
+
+            }
+
+            // reduce action
+
+            int productionIndex = -action - 2;
+
+            int[] production = productions[productionIndex];
+
+            int productionLabel = production[0];
+
+            assert productionLabel >= 0;
+
+            // take as many symbols from the stack as there are in the production
+
+            assert stack.size() >= production.length - 1;
+
+            for (int i = 1; i < production.length; i++) {
+                stack.pop();
+            }
+
+            // the new state is what is now on top of the stack
+
+            assert !stack.isEmpty();
+
+            int newState = stack.peek();
+
+            // compute the next state
+
+            int nextState = gotoTable[newState * nonTerminalCount + productionLabel];
+
+            System.out.println("GOTO " + nextState);
+
+            assert nextState != 0;
+
+            stack.push(nextState);
+
         }
-
-        if (action == -1) {
-            System.out.println("Parsing succeeded: string accepted");
-            return;
-        }
-
-        if (action > 0) {
-            // shift action
-
-            stack.push(action);
-
-            return;
-
-        }
-
-        // reduce action
-
-        int productionIndex = -action - 2;
-
-        int[] production = productions[productionIndex];
-
-        int productionLabel = production[0];
-
-        assert productionLabel >= 0;
-
-        // take as many symbols from the stack as there are in the production
-
-        assert stack.size() >= production.length - 1;
-
-        for (int i = 1; i < production.length; i++) {
-            stack.pop();
-        }
-
-        // the new state is what is now on top of the stack
-
-        assert !stack.isEmpty();
-
-        int newState = stack.peek();
-
-        // compute the next state
-
-        int nextState = gotoTable[newState * nonTerminalCount + productionLabel];
-
-        System.out.println("GOTO " + nextState);
-
-        stack.push(nextState);
-
-        parse(token, value);
 
     }
 
@@ -161,9 +165,11 @@ public class SLRParser {
 
         parser.parse(SLRParser.T_NUM, "2");
         parser.parse(SLRParser.T_MUL, "*");
+        // parser.parse(SLRParser.T_LPAREN, "(");
         parser.parse(SLRParser.T_NUM, "5");
         parser.parse(SLRParser.T_PLUS, "+");
         parser.parse(SLRParser.T_NUM, "7");
+        // parser.parse(SLRParser.T_RPAREN, ")");
         parser.parse(SLRParser.T_EOF, "eof");
 
         System.out.println("done");
