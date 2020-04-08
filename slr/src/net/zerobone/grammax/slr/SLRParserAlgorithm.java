@@ -3,7 +3,7 @@ package net.zerobone.grammax.slr;
 import java.util.Arrays;
 import java.util.Stack;
 
-public class SLRParser {
+public class SLRParserAlgorithm {
 
     public static final int T_EOF = 0;
 
@@ -58,10 +58,44 @@ public class SLRParser {
         {2,5},
         {3,-1}};
 
-    private Stack<Integer> stack = new Stack<>();
+    private interface Reductor {
+        Object reduce(Stack<StackEntry> grx_stack);
+    }
 
-    public SLRParser() {
-        stack.push(0);
+    private static final Reductor[] reductions = new Reductor[] {
+        (Stack<StackEntry> grx_stack) -> {
+            return null;
+        },
+        (Stack<StackEntry> grx_stack) -> {
+            return null;
+        },
+        (Stack<StackEntry> grx_stack) -> {
+            return null;
+        },
+        (Stack<StackEntry> grx_stack) -> {
+            return null;
+        }
+    };
+
+    private static final class StackEntry {
+
+        private final int previousState;
+
+        private final Object payload;
+
+        private StackEntry(int previousState, Object payload) {
+            this.previousState = previousState;
+            this.payload = payload;
+        }
+
+    }
+
+    private Stack<StackEntry> stack = new Stack<>();
+
+    private Object payload = null;
+
+    public SLRParserAlgorithm() {
+        stack.push(new StackEntry(0, null));
     }
 
     private static void debug_printAction(int action) {
@@ -91,31 +125,42 @@ public class SLRParser {
 
     }
 
-    public void parse(int token, String value) {
+    public void parse(int token, Object tokenPayload) {
 
         while (true) {
 
             assert !stack.isEmpty();
 
-            int state = stack.peek();
+            int state = stack.peek().previousState;
 
             int action = actionTable[terminalCount * state + token];
 
             debug_printAction(action);
 
             if (action == 0) {
-                throw new RuntimeException("Action = 0");
+                throw new RuntimeException("Syntax error");
             }
 
             if (action == -1) {
+
+                if (token != T_EOF) {
+                    throw new RuntimeException("Expected end of input, got " + token);
+                }
+
+                assert stack.size() == 2;
+
+                payload = stack.peek().payload;
+
                 System.out.println("Parsing succeeded: string accepted");
+
                 return;
+
             }
 
             if (action > 0) {
                 // shift action
 
-                stack.push(action);
+                stack.push(new StackEntry(action, tokenPayload));
 
                 return;
 
@@ -143,34 +188,43 @@ public class SLRParser {
 
             assert !stack.isEmpty();
 
-            int newState = stack.peek();
+            StackEntry newState = stack.peek();
 
             // compute the next state
 
-            int nextState = gotoTable[newState * nonTerminalCount + productionLabel];
+            int nextState = gotoTable[newState.previousState * nonTerminalCount + productionLabel];
 
             System.out.println("GOTO " + nextState);
 
             assert nextState != 0;
 
-            stack.push(nextState);
+            stack.push(new StackEntry(nextState, null));
 
         }
 
     }
 
+    public boolean successfullyParsed() {
+        return payload != null;
+    }
+
+    public Object getValue() {
+        assert payload != null : "parsing did not succeed";
+        return payload;
+    }
+
     public static void main(String[] args) {
 
-        SLRParser parser = new SLRParser();
+        SLRParserAlgorithm parser = new SLRParserAlgorithm();
 
-        parser.parse(SLRParser.T_NUM, "2");
-        parser.parse(SLRParser.T_MUL, "*");
+        parser.parse(SLRParserAlgorithm.T_NUM, "2");
+        parser.parse(SLRParserAlgorithm.T_MUL, "*");
         // parser.parse(SLRParser.T_LPAREN, "(");
-        parser.parse(SLRParser.T_NUM, "5");
-        parser.parse(SLRParser.T_PLUS, "+");
-        parser.parse(SLRParser.T_NUM, "7");
+        parser.parse(SLRParserAlgorithm.T_NUM, "5");
+        parser.parse(SLRParserAlgorithm.T_PLUS, "+");
+        parser.parse(SLRParserAlgorithm.T_NUM, "7");
         // parser.parse(SLRParser.T_RPAREN, ")");
-        parser.parse(SLRParser.T_EOF, "eof");
+        parser.parse(SLRParserAlgorithm.T_EOF, "eof");
 
         System.out.println("done");
     }
