@@ -50,10 +50,6 @@ public class SLRParserAlgorithm {
 
     private static final int[] productionLabels = {0,0,1,1,2,2,3};
 
-    private interface Reductor {
-        Object reduce(Stack<StackEntry> grx_stack);
-    }
-
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {new Reductor() {
         @Override
@@ -62,7 +58,7 @@ public class SLRParserAlgorithm {
             _grx_stack.pop();
             Object expr = _grx_stack.pop().payload;
             Object v;
-            { v = v = (int)expr + (int)term; }
+            { v = (int)expr + (int)term; }
             return v;
         }
     },new Reductor() {
@@ -117,6 +113,10 @@ public class SLRParserAlgorithm {
         }
     }};
 
+    private interface Reductor {
+        Object reduce(Stack<StackEntry> grx_stack);
+    }
+
     private static final class StackEntry {
 
         private final int previousState;
@@ -163,7 +163,7 @@ public class SLRParserAlgorithm {
 
     }
 
-    public void parse(int token, Object tokenPayload) {
+    public void parse(int tokenId, Object tokenPayload) {
 
         while (true) {
 
@@ -171,7 +171,7 @@ public class SLRParserAlgorithm {
 
             int state = stack.peek().previousState;
 
-            int action = actionTable[terminalCount * state + token];
+            int action = actionTable[terminalCount * state + tokenId];
 
             debug_printAction(action);
 
@@ -181,9 +181,7 @@ public class SLRParserAlgorithm {
 
             if (action == -1) {
 
-                if (token != T_EOF) {
-                    throw new RuntimeException("Expected end of input, got " + token);
-                }
+                assert tokenId == T_EOF;
 
                 assert stack.size() == 2;
 
@@ -245,13 +243,13 @@ public class SLRParserAlgorithm {
 
         SLRParserAlgorithm parser = new SLRParserAlgorithm();
 
-        parser.parse(SLRParserAlgorithm.T_NUM, 2);
-        parser.parse(SLRParserAlgorithm.T_MUL, "*");
-        // parser.parse(SLRParserAlgorithm.T_LPAREN, "(");
+        parser.parse(SLRParserAlgorithm.T_LPAREN, "(");
         parser.parse(SLRParserAlgorithm.T_NUM, 5);
         parser.parse(SLRParserAlgorithm.T_PLUS, "+");
         parser.parse(SLRParserAlgorithm.T_NUM, 7);
-        // parser.parse(SLRParserAlgorithm.T_RPAREN, ")");
+        parser.parse(SLRParserAlgorithm.T_RPAREN, ")");
+        parser.parse(SLRParserAlgorithm.T_MUL, "*");
+        parser.parse(SLRParserAlgorithm.T_NUM, 2);
         parser.parse(SLRParserAlgorithm.T_EOF, "eof");
 
         if (parser.successfullyParsed()) {

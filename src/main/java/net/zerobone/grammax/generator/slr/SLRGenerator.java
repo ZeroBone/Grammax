@@ -13,7 +13,7 @@ public class SLRGenerator {
         {
             JavaFile javaFile = JavaFile
                 .builder(context.packageName, SLRParserClassGenerator.generate(context).build())
-                .indent("\t")
+                .indent("    ")
                 .build();
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(context.className + ".java"));

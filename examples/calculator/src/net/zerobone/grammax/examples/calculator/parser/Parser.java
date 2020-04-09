@@ -1,4 +1,6 @@
-package net.zerobone.parser;
+package net.zerobone.grammax.examples.calculator.parser;
+
+import net.zerobone.grammax.examples.calculator.tokens.NumberToken;
 
 import java.lang.Object;
 import java.lang.Override;
@@ -18,7 +20,9 @@ public final class Parser {
 
     public static final int T_NUM = 5;
 
-    private static final int terminalCount = 6;
+    public static final int T_ID = 6;
+
+    private static final int terminalCount = 7;
 
     private static final int nonTerminalCount = 4;
 
@@ -27,30 +31,34 @@ public final class Parser {
     0,0,0,0,
     0,0,0,0,
     0,0,0,0,
-    8,2,3,0,
+    9,2,3,0,
     0,0,0,0,
-    0,9,3,0,
-    0,0,10,0,
+    0,0,0,0,
+    0,11,3,0,
+    0,0,12,0,
+    0,0,0,0,
     0,0,0,0,
     0,0,0,0,
     0,0,0,0,
     0,0,0,0};
 
     private static final int[] actionTable = {
-    0,0,0,4,0,5,
-    -1,6,0,0,0,0,
-    -3,-3,7,0,-3,0,
-    -5,-5,-5,0,-5,0,
-    0,0,0,4,0,5,
-    -7,-7,-7,0,-7,0,
-    0,0,0,4,0,5,
-    0,0,0,4,0,5,
-    0,6,0,0,11,0,
-    -2,-2,7,0,-2,0,
-    -4,-4,-4,0,-4,0,
-    -6,-6,-6,0,-6,0};
+    0,0,0,4,0,5,6,
+    -1,7,0,0,0,0,0,
+    -3,-3,8,0,-3,0,0,
+    -5,-5,-5,0,-5,0,0,
+    0,0,0,4,0,5,6,
+    -7,-7,-7,0,-7,0,0,
+    0,0,0,0,0,10,0,
+    0,0,0,4,0,5,6,
+    0,0,0,4,0,5,6,
+    0,7,0,0,13,0,0,
+    -8,-8,-8,0,-8,0,0,
+    -2,-2,8,0,-2,0,0,
+    -4,-4,-4,0,-4,0,0,
+    -6,-6,-6,0,-6,0,0};
 
-    private static final int[] productionLabels = {0,0,1,1,2,2,3};
+    private static final int[] productionLabels = {0,0,1,1,2,2,2,3};
 
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {new Reductor() {
@@ -60,7 +68,7 @@ public final class Parser {
             _grx_stack.pop();
             Object expr = _grx_stack.pop().payload;
             Object v;
-            { v = (int)expr + (int)term; }
+            { v = (double)expr + (double)term; }
             return v;
         }
     },new Reductor() {
@@ -78,7 +86,7 @@ public final class Parser {
             _grx_stack.pop();
             Object term = _grx_stack.pop().payload;
             Object v;
-            { v = (int)term * (int)factor; }
+            { v = (double)term * (double)factor; }
             return v;
         }
     },new Reductor() {
@@ -104,7 +112,16 @@ public final class Parser {
         public Object reduce(Stack<StackEntry> _grx_stack) {
             Object n = _grx_stack.pop().payload;
             Object v;
-            { v = n; }
+            { v = ((NumberToken)n).value; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            Object n = _grx_stack.pop().payload;
+            _grx_stack.pop();
+            Object v;
+            { v = ((NumberToken)n).value; }
             return v;
         }
     },new Reductor() {
@@ -115,12 +132,21 @@ public final class Parser {
         }
     }};
 
-    private Stack<StackEntry> stack = new Stack<>();
+    private static final StackEntry initialStackEntry = new StackEntry(0, null);
+
+    private Stack<StackEntry> stack;
 
     private Object payload = null;
 
     public Parser() {
-        stack.push(new StackEntry(0, null));
+        stack = new Stack<>();
+        stack.push(initialStackEntry);
+    }
+
+    public void reset() {
+        stack.clear();
+        stack.push(initialStackEntry);
+        payload = null;
     }
 
     public void parse(int tokenId, Object tokenPayload) {

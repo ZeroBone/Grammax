@@ -1,0 +1,7 @@
+e = e(expr) PLUS t(term); { v = (double)expr + (double)term; }
+e = t(term); { v = term; }
+t = t(term) MUL f(factor); { v = (double)term * (double)factor; }
+t = f(factor); { v = factor; }
+f = LPAREN e(expr) RPAREN; { v = expr; }
+f = NUM(n); { v = ((NumberToken)n).value; }
+f = ID NUM(n); { v = ((NumberToken)n).value; }

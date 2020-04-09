@@ -41,7 +41,18 @@ class SLRParserClassGenerator {
 
     }
 
-    private static TypeSpec generateReductorInterface() {
+    private static TypeName getStackType(GeneratorContext context) {
+        return ParameterizedTypeName.get(
+            ClassName.get("java.util", "Stack"),
+            getStackEntryType(context)
+        );
+    }
+
+    private static TypeName getStackEntryType(GeneratorContext context) {
+        return context.getClassName().nestedClass("StackEntry");
+    }
+
+    private static TypeSpec generateReductorInterface(GeneratorContext context) {
 
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder("Reductor");
 
@@ -53,6 +64,7 @@ class SLRParserClassGenerator {
             MethodSpec
                 .methodBuilder("reduce")
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addParameter(getStackType(context), "_grx_stack")
                 .returns(Object.class)
                 .build()
         );
@@ -63,18 +75,13 @@ class SLRParserClassGenerator {
 
     private static MethodSpec generateReduceLambdaFor(GeneratorContext context, AutomationProduction production) {
 
-        TypeName stackType = ParameterizedTypeName.get(
-            ClassName.get("java.util", "Stack"),
-            context.getClassName().nestedClass("StackEntry")
-        );
-
         MethodSpec.Builder builder = MethodSpec.methodBuilder("reduce");
 
         builder.addAnnotation(Override.class);
 
         builder.addModifiers(Modifier.PUBLIC);
 
-        builder.addParameter(stackType, "_grx_stack");
+        builder.addParameter(getStackType(context), "_grx_stack");
 
         builder.returns(Object.class);
 
@@ -154,8 +161,62 @@ class SLRParserClassGenerator {
         //noinspection ConfusingArgumentToVarargsMethod
         return FieldSpec.builder(ArrayTypeName.of(reductor), "reductions")
             .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .addAnnotation(
+                // @SuppressWarnings("Convert2Lambda")
+                AnnotationSpec.builder(SuppressWarnings.class)
+                    .addMember("value", "$S", "Convert2Lambda")
+                    .build()
+            )
             .initializer(maskSb.toString(), reductors)
             .build();
+
+    }
+
+    private static MethodSpec generateParseMethod() {
+
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("parse");
+
+        builder.addModifiers(Modifier.PUBLIC);
+
+        builder.addParameter(int.class, "tokenId");
+
+        builder.addParameter(Object.class, "tokenPayload");
+
+        // method body
+
+        builder.beginControlFlow("while (true)");
+
+        builder.addStatement("int action = actionTable[terminalCount * stack.peek().previousState + tokenId]");
+
+        // if action is an error
+        builder.beginControlFlow("if (action == 0)");
+        builder.addStatement("throw new RuntimeException(\"Syntax error\")");
+        builder.endControlFlow();
+
+        // if action is accept
+        builder.beginControlFlow("if (action == -1)");
+        builder.addStatement("payload = stack.peek().payload");
+        builder.addStatement("return");
+        builder.endControlFlow();
+
+        // if action is shift
+        builder.beginControlFlow("if (action > 0)");
+        builder.addStatement("stack.push(new StackEntry(action, tokenPayload))");
+        builder.addStatement("return");
+        builder.endControlFlow();
+
+        // otherwise the action is reduce
+
+        builder.addStatement("int productionIndex = -action - 2");
+        builder.addStatement("Object reducedProduction = reductions[productionIndex].reduce(stack)");
+        builder.addStatement("StackEntry newState = stack.peek()");
+        builder.addStatement("int nextState = gotoTable[newState.previousState * nonTerminalCount + productionLabels[productionIndex]]");
+        builder.addStatement("stack.push(new StackEntry(nextState, reducedProduction))");
+
+        // end of the outer infinite loop
+        builder.endControlFlow();
+
+        return builder.build();
 
     }
 
@@ -176,11 +237,29 @@ class SLRParserClassGenerator {
 
         classBuilder.addField(generateReductionsArray(context));
 
+        classBuilder.addField(
+            FieldSpec.builder(getStackEntryType(context), "initialStackEntry")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("new StackEntry(0, null)")
+                .build()
+        );
+
+        classBuilder.addField(
+            FieldSpec.builder(getStackType(context), "stack", Modifier.PRIVATE)
+                .build()
+        );
+
+        classBuilder.addField(
+            FieldSpec.builder(Object.class, "payload", Modifier.PRIVATE)
+                .initializer("null")
+                .build()
+        );
+
         // inner classes
 
         classBuilder.addType(generateStackEntryClass());
 
-        classBuilder.addType(generateReductorInterface());
+        classBuilder.addType(generateReductorInterface(context));
 
         // methods
 
@@ -188,7 +267,39 @@ class SLRParserClassGenerator {
             MethodSpec
                 .constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addStatement("System.out.println(0xff)")
+                .addStatement("stack = new Stack<>()")
+                .addStatement("stack.push(initialStackEntry)")
+                .build()
+        );
+
+        classBuilder.addMethod(
+            MethodSpec
+                .methodBuilder("reset")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement("stack.clear()")
+                .addStatement("stack.push(initialStackEntry)")
+                .addStatement("payload = null")
+                .build()
+        );
+
+        classBuilder.addMethod(generateParseMethod());
+
+        classBuilder.addMethod(
+            MethodSpec
+                .methodBuilder("successfullyParsed")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement("return payload != null")
+                .returns(boolean.class)
+                .build()
+        );
+
+        classBuilder.addMethod(
+            MethodSpec
+                .methodBuilder("getValue")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement("assert payload != null : \"parsing did not succeed\"")
+                .addStatement("return payload")
+                .returns(Object.class)
                 .build()
         );
 
