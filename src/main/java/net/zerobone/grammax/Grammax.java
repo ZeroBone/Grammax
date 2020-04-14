@@ -10,8 +10,6 @@ import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
-import net.zerobone.grammax.parser.ParseError;
-import net.zerobone.grammax.utils.ParseUtils;
 import net.zerobone.grammax.parser.Parser;
 
 import java.io.*;
@@ -32,10 +30,11 @@ public class Grammax {
 
     private void run() {
 
-        System.out.println("[INFO]: Grammax version: " + VERSION);
+        System.out.println("[INF]: Grammax version: " + VERSION);
 
         // TODO: check that all the non-terminals are reachable from the start symbol
         // TODO: check that all symbols are defined
+        // TODO: warn about right recursion in the grammar
 
         context.grammar.augment();
 
@@ -62,14 +61,21 @@ public class Grammax {
 
         }
 
+        GeneratorContext generatorContext = new GeneratorContext(
+            "Parser",
+            "net.zerobone.parser",
+            automation,
+            context.getConfiguration()
+        );
+
         try {
-            SLRGenerator.generate(new GeneratorContext("Parser", "net.zerobone.parser", automation));
+            SLRGenerator.generate(generatorContext);
         }
         catch (IOException e) {
             e.printStackTrace();
         }
 
-        System.out.println("Success");
+        System.out.println("[INF]: Parser generated successfully.");
 
     }
 
@@ -238,25 +244,8 @@ public class Grammax {
             }
 
             if (!parser.successfullyParsed()) {
-
-                for (ParseError error : parser.getErrors()) {
-
-                    if (error.expected != ParseError.ANY) {
-                        System.err.println(
-                            "Syntax Error: Expected '" + ParseUtils.convertTerminal(error.expected) +
-                                "', got '" + ParseUtils.convertTerminal(error.got) +
-                                "' at line " + ((Token)error.token).line
-                        );
-                    }
-                    else {
-                        System.err.println(
-                            "Syntax Error: Unexpected '" + ParseUtils.convertTerminal(error.got) +
-                                "' at line " + ((Token)error.token).line
-                        );
-                    }
-
-                }
-
+                System.err.println("Error while parsing the grammar file.");
+                // TODO: display parsing errors
                 return;
             }
 
@@ -270,8 +259,8 @@ public class Grammax {
 
         }
 
-        System.err.println("Invalid arguments!");
-        System.out.println("Usage: grammax filename.grx");
+        System.err.println("[ERR]: Invalid arguments!");
+        System.out.println("[INF]: Usage: grammax filename.grx");
 
     }
 

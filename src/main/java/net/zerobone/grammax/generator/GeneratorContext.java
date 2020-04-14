@@ -1,6 +1,7 @@
 package net.zerobone.grammax.generator;
 
 import com.squareup.javapoet.ClassName;
+import net.zerobone.grammax.GrammaxConfiguration;
 import net.zerobone.grammax.grammar.automation.Automation;
 
 public class GeneratorContext {
@@ -11,10 +12,13 @@ public class GeneratorContext {
 
     public final Automation automation;
 
-    public GeneratorContext(String className, String packageName, Automation automation) {
+    public final GrammaxConfiguration configuration;
+
+    public GeneratorContext(String className, String packageName, Automation automation, GrammaxConfiguration configuration) {
         this.className = className;
         this.packageName = packageName;
         this.automation = automation;
+        this.configuration = configuration;
     }
 
     public ClassName getClassName() {

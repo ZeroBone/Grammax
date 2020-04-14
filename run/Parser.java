@@ -8,19 +8,19 @@ import java.util.Stack;
 public final class Parser {
     public static final int T_EOF = 0;
 
-    public static final int T_TYPE = 1;
+    public static final int T_ID = 1;
 
-    public static final int T_ID = 2;
+    public static final int T_ASSIGN = 2;
 
-    public static final int T_LEFT_PAREN = 3;
+    public static final int T_SEMICOLON = 3;
 
-    public static final int T_RIGHT_PAREN = 4;
+    public static final int T_CODE = 4;
 
-    public static final int T_CODE = 5;
+    public static final int T_LEFT_PAREN = 5;
 
-    public static final int T_SEMICOLON = 6;
+    public static final int T_RIGHT_PAREN = 6;
 
-    public static final int T_ASSIGN = 7;
+    public static final int T_TYPE = 7;
 
     private static final int terminalCount = 8;
 
@@ -28,16 +28,17 @@ public final class Parser {
 
     private static final int[] gotoTable = {
     1,0,0,0,0,0,
+    0,3,0,0,0,0,
     0,0,0,0,0,0,
     0,0,0,0,0,0,
     0,0,0,0,0,0,
+    0,0,8,0,0,0,
     0,0,0,0,0,0,
-    0,0,0,8,0,0,
+    0,0,0,0,11,0,
     0,0,0,0,0,0,
-    0,10,0,0,0,0,
+    0,0,0,13,0,0,
     0,0,0,0,0,0,
-    0,0,12,0,0,0,
-    0,0,0,14,0,0,
+    0,0,15,0,0,0,
     0,0,0,0,0,0,
     0,0,0,0,0,0,
     0,0,0,0,0,0,
@@ -46,45 +47,89 @@ public final class Parser {
     0,0,0,0,0,0};
 
     private static final int[] actionTable = {
-    0,2,3,0,0,0,0,0,
-    -1,0,0,0,0,0,0,0,
-    0,0,4,0,0,0,0,0,
-    0,0,0,0,0,0,0,5,
-    0,0,6,0,0,0,0,0,
-    0,0,7,0,0,0,9,0,
-    -2,-2,-2,0,0,0,0,0,
-    0,0,-4,11,0,0,-4,0,
-    -9,-9,-9,0,0,0,0,0,
-    -6,-6,-6,0,0,13,0,0,
-    0,0,7,0,0,0,9,0,
-    0,0,15,0,0,0,0,0,
-    -8,-8,-8,0,0,0,0,0,
-    -5,-5,-5,0,0,0,0,0,
-    -7,-7,-7,0,0,0,0,0,
-    0,0,0,0,16,0,0,0,
-    0,0,-3,0,0,0,-3,0};
+    -2,-2,0,0,0,0,0,-2,
+    -1,2,0,0,0,0,0,4,
+    0,0,5,0,0,0,0,0,
+    -3,-3,0,0,0,0,0,-3,
+    0,6,0,0,0,0,0,0,
+    0,7,0,9,0,0,0,0,
+    0,10,0,0,0,0,0,0,
+    0,-9,0,-9,0,12,0,0,
+    -4,-4,0,0,0,0,0,-4,
+    -7,-7,0,0,14,0,0,-7,
+    -11,-11,0,0,0,0,0,-11,
+    0,7,0,9,0,0,0,0,
+    0,16,0,0,0,0,0,0,
+    -5,-5,0,0,0,0,0,-5,
+    -8,-8,0,0,0,0,0,-8,
+    -6,-6,0,0,0,0,0,-6,
+    0,0,0,0,0,0,17,0,
+    0,-10,0,-10,0,0,0,0};
 
-    private static final int[] productionLabels = {0,1,1,2,2,3,3,0,4,4,5};
+    private static final int[] productionLabels = {0,0,1,2,2,3,3,4,4,1,5};
 
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object type = _grx_stack.pop().payload;
-            Object symbol = _grx_stack.pop().payload;
-            _grx_stack.pop();
             Object v;
-            { v = new TypeStatementNode(symbol.id, type.id); }
+            { v = new TranslationUnitNode(); }
             return v;
         }
     },new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
+            StatementNode s = (StatementNode)_grx_stack.pop().payload;
+            TranslationUnitNode t = (TranslationUnitNode)_grx_stack.pop().payload;
+            Object v;
+            { t.addStatement(s); v = t; }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            ProductionStatementBody body = (ProductionStatementBody)_grx_stack.pop().payload;
             _grx_stack.pop();
-            Object arg = _grx_stack.pop().payload;
+            IdToken nonTerminal = (IdToken)_grx_stack.pop().payload;
+            Object v;
+            { v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), body.getCode()); }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            CodeToken code = (CodeToken)_grx_stack.pop().payload;
             _grx_stack.pop();
             Object v;
-            { v = arg; }
+            { v = new ProductionStatementBody(code == null ? null : code.code); }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            ProductionStatementBody b = (ProductionStatementBody)_grx_stack.pop().payload;
+            IdToken arg = (IdToken)_grx_stack.pop().payload;
+            IdToken s = (IdToken)_grx_stack.pop().payload;
+            Object v;
+            {
+                if (StringUtils.isTerminal(s.id)) {
+                    if (arg == null) {
+                        b.addTerminal(s.id);
+                    }
+                    else {
+                        b.addTerminal(s.id, arg.id);
+                    }
+                }
+                else {
+                    if (arg == null) {
+                        b.addNonTerminal(s.id);
+                    }
+                    else {
+                        b.addNonTerminal(s.id, arg.id);
+                    }
+                }
+                v = b;
+            }
             return v;
         }
     },new Reductor() {
@@ -112,64 +157,21 @@ public final class Parser {
     },new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object b = _grx_stack.pop().payload;
-            Object arg = _grx_stack.pop().payload;
-            Object s = _grx_stack.pop().payload;
-            Object v;
-            {
-                if (StringUtils.isTerminal(s.id)) {
-                    if (arg == null) {
-                        b.addTerminal(s.id);
-                    }
-                    else {
-                        b.addTerminal(s.id, arg.id);
-                    }
-                }
-                else {
-                    if (arg == null) {
-                        b.addNonTerminal(s.id);
-                    }
-                    else {
-                        b.addNonTerminal(s.id, arg.id);
-                    }
-                }
-                v = b;
-            }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object code = _grx_stack.pop().payload;
+            _grx_stack.pop();
+            IdToken arg = (IdToken)_grx_stack.pop().payload;
             _grx_stack.pop();
             Object v;
-            { v = new ProductionStatementBody(code == null ? null : code.code); }
+            { v = arg; }
             return v;
         }
     },new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object body = _grx_stack.pop().payload;
+            IdToken type = (IdToken)_grx_stack.pop().payload;
+            IdToken symbol = (IdToken)_grx_stack.pop().payload;
             _grx_stack.pop();
-            Object nonTerminal = _grx_stack.pop().payload;
             Object v;
-            { v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), body.getCode()); }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object s = _grx_stack.pop().payload;
-            Object t = _grx_stack.pop().payload;
-            Object v;
-            { t.addStatement(s); v = t; }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object v;
-            { v = new TranslationUnitNode(); }
+            { v = new TypeStatementNode(symbol.id, type.id); }
             return v;
         }
     },new Reductor() {

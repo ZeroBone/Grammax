@@ -64,6 +64,10 @@ public class GrammaxContext {
 
     }
 
+    public GrammaxConfiguration getConfiguration() {
+        return new GrammaxConfiguration(typeMap);
+    }
+
     private static Production convertProduction(ProductionStatementNode statement) {
 
         Production production = new Production(statement.code);

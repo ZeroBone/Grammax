@@ -102,7 +102,19 @@ class SLRParserClassGenerator {
                 continue;
             }
 
-            builder.addStatement("Object " + symbol.argumentName + " = _grx_stack.pop().payload");
+            String symbolName = symbol.isTerminal ?
+                context.automation.terminalToSymbol(symbol.index) :
+                context.automation.nonTerminalToSymbol(symbol.index);
+
+            String symbolType = context.configuration.getTypeForSymbol(symbolName);
+
+            if (symbolType == null) {
+                builder.addStatement("Object " + symbol.argumentName + " = _grx_stack.pop().payload");
+            }
+            else {
+                builder.addStatement(symbolType + " " + symbol.argumentName +
+                    " = (" + symbolType + ")_grx_stack.pop().payload");
+            }
 
         }
 
