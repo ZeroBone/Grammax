@@ -1,4 +1,6 @@
-package net.zerobone.grammax.parser;
+package net.zerobone.grammax.utils;
+
+import net.zerobone.grammax.parser.Parser;
 
 public class ParseUtils {
 

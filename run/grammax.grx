@@ -1,0 +1,47 @@
+// translation unit
+%type translationUnit TranslationUnitNode
+translationUnit = ; { v = new TranslationUnitNode(); }
+translationUnit = translationUnit(t) statement(s); { t.addStatement(s); v = t; }
+
+// token types
+
+%type ID IdToken
+
+// statements
+%type statement StatementNode
+
+// production statement
+statement = ID(nonTerminal) ASSIGN productionStatementBody(body); { v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), body.getCode()); }
+
+%type productionStatementBody ProductionStatementBody
+productionStatementBody = SEMICOLON productionStatementCode(code); { v = new ProductionStatementBody(code == null ? null : code.code); }
+productionStatementBody = ID(s) productionStatementArgument(arg) productionStatementBody(b); {
+    if (StringUtils.isTerminal(s.id)) {
+        if (arg == null) {
+            b.addTerminal(s.id);
+        }
+        else {
+            b.addTerminal(s.id, arg.id);
+        }
+    }
+    else {
+        if (arg == null) {
+            b.addNonTerminal(s.id);
+        }
+        else {
+            b.addNonTerminal(s.id, arg.id);
+        }
+    }
+    v = b;
+}
+
+%type productionStatementCode CodeToken
+productionStatementCode = ; { v = null; }
+productionStatementCode = CODE(c); { v = c; }
+
+%type productionStatementArgument IdToken
+productionStatementArgument = ; { v = null; }
+productionStatementArgument = LEFT_PAREN ID(arg) RIGHT_PAREN; { v = arg; }
+
+// type statement
+statement = TYPE ID(symbol) ID(type); { v = new TypeStatementNode(symbol.id, type.id); }

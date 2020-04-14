@@ -218,7 +218,7 @@ public class Grammar extends IdGrammar {
     }
 
     public int getTerminalCount() {
-        return terminals.size();
+        return terminals.size() + 1;
     }
 
     public int getNonTerminalCount() {

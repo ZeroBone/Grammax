@@ -2,7 +2,7 @@ package net.zerobone.grammax.grammar.automation.conflict;
 
 import net.zerobone.grammax.grammar.automation.Automation;
 
-public final class Conflict {
+public class Conflict {
 
     private final ConflictOption firstOption;
 

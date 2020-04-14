@@ -1,22 +1,17 @@
 package net.zerobone.grammax;
 
 import net.zerobone.grammax.ast.TranslationUnitNode;
-import net.zerobone.grammax.ast.entities.ProductionSymbol;
-import net.zerobone.grammax.ast.statements.ProductionStatementNode;
 import net.zerobone.grammax.ast.statements.StatementNode;
-import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.generator.slr.SLRGenerator;
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.Production;
-import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.conflict.Conflict;
 import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
 import net.zerobone.grammax.parser.ParseError;
-import net.zerobone.grammax.parser.ParseUtils;
+import net.zerobone.grammax.utils.ParseUtils;
 import net.zerobone.grammax.parser.Parser;
 
 import java.io.*;
@@ -28,25 +23,23 @@ public class Grammax {
 
     private static final String VERSION = "1.0.0-beta";
 
-    private Grammar grammar;
+    private final GrammaxContext context;
 
-    private final HashMap<String, String> typeMap; // TODO: use type map
-
-    private Grammax(Grammar grammar, HashMap<String, String> typeMap) {
-        this.grammar = grammar;
-        this.typeMap = typeMap;
+    private Grammax(GrammaxContext context) {
+        assert context.grammar != null;
+        this.context = context;
     }
 
     private void run() {
 
-        System.out.println("Grammax version: " + VERSION);
+        System.out.println("[INFO]: Grammax version: " + VERSION);
 
         // TODO: check that all the non-terminals are reachable from the start symbol
-        // TODO: check that all the symbols are defined
+        // TODO: check that all symbols are defined
 
-        grammar.augment();
+        context.grammar.augment();
 
-        Automation automation = new Automation(grammar);
+        Automation automation = new Automation(context.grammar);
 
         try {
             exportDebugInfo(automation);
@@ -87,7 +80,7 @@ public class Grammax {
         debugLogWriter.write("Grammar:");
         debugLogWriter.newLine();
 
-        debugLogWriter.write(grammar.toString(true));
+        debugLogWriter.write(context.grammar.toString(true));
 
         debugLogWriter.newLine();
         debugLogWriter.newLine();
@@ -95,12 +88,12 @@ public class Grammax {
         debugLogWriter.write("First sets:");
         debugLogWriter.newLine();
 
-        HashMap<Integer, HashSet<Integer>> firstSets = grammar.firstSets();
+        HashMap<Integer, HashSet<Integer>> firstSets = context.grammar.firstSets();
 
         for (HashMap.Entry<Integer, HashSet<Integer>> entry : firstSets.entrySet()) {
 
             debugLogWriter.write("FIRST(");
-            debugLogWriter.write(grammar.idToSymbol(entry.getKey()));
+            debugLogWriter.write(context.grammar.idToSymbol(entry.getKey()));
             debugLogWriter.write(") = {");
 
             Iterator<Integer> firstSetIterator = entry.getValue().iterator();
@@ -113,7 +106,7 @@ public class Grammax {
 
                     if (id != Grammar.FIRST_FOLLOW_SET_EPSILON) {
 
-                        debugLogWriter.write(grammar.idToSymbol(id));
+                        debugLogWriter.write(context.grammar.idToSymbol(id));
 
                     }
 
@@ -138,12 +131,12 @@ public class Grammax {
         debugLogWriter.write("Follow sets:");
         debugLogWriter.newLine();
 
-        HashMap<Integer, HashSet<Integer>> followSets = grammar.followSets();
+        HashMap<Integer, HashSet<Integer>> followSets = context.grammar.followSets();
 
         for (HashMap.Entry<Integer, HashSet<Integer>> entry : followSets.entrySet()) {
 
             debugLogWriter.write("FOLLOW(");
-            debugLogWriter.write(grammar.idToSymbol(entry.getKey()));
+            debugLogWriter.write(context.grammar.idToSymbol(entry.getKey()));
             debugLogWriter.write(") = {");
 
             Iterator<Integer> followSetIterator = entry.getValue().iterator();
@@ -159,7 +152,7 @@ public class Grammax {
                     }
                     else if (id != Grammar.FIRST_FOLLOW_SET_EPSILON) {
 
-                        debugLogWriter.write(grammar.idToSymbol(id));
+                        debugLogWriter.write(context.grammar.idToSymbol(id));
 
                     }
 
@@ -189,61 +182,22 @@ public class Grammax {
 
     }
 
-    private static Production convertProduction(ProductionStatementNode statement) {
-
-        Production production = new Production(statement.code);
-
-        for (ProductionSymbol symbol : statement.production) {
-            production.append(new Symbol(symbol.id, symbol.terminal, symbol.argument));
-        }
-
-        return production;
-
-    }
-
     private static void run(TranslationUnitNode translationUnit) {
 
-        Grammar grammar = null;
+        GrammaxContext context = new GrammaxContext();
 
-        HashMap<String, String> typeMap = new HashMap<>();
+        for (StatementNode statement : translationUnit.statements) {
 
-        for (StatementNode stmt : translationUnit.statements) {
-
-            if (stmt instanceof ProductionStatementNode) {
-
-                ProductionStatementNode production = (ProductionStatementNode)stmt;
-
-                if (grammar == null) {
-                    grammar = new Grammar(production.nonTerminal, convertProduction(production));
-                }
-                else {
-                    grammar.addProduction(production.nonTerminal, convertProduction(production));
-                }
-
-            }
-            else if (stmt instanceof TypeStatementNode) {
-
-                String symbol = ((TypeStatementNode)stmt).symbol;
-
-                String type = ((TypeStatementNode)stmt).type;
-
-                if (typeMap.containsKey(symbol)) {
-                    System.err.println("Error: Duplicate type declaration for symbol '" + symbol + "'.");
-                    return;
-                }
-
-                typeMap.put(symbol, type);
-
-            }
+            statement.apply(context);
 
         }
 
-        if (grammar == null) {
-            System.err.println("Error: could not find start symbol in grammar.");
+        if (context.hasErrors()) {
+            context.printErrors();
             return;
         }
 
-        new Grammax(grammar, typeMap).run();
+        new Grammax(context).run();
 
     }
 

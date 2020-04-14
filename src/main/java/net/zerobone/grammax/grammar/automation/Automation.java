@@ -44,7 +44,7 @@ public class Automation {
      */
     public final int[] actionTable;
 
-    private final String[] parserStateDescriptions; // array of HashSet<Point>
+    private final String[] parserStateDescriptions;
 
     private final ArrayList<Conflict> conflicts = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public class Automation {
 
         nonTerminalCount = grammar.getNonTerminalCount();
 
-        terminalCount = grammar.getTerminalCount() + 1;
+        terminalCount = grammar.getTerminalCount();
 
         // productions
 
@@ -94,7 +94,7 @@ public class Automation {
 
         }
 
-        assert terminals[0] == null;
+        assert terminals[Grammar.TERMINAL_EOF] == null;
 
         terminals[Grammar.TERMINAL_EOF] = "$";
 
