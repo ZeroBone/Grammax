@@ -2,6 +2,7 @@ package net.zerobone.grammax.parser;
 
 import net.zerobone.grammax.ast.TranslationUnitNode;
 import net.zerobone.grammax.ast.entities.ProductionStatementBody;
+import net.zerobone.grammax.ast.statements.ImportsStatementNode;
 import net.zerobone.grammax.ast.statements.ProductionStatementNode;
 import net.zerobone.grammax.ast.statements.StatementNode;
 import net.zerobone.grammax.ast.statements.TypeStatementNode;
@@ -28,7 +29,9 @@ public final class Parser {
 
     public static final int T_TYPE = 7;
 
-    private static final int terminalCount = 8;
+    public static final int T_IMPORTS = 8;
+
+    private static final int terminalCount = 9;
 
     private static final int nonTerminalCount = 6;
 
@@ -38,13 +41,15 @@ public final class Parser {
         0,0,0,0,0,0,
         0,0,0,0,0,0,
         0,0,0,0,0,0,
-        0,0,8,0,0,0,
         0,0,0,0,0,0,
-        0,0,0,0,11,0,
+        0,0,10,0,0,0,
         0,0,0,0,0,0,
-        0,0,0,13,0,0,
         0,0,0,0,0,0,
-        0,0,15,0,0,0,
+        0,0,0,0,13,0,
+        0,0,0,0,0,0,
+        0,0,0,15,0,0,
+        0,0,0,0,0,0,
+        0,0,17,0,0,0,
         0,0,0,0,0,0,
         0,0,0,0,0,0,
         0,0,0,0,0,0,
@@ -53,26 +58,28 @@ public final class Parser {
         0,0,0,0,0,0};
 
     private static final int[] actionTable = {
-        -2,-2,0,0,0,0,0,-2,
-        -1,2,0,0,0,0,0,4,
-        0,0,5,0,0,0,0,0,
-        -3,-3,0,0,0,0,0,-3,
-        0,6,0,0,0,0,0,0,
-        0,7,0,9,0,0,0,0,
-        0,10,0,0,0,0,0,0,
-        0,-9,0,-9,0,12,0,0,
-        -4,-4,0,0,0,0,0,-4,
-        -7,-7,0,0,14,0,0,-7,
-        -11,-11,0,0,0,0,0,-11,
-        0,7,0,9,0,0,0,0,
-        0,16,0,0,0,0,0,0,
-        -5,-5,0,0,0,0,0,-5,
-        -8,-8,0,0,0,0,0,-8,
-        -6,-6,0,0,0,0,0,-6,
-        0,0,0,0,0,0,17,0,
-        0,-10,0,-10,0,0,0,0};
+        -2,-2,0,0,0,0,0,-2,-2,
+        -1,2,0,0,0,0,0,4,5,
+        0,0,6,0,0,0,0,0,0,
+        -3,-3,0,0,0,0,0,-3,-3,
+        0,7,0,0,0,0,0,0,0,
+        0,0,0,0,8,0,0,0,0,
+        0,9,0,11,0,0,0,0,0,
+        0,12,0,0,0,0,0,0,0,
+        -12,-12,0,0,0,0,0,-12,-12,
+        0,-9,0,-9,0,14,0,0,0,
+        -4,-4,0,0,0,0,0,-4,-4,
+        -7,-7,0,0,16,0,0,-7,-7,
+        -11,-11,0,0,0,0,0,-11,-11,
+        0,9,0,11,0,0,0,0,0,
+        0,18,0,0,0,0,0,0,0,
+        -5,-5,0,0,0,0,0,-5,-5,
+        -8,-8,0,0,0,0,0,-8,-8,
+        -6,-6,0,0,0,0,0,-6,-6,
+        0,0,0,0,0,0,19,0,0,
+        0,-10,0,-10,0,0,0,0,0};
 
-    private static final int[] productionLabels = {0,0,1,2,2,3,3,4,4,1,5};
+    private static final int[] productionLabels = {0,0,1,2,2,3,3,4,4,1,1,5};
 
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {new Reductor() {
@@ -148,7 +155,7 @@ public final class Parser {
     },new Reductor() {
         @Override
         public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object c = _grx_stack.pop().payload;
+            CodeToken c = (CodeToken)_grx_stack.pop().payload;
             Object v;
             { v = c; }
             return v;
@@ -178,6 +185,15 @@ public final class Parser {
             _grx_stack.pop();
             Object v;
             { v = new TypeStatementNode(symbol.id, type.id); }
+            return v;
+        }
+    },new Reductor() {
+        @Override
+        public Object reduce(Stack<StackEntry> _grx_stack) {
+            CodeToken c = (CodeToken)_grx_stack.pop().payload;
+            _grx_stack.pop();
+            Object v;
+            { v = new ImportsStatementNode(c.code); }
             return v;
         }
     },new Reductor() {

@@ -1,3 +1,15 @@
+%imports {
+    import net.zerobone.grammax.ast.TranslationUnitNode;
+    import net.zerobone.grammax.ast.entities.ProductionStatementBody;
+    import net.zerobone.grammax.ast.statements.ImportsStatementNode;
+    import net.zerobone.grammax.ast.statements.ProductionStatementNode;
+    import net.zerobone.grammax.ast.statements.StatementNode;
+    import net.zerobone.grammax.ast.statements.TypeStatementNode;
+    import net.zerobone.grammax.lexer.tokens.CodeToken;
+    import net.zerobone.grammax.lexer.tokens.IdToken;
+    import net.zerobone.grammax.utils.StringUtils;
+}
+
 // translation unit
 %type translationUnit TranslationUnitNode
 translationUnit = ; { v = new TranslationUnitNode(); }
@@ -6,6 +18,7 @@ translationUnit = translationUnit(t) statement(s); { t.addStatement(s); v = t; }
 // token types
 
 %type ID IdToken
+%type CODE CodeToken
 
 // statements
 %type statement StatementNode
@@ -13,6 +26,7 @@ translationUnit = translationUnit(t) statement(s); { t.addStatement(s); v = t; }
 // production statement
 statement = ID(nonTerminal) ASSIGN productionStatementBody(body); { v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), body.getCode()); }
 
+// TODO: remove right recursion
 %type productionStatementBody ProductionStatementBody
 productionStatementBody = SEMICOLON productionStatementCode(code); { v = new ProductionStatementBody(code == null ? null : code.code); }
 productionStatementBody = ID(s) productionStatementArgument(arg) productionStatementBody(b); {
@@ -45,3 +59,6 @@ productionStatementArgument = LEFT_PAREN ID(arg) RIGHT_PAREN; { v = arg; }
 
 // type statement
 statement = TYPE ID(symbol) ID(type); { v = new TypeStatementNode(symbol.id, type.id); }
+
+// imports statement
+statement = IMPORTS CODE(c); { v = new ImportsStatementNode(c.code); }

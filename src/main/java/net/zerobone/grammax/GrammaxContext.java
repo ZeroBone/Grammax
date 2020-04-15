@@ -13,6 +13,8 @@ public class GrammaxContext {
 
     public Grammar grammar = null;
 
+    private String imports = null;
+
     private final HashMap<String, String> typeMap = new HashMap<>();
 
     private final ArrayList<String> errors = new ArrayList<>();
@@ -28,10 +30,22 @@ public class GrammaxContext {
 
     }
 
+    private static Production convertProduction(ProductionStatementNode statement) {
+
+        Production production = new Production(statement.code);
+
+        for (ProductionSymbol symbol : statement.production) {
+            production.append(new Symbol(symbol.id, symbol.terminal, symbol.argument));
+        }
+
+        return production;
+
+    }
+
     public void addType(String symbol, String type) {
 
         if (typeMap.containsKey(symbol)) {
-            addError("Error: Duplicate type declaration for symbol '" + symbol + "'.");
+            addError("Duplicate type declaration for symbol '" + symbol + "'.");
             return;
         }
 
@@ -39,7 +53,7 @@ public class GrammaxContext {
 
     }
 
-    public void addError(String error) {
+    private void addError(String error) {
         errors.add(error);
     }
 
@@ -65,18 +79,17 @@ public class GrammaxContext {
     }
 
     public GrammaxConfiguration getConfiguration() {
-        return new GrammaxConfiguration(typeMap);
+        return new GrammaxConfiguration(imports, typeMap);
     }
 
-    private static Production convertProduction(ProductionStatementNode statement) {
+    public void setImports(String imports) {
 
-        Production production = new Production(statement.code);
-
-        for (ProductionSymbol symbol : statement.production) {
-            production.append(new Symbol(symbol.id, symbol.terminal, symbol.argument));
+        if (this.imports != null) {
+            addError("Duplicate imports statement.");
+            return;
         }
 
-        return production;
+        this.imports = imports;
 
     }
 

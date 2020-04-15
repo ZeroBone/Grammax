@@ -19,7 +19,7 @@ import java.util.Iterator;
 
 public class Grammax {
 
-    private static final String VERSION = "1.0.0-beta";
+    public static final String VERSION = "1.0.0-beta";
 
     private final GrammaxContext context;
 
