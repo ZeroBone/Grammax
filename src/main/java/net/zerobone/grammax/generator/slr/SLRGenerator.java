@@ -20,19 +20,15 @@ public class SLRGenerator {
         writer.write(Grammax.VERSION);
         writer.write(" */");
         writer.newLine();
+
+        writer.writeAlignTrim(context.configuration.topCode);
+
         writer.newLine();
 
-        writer.write("package ");
-        writer.write(context.packageName);
-        writer.write(";");
-        writer.newLine();
-        writer.newLine();
-
+        // local imports
         writer.write("import java.util.Stack;");
+
         writer.newLine();
-
-        writer.writeAlignTrim(context.configuration.imports);
-
         writer.newLine();
 
         SLRParserClassGenerator.generate(writer, context);

@@ -13,7 +13,7 @@ public class GrammaxContext {
 
     public Grammar grammar = null;
 
-    private String imports = null;
+    private String topCode = null;
 
     private final HashMap<String, String> typeMap = new HashMap<>();
 
@@ -79,17 +79,17 @@ public class GrammaxContext {
     }
 
     public GrammaxConfiguration getConfiguration() {
-        return new GrammaxConfiguration(imports, typeMap);
+        return new GrammaxConfiguration(topCode, typeMap);
     }
 
-    public void setImports(String imports) {
+    public void setTopCode(String imports) {
 
-        if (this.imports != null) {
-            addError("Duplicate imports statement.");
+        if (this.topCode != null) {
+            addError("Duplicate %top statement.");
             return;
         }
 
-        this.imports = imports;
+        this.topCode = imports;
 
     }
 

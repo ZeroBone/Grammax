@@ -63,7 +63,6 @@ public class Grammax {
 
         GeneratorContext generatorContext = new GeneratorContext(
             "Parser",
-            "net.zerobone.parser",
             automation,
             context.getConfiguration()
         );

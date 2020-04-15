@@ -167,8 +167,8 @@ public class Lexer {
                 if (id.equals("type")) {
                     return constructPrimitiveToken(Parser.T_TYPE);
                 }
-                else if (id.equals("imports")) {
-                    return constructPrimitiveToken(Parser.T_IMPORTS);
+                else if (id.equals("top")) {
+                    return constructPrimitiveToken(Parser.T_TOP);
                 }
                 else {
                     throw new LexerException("Unknown directive '" + id + "'", line);

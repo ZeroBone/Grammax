@@ -2,17 +2,17 @@
 
 package net.zerobone.grammax.parser;
 
-import java.util.Stack;
-
 import net.zerobone.grammax.ast.TranslationUnitNode;
 import net.zerobone.grammax.ast.entities.ProductionStatementBody;
-import net.zerobone.grammax.ast.statements.ImportsStatementNode;
+import net.zerobone.grammax.ast.statements.TopStatementNode;
 import net.zerobone.grammax.ast.statements.ProductionStatementNode;
 import net.zerobone.grammax.ast.statements.StatementNode;
 import net.zerobone.grammax.ast.statements.TypeStatementNode;
 import net.zerobone.grammax.lexer.tokens.CodeToken;
 import net.zerobone.grammax.lexer.tokens.IdToken;
 import net.zerobone.grammax.utils.StringUtils;
+
+import java.util.Stack;
 
 public final class Parser {
     public static final int T_EOF = 0;
@@ -23,7 +23,7 @@ public final class Parser {
     public static final int T_LEFT_PAREN = 5;
     public static final int T_RIGHT_PAREN = 6;
     public static final int T_TYPE = 7;
-    public static final int T_IMPORTS = 8;
+    public static final int T_TOP = 8;
     private static final int terminalCount = 9;
     private static final int nonTerminalCount = 6;
     private static final int[] gotoTable = {
@@ -212,7 +212,7 @@ public final class Parser {
                 _grx_stack.pop();
                 Object v;
                 {
-                    v = new ImportsStatementNode(c.code);
+                    v = new TopStatementNode(c.code);
                 }
                 return v;
             }

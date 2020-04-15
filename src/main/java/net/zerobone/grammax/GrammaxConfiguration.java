@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 public class GrammaxConfiguration {
 
-    public final String imports;
+    public final String topCode;
 
     private final HashMap<String, String> typeMap;
 
-    public GrammaxConfiguration(String imports, HashMap<String, String> typeMap) {
-        this.imports = imports;
+    public GrammaxConfiguration(String topCode, HashMap<String, String> typeMap) {
+        this.topCode = topCode;
         this.typeMap = typeMap;
     }
 

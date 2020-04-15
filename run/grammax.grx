@@ -1,7 +1,9 @@
-%imports {
+%top {
+    package net.zerobone.grammax.parser;
+
     import net.zerobone.grammax.ast.TranslationUnitNode;
     import net.zerobone.grammax.ast.entities.ProductionStatementBody;
-    import net.zerobone.grammax.ast.statements.ImportsStatementNode;
+    import net.zerobone.grammax.ast.statements.TopStatementNode;
     import net.zerobone.grammax.ast.statements.ProductionStatementNode;
     import net.zerobone.grammax.ast.statements.StatementNode;
     import net.zerobone.grammax.ast.statements.TypeStatementNode;
@@ -57,8 +59,8 @@ productionStatementCode = CODE(c); { v = c; }
 productionStatementArgument = ; { v = null; }
 productionStatementArgument = LEFT_PAREN ID(arg) RIGHT_PAREN; { v = arg; }
 
-// type statement
+// %type statement
 statement = TYPE ID(symbol) ID(type); { v = new TypeStatementNode(symbol.id, type.id); }
 
-// imports statement
-statement = IMPORTS CODE(c); { v = new ImportsStatementNode(c.code); }
+// %top statement
+statement = TOP CODE(c); { v = new TopStatementNode(c.code); }
