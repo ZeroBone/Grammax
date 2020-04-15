@@ -1,77 +1,54 @@
 package net.zerobone.grammax.generator.slr;
 
-import com.squareup.javapoet.*;
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.generator.JavaWriter;
 import net.zerobone.grammax.generator.MetaGenerator;
 import net.zerobone.grammax.grammar.automation.AutomationProduction;
 import net.zerobone.grammax.grammar.automation.AutomationSymbol;
 
-import javax.lang.model.element.Modifier;
 import java.io.IOException;
 
 class SLRParserClassGenerator {
 
     private SLRParserClassGenerator() {}
 
-    private static TypeSpec generateStackEntryClass() {
+    private static void writeStackEntryClass(JavaWriter writer) throws IOException {
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder("StackEntry");
+        writer.beginIndentedBlock("private static final class StackEntry");
 
-        builder.addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL);
+        writer.write("private final int previousState;");
+        writer.newLine();
 
-        // fields
+        writer.write("private final Object payload;");
+        writer.newLine();
 
-        builder.addField(int.class, "previousState", Modifier.PRIVATE, Modifier.FINAL);
+        writer.beginIndentedBlock("private StackEntry(int previousState, Object payload)");
 
-        builder.addField(Object.class, "payload", Modifier.PRIVATE, Modifier.FINAL);
+        // constructor body
 
-        // constructor
+        writer.addStatement("this.previousState = previousState");
+        writer.addStatement("this.payload = payload");
 
-        builder.addMethod(
-            MethodSpec
-                .constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
-                .addParameter(int.class, "previousState")
-                .addParameter(Object.class, "payload")
-                .addStatement("this.previousState = previousState")
-                .addStatement("this.payload = payload")
-                .build()
-        );
+        // end of constructor body
 
-        return builder.build();
+        writer.endIndentedBlock();
+
+        writer.endIndentedBlock();
 
     }
 
-    private static TypeName getStackType(GeneratorContext context) {
-        return ParameterizedTypeName.get(
-            ClassName.get("java.util", "Stack"),
-            getStackEntryType(context)
-        );
-    }
+    private static void writeReductorInterface(JavaWriter writer) throws IOException {
 
-    private static TypeName getStackEntryType(GeneratorContext context) {
-        return context.getClassName().nestedClass("StackEntry");
-    }
+        writer.write("private interface Reductor {");
+        writer.newLine();
+        writer.enterIndent();
 
-    private static TypeSpec generateReductorInterface(GeneratorContext context) {
+        writer.write("Object reduce(Stack<StackEntry> _grx_stack);");
+        writer.newLine();
 
-        TypeSpec.Builder builder = TypeSpec.interfaceBuilder("Reductor");
-
-        builder.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-
-        // constructor
-
-        builder.addMethod(
-            MethodSpec
-                .methodBuilder("reduce")
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addParameter(getStackType(context), "_grx_stack")
-                .returns(Object.class)
-                .build()
-        );
-
-        return builder.build();
+        writer.exitIndent();
+        writer.write('}');
+        writer.newLine();
 
     }
 
@@ -150,17 +127,6 @@ class SLRParserClassGenerator {
 
         assert context.automation.productions.length != 0;
 
-        /*
-         * new Reductor() {
-         *         @Override
-         *         public Object reduce(Stack<StackEntry> _grx_stack) {
-         *             Object v;
-         *             { v = new TranslationUnitNode(); }
-         *             return v;
-         *         }
-         *     }
-         */
-
         writer.write("@SuppressWarnings(\"Convert2Lambda\")");
         writer.newLine();
         writer.write("private static final Reductor[] reductions = {");
@@ -190,51 +156,89 @@ class SLRParserClassGenerator {
 
     }
 
-    private static MethodSpec generateParseMethod() {
+    private static void writeParseMethod(JavaWriter writer) throws IOException {
 
-        MethodSpec.Builder builder = MethodSpec.methodBuilder("parse");
-
-        builder.addModifiers(Modifier.PUBLIC);
-
-        builder.addParameter(int.class, "tokenId");
-
-        builder.addParameter(Object.class, "tokenPayload");
+        writer.beginIndentedBlock("public void parse(int tokenId, Object tokenPayload)");
 
         // method body
 
-        builder.beginControlFlow("while (true)");
+        writer.beginIndentedBlock("while (true)");
 
-        builder.addStatement("int action = actionTable[terminalCount * stack.peek().previousState + tokenId]");
+        writer.addStatement("int action = actionTable[terminalCount * stack.peek().previousState + tokenId]");
 
         // if action is an error
-        builder.beginControlFlow("if (action == 0)");
-        builder.addStatement("throw new RuntimeException(\"Syntax error\")");
-        builder.endControlFlow();
+        writer.beginIndentedBlock("if (action == 0)");
+        writer.addStatement("throw new RuntimeException(\"Syntax error\")");
+        writer.endIndentedBlock();
 
         // if action is accept
-        builder.beginControlFlow("if (action == -1)");
-        builder.addStatement("payload = stack.peek().payload");
-        builder.addStatement("return");
-        builder.endControlFlow();
+        writer.beginIndentedBlock("if (action == -1)");
+        writer.addStatement("payload = stack.peek().payload");
+        writer.addStatement("return");
+        writer.endIndentedBlock();
 
         // if action is shift
-        builder.beginControlFlow("if (action > 0)");
-        builder.addStatement("stack.push(new StackEntry(action, tokenPayload))");
-        builder.addStatement("return");
-        builder.endControlFlow();
+        writer.beginIndentedBlock("if (action > 0)");
+        writer.addStatement("stack.push(new StackEntry(action, tokenPayload))");
+        writer.addStatement("return");
+        writer.endIndentedBlock();
 
         // otherwise the action is reduce
 
-        builder.addStatement("int productionIndex = -action - 2");
-        builder.addStatement("Object reducedProduction = reductions[productionIndex].reduce(stack)");
-        builder.addStatement("StackEntry newState = stack.peek()");
-        builder.addStatement("int nextState = gotoTable[newState.previousState * nonTerminalCount + productionLabels[productionIndex]]");
-        builder.addStatement("stack.push(new StackEntry(nextState, reducedProduction))");
+        writer.addStatement("int productionIndex = -action - 2");
+        writer.addStatement("Object reducedProduction = reductions[productionIndex].reduce(stack)");
+        writer.addStatement("StackEntry newState = stack.peek()");
+        writer.addStatement("int nextState = gotoTable[newState.previousState * nonTerminalCount + productionLabels[productionIndex]]");
+        writer.addStatement("stack.push(new StackEntry(nextState, reducedProduction))");
 
         // end of the outer infinite loop
-        builder.endControlFlow();
+        writer.endIndentedBlock();
 
-        return builder.build();
+        writer.endIndentedBlock();
+
+    }
+
+    private static void writeConstructor(JavaWriter writer) throws IOException {
+
+        writer.beginIndentedBlock("public Parser()");
+
+        writer.addStatement("stack = new Stack<>()");
+        writer.addStatement("stack.push(initialStackEntry)");
+
+        writer.endIndentedBlock();
+
+    }
+
+    private static void writeResetMethod(JavaWriter writer) throws IOException {
+
+        writer.beginIndentedBlock("public void reset()");
+
+        writer.addStatement("stack.clear()");
+        writer.addStatement("stack.push(initialStackEntry)");
+        writer.addStatement("payload = null");
+
+        writer.endIndentedBlock();
+
+    }
+
+    private static void writeSuccessfullyParsedMethod(JavaWriter writer) throws IOException {
+
+        writer.beginIndentedBlock("public boolean successfullyParsed()");
+
+        writer.addStatement("return payload != null");
+
+        writer.endIndentedBlock();
+
+    }
+
+    private static void writeGetValueMethod(JavaWriter writer) throws IOException {
+
+        writer.beginIndentedBlock("public Object getValue()");
+
+        writer.addStatement("assert payload != null : \"parsing did not succeed\"");
+        writer.addStatement("return payload");
+
+        writer.endIndentedBlock();
 
     }
 
@@ -244,11 +248,7 @@ class SLRParserClassGenerator {
         writer.write(context.className);
         writer.write(" {");
         writer.newLine();
-
         writer.enterIndent();
-
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(context.className)
-            .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
         // fields
 
@@ -262,71 +262,35 @@ class SLRParserClassGenerator {
 
         writeReductionsArray(writer, context);
 
-        classBuilder.addField(
-            FieldSpec.builder(getStackEntryType(context), "initialStackEntry")
-                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer("new StackEntry(0, null)")
-                .build()
-        );
+        // initialStackEntry
+        writer.write("private static final StackEntry initialStackEntry = new StackEntry(0, null);");
+        writer.newLine();
 
-        classBuilder.addField(
-            FieldSpec.builder(getStackType(context), "stack", Modifier.PRIVATE)
-                .build()
-        );
+        // stack
+        writer.write("private Stack<StackEntry> stack;");
+        writer.newLine();
 
-        classBuilder.addField(
-            FieldSpec.builder(Object.class, "payload", Modifier.PRIVATE)
-                .initializer("null")
-                .build()
-        );
+        // payload
+        writer.write("private Object payload = null;");
+        writer.newLine();
 
         // inner classes
 
-        classBuilder.addType(generateStackEntryClass());
+        writeStackEntryClass(writer);
 
-        classBuilder.addType(generateReductorInterface(context));
+        writeReductorInterface(writer);
 
         // methods
 
-        classBuilder.addMethod(
-            MethodSpec
-                .constructorBuilder()
-                .addModifiers(Modifier.PUBLIC)
-                .addStatement("stack = new Stack<>()")
-                .addStatement("stack.push(initialStackEntry)")
-                .build()
-        );
+        writeConstructor(writer);
 
-        classBuilder.addMethod(
-            MethodSpec
-                .methodBuilder("reset")
-                .addModifiers(Modifier.PUBLIC)
-                .addStatement("stack.clear()")
-                .addStatement("stack.push(initialStackEntry)")
-                .addStatement("payload = null")
-                .build()
-        );
+        writeResetMethod(writer);
 
-        classBuilder.addMethod(generateParseMethod());
+        writeParseMethod(writer);
 
-        classBuilder.addMethod(
-            MethodSpec
-                .methodBuilder("successfullyParsed")
-                .addModifiers(Modifier.PUBLIC)
-                .addStatement("return payload != null")
-                .returns(boolean.class)
-                .build()
-        );
+        writeSuccessfullyParsedMethod(writer);
 
-        classBuilder.addMethod(
-            MethodSpec
-                .methodBuilder("getValue")
-                .addModifiers(Modifier.PUBLIC)
-                .addStatement("assert payload != null : \"parsing did not succeed\"")
-                .addStatement("return payload")
-                .returns(Object.class)
-                .build()
-        );
+        writeGetValueMethod(writer);
 
         writer.exitIndent();
         writer.write("}");

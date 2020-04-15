@@ -26,6 +26,12 @@ public class SLRGenerator {
         writer.write(context.packageName);
         writer.write(";");
         writer.newLine();
+        writer.newLine();
+
+        writer.write("import java.util.Stack;");
+        writer.newLine();
+
+        writer.writeAlignTrim(context.configuration.imports);
 
         writer.newLine();
 

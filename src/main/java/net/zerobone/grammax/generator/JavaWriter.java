@@ -55,6 +55,18 @@ public class JavaWriter {
 
     }
 
+    public void writeAlignTrim(String s) throws IOException {
+
+        BufferedReader bufReader = new BufferedReader(new StringReader(s));
+
+        String line;
+        while ((line=bufReader.readLine()) != null) {
+            write(line.trim());
+            newLine();
+        }
+
+    }
+
     public void newLine() throws IOException {
         indenting = true;
         writer.newLine();
@@ -74,6 +86,25 @@ public class JavaWriter {
     public void exitIndent() {
         indent--;
         assert indent >= 0;
+    }
+
+    public void beginIndentedBlock() throws IOException {
+        write('{');
+        newLine();
+        enterIndent();
+    }
+
+    public void beginIndentedBlock(String title) throws IOException {
+        write(title);
+        write(" {");
+        newLine();
+        enterIndent();
+    }
+
+    public void endIndentedBlock() throws IOException {
+        exitIndent();
+        write('}');
+        newLine();
     }
 
     public void close() throws IOException {
