@@ -1,6 +1,6 @@
 package net.zerobone.grammax.utils;
 
-import net.zerobone.grammax.parser.Parser;
+import net.zerobone.grammax.parser.GrxParser;
 
 public class ParseUtils {
 
@@ -8,28 +8,28 @@ public class ParseUtils {
 
         switch (terminal) {
 
-            case Parser.T_EOF:
+            case GrxParser.T_EOF:
                 return "<end-of-source>";
 
-            case Parser.T_CODE:
+            case GrxParser.T_CODE:
                 return "<code-block>";
 
-            case Parser.T_SEMICOLON:
+            case GrxParser.T_SEMICOLON:
                 return ";";
 
-            case Parser.T_RIGHT_PAREN:
+            case GrxParser.T_RIGHT_PAREN:
                 return ")";
 
-            case Parser.T_ID:
+            case GrxParser.T_ID:
                 return "<identifier>";
 
-            case Parser.T_ASSIGN:
+            case GrxParser.T_ASSIGN:
                 return "=";
 
-            case Parser.T_LEFT_PAREN:
+            case GrxParser.T_LEFT_PAREN:
                 return "(";
 
-            case Parser.T_TYPE:
+            case GrxParser.T_TYPE:
                 return "%type";
 
             default:

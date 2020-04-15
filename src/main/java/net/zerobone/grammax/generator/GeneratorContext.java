@@ -5,14 +5,11 @@ import net.zerobone.grammax.grammar.automation.Automation;
 
 public class GeneratorContext {
 
-    public final String className;
-
     public final Automation automation;
 
     public final GrammaxConfiguration configuration;
 
-    public GeneratorContext(String className, Automation automation, GrammaxConfiguration configuration) {
-        this.className = className;
+    public GeneratorContext(Automation automation, GrammaxConfiguration configuration) {
         this.automation = automation;
         this.configuration = configuration;
     }

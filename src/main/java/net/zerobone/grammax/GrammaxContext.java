@@ -5,6 +5,7 @@ import net.zerobone.grammax.ast.statements.ProductionStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,8 @@ public class GrammaxContext {
     public Grammar grammar = null;
 
     private String topCode = null;
+
+    private String name = null;
 
     private final HashMap<String, String> typeMap = new HashMap<>();
 
@@ -79,17 +82,40 @@ public class GrammaxContext {
     }
 
     public GrammaxConfiguration getConfiguration() {
-        return new GrammaxConfiguration(topCode, typeMap);
+        return new GrammaxConfiguration(topCode, name, typeMap);
     }
 
-    public void setTopCode(String imports) {
+    public void setTopCode(String topCode) {
 
         if (this.topCode != null) {
             addError("Duplicate %top statement.");
             return;
         }
 
-        this.topCode = imports;
+        this.topCode = topCode;
+
+    }
+
+    public void setName(String name) {
+
+        if (this.name != null) {
+            addError("Duplicate %name statement.");
+            return;
+        }
+
+        assert !name.isEmpty();
+
+        if (!StringUtils.startsWithCapital(name)) {
+            addError("The name of the class should start with a capital letter.");
+            return;
+        }
+
+        if (name.length() > 20) {
+            addError("The name of the class is too long.");
+            return;
+        }
+
+        this.name = name;
 
     }
 

@@ -12,7 +12,7 @@ public class SLRGenerator {
 
     private static void generateParserClass(GeneratorContext context) throws IOException {
 
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(context.className + ".java"));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(context.configuration.getName() + ".java"));
 
         JavaWriter writer = new JavaWriter(bufferedWriter);
 

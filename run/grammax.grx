@@ -7,10 +7,13 @@
     import net.zerobone.grammax.ast.statements.ProductionStatementNode;
     import net.zerobone.grammax.ast.statements.StatementNode;
     import net.zerobone.grammax.ast.statements.TypeStatementNode;
+    import net.zerobone.grammax.ast.statements.NameStatementNode;
     import net.zerobone.grammax.lexer.tokens.CodeToken;
     import net.zerobone.grammax.lexer.tokens.IdToken;
     import net.zerobone.grammax.utils.StringUtils;
 }
+
+%name GrxParser
 
 // translation unit
 %type translationUnit TranslationUnitNode
@@ -64,3 +67,6 @@ statement = TYPE ID(symbol) ID(type); { v = new TypeStatementNode(symbol.id, typ
 
 // %top statement
 statement = TOP CODE(c); { v = new TopStatementNode(c.code); }
+
+// %name statement
+statement = NAME ID(name); { v = new NameStatementNode(name.id); }

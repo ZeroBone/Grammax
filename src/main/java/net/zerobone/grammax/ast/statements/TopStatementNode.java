@@ -4,7 +4,7 @@ import net.zerobone.grammax.GrammaxContext;
 
 public class TopStatementNode extends StatementNode {
 
-    public String code;
+    private String code;
 
     public TopStatementNode(String code) {
         this.code = code;

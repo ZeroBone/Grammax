@@ -3,7 +3,7 @@ package net.zerobone.grammax.lexer;
 import net.zerobone.grammax.lexer.tokens.CodeToken;
 import net.zerobone.grammax.lexer.tokens.IdToken;
 import net.zerobone.grammax.lexer.tokens.Token;
-import net.zerobone.grammax.parser.Parser;
+import net.zerobone.grammax.parser.GrxParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +69,7 @@ public class Lexer {
             readChar();
 
             if (current == -1) {
-                return constructPrimitiveToken(Parser.T_EOF);
+                return constructPrimitiveToken(GrxParser.T_EOF);
             }
 
             if (current == ' ' || current == '\n' || current == '\t' || current == '\r') {
@@ -102,16 +102,16 @@ public class Lexer {
         switch (current) {
 
             case '=':
-                return constructPrimitiveToken(Parser.T_ASSIGN);
+                return constructPrimitiveToken(GrxParser.T_ASSIGN);
 
             case ';':
-                return constructPrimitiveToken(Parser.T_SEMICOLON);
+                return constructPrimitiveToken(GrxParser.T_SEMICOLON);
 
             case '(':
-                return constructPrimitiveToken(Parser.T_LEFT_PAREN);
+                return constructPrimitiveToken(GrxParser.T_LEFT_PAREN);
 
             case ')':
-                return constructPrimitiveToken(Parser.T_RIGHT_PAREN);
+                return constructPrimitiveToken(GrxParser.T_RIGHT_PAREN);
 
             case '{': {
                 // code block
@@ -165,10 +165,13 @@ public class Lexer {
                 String id = readIndentifier();
 
                 if (id.equals("type")) {
-                    return constructPrimitiveToken(Parser.T_TYPE);
+                    return constructPrimitiveToken(GrxParser.T_TYPE);
                 }
                 else if (id.equals("top")) {
-                    return constructPrimitiveToken(Parser.T_TOP);
+                    return constructPrimitiveToken(GrxParser.T_TOP);
+                }
+                else if (id.equals("name")) {
+                    return constructPrimitiveToken(GrxParser.T_NAME);
                 }
                 else {
                     throw new LexerException("Unknown directive '" + id + "'", line);

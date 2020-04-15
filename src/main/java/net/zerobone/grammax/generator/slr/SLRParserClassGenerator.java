@@ -198,9 +198,13 @@ class SLRParserClassGenerator {
 
     }
 
-    private static void writeConstructor(JavaWriter writer) throws IOException {
+    private static void writeConstructor(JavaWriter writer, GeneratorContext context) throws IOException {
 
-        writer.beginIndentedBlock("public Parser()");
+        writer.write("public ");
+        writer.write(context.configuration.getName());
+        writer.write("() ");
+
+        writer.beginIndentedBlock();
 
         writer.addStatement("stack = new Stack<>()");
         writer.addStatement("stack.push(initialStackEntry)");
@@ -245,7 +249,7 @@ class SLRParserClassGenerator {
     static void generate(JavaWriter writer, GeneratorContext context) throws IOException {
 
         writer.write("public final class ");
-        writer.write(context.className);
+        writer.write(context.configuration.getName());
         writer.write(" {");
         writer.newLine();
         writer.enterIndent();
@@ -282,7 +286,7 @@ class SLRParserClassGenerator {
 
         // methods
 
-        writeConstructor(writer);
+        writeConstructor(writer, context);
 
         writeResetMethod(writer);
 

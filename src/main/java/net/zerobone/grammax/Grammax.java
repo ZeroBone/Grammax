@@ -10,7 +10,7 @@ import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
-import net.zerobone.grammax.parser.Parser;
+import net.zerobone.grammax.parser.GrxParser;
 
 import java.io.*;
 import java.util.HashMap;
@@ -62,7 +62,6 @@ public class Grammax {
         }
 
         GeneratorContext generatorContext = new GeneratorContext(
-            "Parser",
             automation,
             context.getConfiguration()
         );
@@ -221,7 +220,7 @@ public class Grammax {
             }
 
             Lexer lexer = new Lexer(is);
-            Parser parser = new Parser();
+            GrxParser parser = new GrxParser();
 
             try {
 
@@ -230,7 +229,7 @@ public class Grammax {
                 do {
                     currentToken = lexer.lex();
                     parser.parse(currentToken.type, currentToken);
-                } while (currentToken.type != Parser.T_EOF);
+                } while (currentToken.type != GrxParser.T_EOF);
 
             }
             catch (LexerException e) {

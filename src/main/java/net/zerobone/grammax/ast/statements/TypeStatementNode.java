@@ -4,9 +4,9 @@ import net.zerobone.grammax.GrammaxContext;
 
 public class TypeStatementNode extends StatementNode {
 
-    public String symbol;
+    private String symbol;
 
-    public String type;
+    private String type;
 
     public TypeStatementNode(String symbol, String type) {
         this.symbol = symbol;
