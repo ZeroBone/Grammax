@@ -1,126 +1,108 @@
 package net.zerobone.grammax.generator;
 
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.TypeSpec;
+import net.zerobone.grammax.generator.slr.SLRGenerator;
 import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.grammar.automation.AutomationProduction;
-import net.zerobone.grammax.grammar.automation.AutomationSymbol;
 
-import javax.lang.model.element.Modifier;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class MetaGenerator {
 
-    public static void writeConstants(Automation automation, TypeSpec.Builder classBuilder) {
+    public static void writeConstants(JavaWriter writer, Automation automation) throws IOException {
 
-        {
-            // T_EOF = 0
-            FieldSpec field = FieldSpec.builder(int.class, "T_EOF")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                .initializer("$L", 0)
-                .build();
-
-            classBuilder.addField(field);
-        }
+        writer.write("public static final int T_EOF = 0;");
+        writer.newLine();
 
         for (int i = 1; i < automation.terminalCount; i++) {
 
-            FieldSpec field = FieldSpec.builder(int.class, "T_" + automation.terminalToSymbol(i))
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                .initializer("$L", i)
-                .build();
-
-            classBuilder.addField(field);
-
-        }
-
-        {
-            // write terminal count
-
-            FieldSpec field = FieldSpec.builder(int.class, "terminalCount")
-                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer("$L", automation.terminalCount)
-                .build();
-
-            classBuilder.addField(field);
-
-            field = FieldSpec.builder(int.class, "nonTerminalCount")
-                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                .initializer("$L", automation.nonTerminalCount)
-                .build();
-
-            classBuilder.addField(field);
+            writer.write("public static final int T_");
+            writer.write(automation.terminalToSymbol(i));
+            writer.write(" = ");
+            writer.write(String.valueOf(i));
+            writer.write(";");
+            writer.newLine();
 
         }
+
+        // write terminal count
+
+        writer.write("private static final int terminalCount = ");
+        writer.write(String.valueOf(automation.terminalCount));
+        writer.write(";");
+        writer.newLine();
+
+        // write non-terminal count
+
+        writer.write("private static final int nonTerminalCount = ");
+        writer.write(String.valueOf(automation.nonTerminalCount));
+        writer.write(";");
+        writer.newLine();
 
     }
 
-    public static FieldSpec constructGotoTable(Automation automation) {
+    public static void writeGotoTable(JavaWriter writer, Automation automation) throws IOException {
 
-        StringBuilder sb = new StringBuilder();
+        writer.write("private static final int[] gotoTable = {");
 
-        sb.append('{');
+        writer.enterIndent();
 
         for (int s = 0; s < automation.stateCount; s++) {
 
-            sb.append('\n');
+            writer.newLine();
 
             for (int nt = 0; nt < automation.nonTerminalCount; nt++) {
 
-                sb.append(automation.gotoTable[s * automation.nonTerminalCount + nt]);
+                writer.write(String.valueOf(automation.gotoTable[s * automation.nonTerminalCount + nt]));
 
                 if (nt != automation.nonTerminalCount - 1 || s != automation.stateCount - 1) {
-                    sb.append(',');
+                    writer.write(',');
                 }
 
             }
 
         }
 
-        sb.append('}');
+        writer.exitIndent();
 
-        return FieldSpec.builder(int[].class, "gotoTable")
-            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-            .initializer("$L", sb.toString())
-            .build();
+        writer.write("};");
+        writer.newLine();
 
     }
 
-    public static FieldSpec constructActionTable(Automation automation) {
+    public static void writeActionTable(JavaWriter writer, Automation automation) throws IOException {
 
-        StringBuilder sb = new StringBuilder();
+        writer.write("private static final int[] actionTable = {");
 
-        sb.append('{');
+        writer.enterIndent();
 
         for (int s = 0; s < automation.stateCount; s++) {
 
-            sb.append('\n');
+            writer.newLine();
 
             for (int t = 0; t < automation.terminalCount; t++) {
 
-                sb.append(automation.actionTable[s * automation.terminalCount + t]);
+                writer.write(String.valueOf(automation.actionTable[s * automation.terminalCount + t]));
 
                 if (t != automation.terminalCount - 1 || s != automation.stateCount - 1) {
-                    sb.append(',');
+                    writer.write(',');
                 }
 
             }
 
         }
 
-        sb.append('}');
+        writer.exitIndent();
 
-        return FieldSpec.builder(int[].class, "actionTable")
-            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-            .initializer("$L", sb.toString())
-            .build();
+        writer.write("};");
+
+        writer.newLine();
 
     }
 
-    public static FieldSpec constructProductionLabelTable(Automation automation) {
+    public static void writeProductionLabelTable(JavaWriter writer, Automation automation) throws IOException {
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append('{');
+        writer.write("private static final int[] productionLabels = {");
 
         assert automation.productions.length != 0;
 
@@ -128,22 +110,18 @@ public class MetaGenerator {
 
             AutomationProduction production = automation.productions[i];
 
-            sb.append(production.nonTerminal);
+            writer.write(String.valueOf(production.nonTerminal));
 
             if (i == automation.productions.length - 1) {
                 break;
             }
 
-            sb.append(',');
+            writer.write(',');
 
         }
 
-        sb.append('}');
-
-        return FieldSpec.builder(int[].class, "productionLabels")
-            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-            .initializer("$L", sb.toString())
-            .build();
+        writer.write("};");
+        writer.newLine();
 
     }
 

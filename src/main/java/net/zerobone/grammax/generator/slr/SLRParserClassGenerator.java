@@ -2,11 +2,13 @@ package net.zerobone.grammax.generator.slr;
 
 import com.squareup.javapoet.*;
 import net.zerobone.grammax.generator.GeneratorContext;
+import net.zerobone.grammax.generator.JavaWriter;
 import net.zerobone.grammax.generator.MetaGenerator;
 import net.zerobone.grammax.grammar.automation.AutomationProduction;
 import net.zerobone.grammax.grammar.automation.AutomationSymbol;
 
 import javax.lang.model.element.Modifier;
+import java.io.IOException;
 
 class SLRParserClassGenerator {
 
@@ -73,24 +75,14 @@ class SLRParserClassGenerator {
 
     }
 
-    private static MethodSpec generateReduceLambdaFor(GeneratorContext context, AutomationProduction production) {
-
-        MethodSpec.Builder builder = MethodSpec.methodBuilder("reduce");
-
-        builder.addAnnotation(Override.class);
-
-        builder.addModifiers(Modifier.PUBLIC);
-
-        builder.addParameter(getStackType(context), "_grx_stack");
-
-        builder.returns(Object.class);
+    private static void writeReduceLambdaFor(JavaWriter writer, GeneratorContext context, AutomationProduction production) throws IOException {
 
         if (production.code == null) {
             for (AutomationSymbol ignored : production.body) {
-                builder.addStatement("_grx_stack.pop()");
+                writer.addStatement("_grx_stack.pop()");
             }
-            builder.addStatement("return null");
-            return builder.build();
+            writer.addStatement("return null");
+            return;
         }
 
         for (int i = production.body.length - 1; i >= 0; i--) {
@@ -98,7 +90,7 @@ class SLRParserClassGenerator {
             AutomationSymbol symbol = production.body[i];
 
             if (symbol.argumentName == null) {
-                builder.addStatement("_grx_stack.pop()");
+                writer.addStatement("_grx_stack.pop()");
                 continue;
             }
 
@@ -109,78 +101,92 @@ class SLRParserClassGenerator {
             String symbolType = context.configuration.getTypeForSymbol(symbolName);
 
             if (symbolType == null) {
-                builder.addStatement("Object " + symbol.argumentName + " = _grx_stack.pop().payload");
+                writer.addStatement("Object " + symbol.argumentName + " = _grx_stack.pop().payload");
             }
             else {
-                builder.addStatement(symbolType + " " + symbol.argumentName +
+                writer.addStatement(symbolType + " " + symbol.argumentName +
                     " = (" + symbolType + ")_grx_stack.pop().payload");
             }
 
         }
 
-        builder.addStatement("Object v");
+        writer.addStatement("Object v");
 
-        builder.addCode("{$L}\n", production.code);
+        writer.write('{');
+        writer.newLine();
+        writer.writeAlign(production.code);
+        writer.write('}');
 
-        builder.addStatement("return v");
-
-        return builder.build();
-
-    }
-
-    private static TypeSpec generateReductorFor(GeneratorContext context, AutomationProduction production) {
-
-        TypeSpec.Builder reductor = TypeSpec.anonymousClassBuilder("");
-
-        reductor.addSuperinterface(context.getClassName().nestedClass("Reductor"));
-
-        reductor.addMethod(generateReduceLambdaFor(context, production));
-
-        return reductor.build();
+        writer.newLine();
+        writer.addStatement("return v");
 
     }
 
-    private static FieldSpec generateReductionsArray(GeneratorContext context) {
+    private static void writeReductorFor(JavaWriter writer, GeneratorContext context, AutomationProduction production) throws IOException {
+
+        writer.write("new Reductor() {");
+        writer.newLine();
+        writer.enterIndent();
+
+        writer.write("@Override");
+        writer.newLine();
+
+        writer.write("public Object reduce(Stack<StackEntry> _grx_stack) {");
+        writer.newLine();
+        writer.enterIndent();
+
+        writeReduceLambdaFor(writer, context, production);
+
+        writer.exitIndent();
+        writer.write('}');
+        writer.newLine();
+
+        writer.exitIndent();
+        writer.write('}');
+
+    }
+
+    private static void writeReductionsArray(JavaWriter writer, GeneratorContext context) throws IOException {
 
         assert context.automation.productions.length != 0;
 
-        StringBuilder maskSb = new StringBuilder();
+        /*
+         * new Reductor() {
+         *         @Override
+         *         public Object reduce(Stack<StackEntry> _grx_stack) {
+         *             Object v;
+         *             { v = new TranslationUnitNode(); }
+         *             return v;
+         *         }
+         *     }
+         */
 
-        maskSb.append('{');
+        writer.write("@SuppressWarnings(\"Convert2Lambda\")");
+        writer.newLine();
+        writer.write("private static final Reductor[] reductions = {");
 
-        TypeSpec[] reductors = new TypeSpec[context.automation.productions.length];
+        writer.newLine();
+        writer.enterIndent();
 
         for (int i = 0;;i++) {
 
             AutomationProduction production = context.automation.productions[i];
 
-            reductors[i] = generateReductorFor(context, production);
-
-            maskSb.append("$L");
+            writeReductorFor(writer, context, production);
 
             if (i == context.automation.productions.length - 1) {
+                writer.newLine();
                 break;
             }
 
-            maskSb.append(',');
+            writer.write(',');
+            writer.newLine();
 
         }
 
-        maskSb.append('}');
-
-        final ClassName reductor = context.getClassName().nestedClass("Reductor");
-
-        //noinspection ConfusingArgumentToVarargsMethod
-        return FieldSpec.builder(ArrayTypeName.of(reductor), "reductions")
-            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-            .addAnnotation(
-                // @SuppressWarnings("Convert2Lambda")
-                AnnotationSpec.builder(SuppressWarnings.class)
-                    .addMember("value", "$S", "Convert2Lambda")
-                    .build()
-            )
-            .initializer(maskSb.toString(), reductors)
-            .build();
+        writer.exitIndent();
+        writer.write("};");
+        writer.newLine();
 
     }
 
@@ -232,22 +238,29 @@ class SLRParserClassGenerator {
 
     }
 
-    static TypeSpec.Builder generate(GeneratorContext context) {
+    static void generate(JavaWriter writer, GeneratorContext context) throws IOException {
+
+        writer.write("public final class ");
+        writer.write(context.className);
+        writer.write(" {");
+        writer.newLine();
+
+        writer.enterIndent();
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(context.className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
         // fields
 
-        MetaGenerator.writeConstants(context.automation, classBuilder);
+        MetaGenerator.writeConstants(writer, context.automation);
 
-        classBuilder.addField(MetaGenerator.constructGotoTable(context.automation));
+        MetaGenerator.writeGotoTable(writer, context.automation);
 
-        classBuilder.addField(MetaGenerator.constructActionTable(context.automation));
+        MetaGenerator.writeActionTable(writer, context.automation);
 
-        classBuilder.addField(MetaGenerator.constructProductionLabelTable(context.automation));
+        MetaGenerator.writeProductionLabelTable(writer, context.automation);
 
-        classBuilder.addField(generateReductionsArray(context));
+        writeReductionsArray(writer, context);
 
         classBuilder.addField(
             FieldSpec.builder(getStackEntryType(context), "initialStackEntry")
@@ -315,7 +328,8 @@ class SLRParserClassGenerator {
                 .build()
         );
 
-        return classBuilder;
+        writer.exitIndent();
+        writer.write("}");
 
     }
 
