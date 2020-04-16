@@ -21,7 +21,9 @@ public class SLRGenerator {
         writer.write(" */");
         writer.newLine();
 
-        writer.writeAlignTrim(context.configuration.topCode);
+        if (context.configuration.topCode != null) {
+            writer.writeAlignTrim(context.configuration.topCode);
+        }
 
         writer.newLine();
 
