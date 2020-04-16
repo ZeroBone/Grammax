@@ -120,13 +120,9 @@ public class Automation {
 
             int stateId = entry.getValue();
 
-            HashSet<Point> closure = grammar.lr0PointClosure(kernels);
-
-            // System.out.println("Closure of state " + stateId + ": " + closure);
-
             StringBuilder sb = new StringBuilder();
 
-            for (Point point : closure) {
+            for (Point point : kernels) {
 
                 IdProduction production = grammar.getProduction(point.productionId);
 
@@ -212,7 +208,7 @@ public class Automation {
 
                 for (int terminalOrEof : grammar.followSet(nonTerminal)) {
 
-                    writeReduce(grammar, stateId, terminalOrEof, kernelPoint.productionId);
+                    writeReduce(stateId, terminalOrEof, kernelPoint.productionId);
 
                 }
 
@@ -291,7 +287,7 @@ public class Automation {
 
     }
 
-    private void writeReduce(Grammar grammar, int state, int terminal, int productionId) {
+    private void writeReduce(int state, int terminal, int productionId) {
 
         assert productionId >= 0;
 
