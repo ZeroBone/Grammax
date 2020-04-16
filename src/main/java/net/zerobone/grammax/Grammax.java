@@ -7,12 +7,15 @@ import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.automation.conflict.Conflict;
 import net.zerobone.grammax.grammar.automation.Automation;
+import net.zerobone.grammax.grammar.verification.GrammarVerification;
+import net.zerobone.grammax.grammar.verification.messages.VerificationMessage;
 import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
 import net.zerobone.grammax.parser.GrxParser;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,6 +34,36 @@ public class Grammax {
     private void run() {
 
         System.out.println("[INF]: Grammax version: " + VERSION);
+
+        GrammarVerification verification = new GrammarVerification(context.grammar);
+
+        verification.verify();
+
+        ArrayList<VerificationMessage> messages = verification.getMessages();
+
+        if (!messages.isEmpty()) {
+
+            boolean errored = false;
+
+            for (VerificationMessage message : messages) {
+
+                if (message.warning) {
+                    System.out.print("[WRN]: ");
+                    System.out.println(message.getMessage(context.grammar));
+                }
+                else {
+                    errored = true;
+                    System.err.print("[ERR]: ");
+                    System.err.println(message.getMessage(context.grammar));
+                }
+
+            }
+
+            if (errored) {
+                return;
+            }
+
+        }
 
         // TODO: check that all the non-terminals are reachable from the start symbol
         // TODO: check that all symbols are defined
@@ -191,9 +224,7 @@ public class Grammax {
         GrammaxContext context = new GrammaxContext();
 
         for (StatementNode statement : translationUnit.statements) {
-
             statement.apply(context);
-
         }
 
         if (context.hasErrors()) {
@@ -215,7 +246,7 @@ public class Grammax {
                 is = new FileInputStream(args[0]);
             }
             catch (FileNotFoundException e) {
-                System.out.println("[ERR]: I/O error: File '" + args[0] + "' was not found!");
+                System.err.println("[ERR]: I/O error: File '" + args[0] + "' was not found!");
                 return;
             }
 
