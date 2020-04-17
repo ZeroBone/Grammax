@@ -1,7 +1,5 @@
 package net.zerobone.grammax.grammar;
 
-import java.util.Objects;
-
 public final class Symbol {
 
     // used in first and follow sets
@@ -27,4 +25,5 @@ public final class Symbol {
     public boolean equals(Object o) {
         return this == o;
     }
+
 }

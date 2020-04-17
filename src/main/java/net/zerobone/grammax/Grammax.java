@@ -109,7 +109,7 @@ public class Grammax {
 
     private void exportDebugInfo(Automation automation) throws IOException {
 
-        BufferedWriter debugLogWriter = new BufferedWriter(new FileWriter("debug.log"));
+        BufferedWriter debugLogWriter = new BufferedWriter(new FileWriter("debug.txt"));
 
         debugLogWriter.write("Grammar:");
         debugLogWriter.newLine();

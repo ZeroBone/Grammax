@@ -73,8 +73,6 @@ public class LR0Items {
             // kernels of the new state
             HashSet<Point> derivative = derivativeEntry.getValue();
 
-            assert debug_derivativeValid(derivative);
-
             Integer derivativeStateId = states.get(derivative);
 
             if (derivativeStateId == null) {
@@ -107,26 +105,6 @@ public class LR0Items {
 
     public Set<Map.Entry<HashSet<Point>, Integer>> getStates() {
         return states.entrySet();
-    }
-
-    public static boolean debug_derivativeValid(HashSet<Point> derivative) {
-
-        if (derivative.isEmpty()) {
-            return false;
-        }
-
-        HashSet<Integer> pointProductions = new HashSet<>();
-
-        for (Point point : derivative) {
-            if (pointProductions.contains(point.productionId)) {
-                System.err.println("Duplicate derivative for production " + point.productionId);
-                return false;
-            }
-            pointProductions.add(point.productionId);
-        }
-
-        return true;
-
     }
 
 }

@@ -87,13 +87,11 @@ public class SLRAutomation extends Automation {
 
             int stateId = entry.getValue();
 
-            HashSet<Point> fullDerivative = LR0ClosureCalculation.endPointClosure(grammar, derivative);
+            HashSet<Point> endPoints = LR0ClosureCalculation.endPointClosure(grammar, derivative);
 
-            assert !fullDerivative.isEmpty();
+            System.out.println("[LOG]: State: " + stateId + " Derivative: " + derivative + " End points: " + endPoints);
 
-            System.out.println("[LOG]: State: " + stateId + " Derivative: " + derivative + " End point derivative: " + fullDerivative);
-
-            for (Point kernelPoint : fullDerivative) {
+            for (Point kernelPoint : endPoints) {
 
                 Production pointProduction = grammar.getProduction(kernelPoint.productionId);
 
