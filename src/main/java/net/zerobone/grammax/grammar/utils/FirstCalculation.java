@@ -39,9 +39,9 @@ public class FirstCalculation {
 
         HashSet<Symbol> set = new HashSet<>();
 
-        for (int productionId : grammar.getProductionsFor(nonTerminal)) {
+        for (Iterator<Production> it = grammar.getProductionsFor(nonTerminal); it.hasNext();) {
 
-            Production production = grammar.getProduction(productionId);
+            Production production = it.next();
 
             if (production.body.isEmpty()) {
 

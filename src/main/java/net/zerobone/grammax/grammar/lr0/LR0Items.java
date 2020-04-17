@@ -26,11 +26,13 @@ public class LR0Items {
         int productionId;
 
         {
-            ArrayList<Integer> startSymbolProductions = grammar.getProductionsFor(grammar.getStartSymbol());
+            Iterator<Integer> startSymbolProductions = grammar.getProductionIdsFor(grammar.getStartSymbol());
 
-            assert startSymbolProductions.size() == 1 : "grammar is not augmented";
+            assert startSymbolProductions.hasNext() : "grammar is not augmented";
 
-            productionId = startSymbolProductions.get(0);
+            productionId = startSymbolProductions.next();
+
+            assert !startSymbolProductions.hasNext() : "grammar is not augmented";
 
         }
 

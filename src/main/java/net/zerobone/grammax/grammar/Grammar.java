@@ -5,7 +5,7 @@ import net.zerobone.grammax.utils.zerolist.ZeroList;
 
 import java.util.*;
 
-public class Grammar {
+public class Grammar implements Iterable<Production> {
 
     private HashMap<String, Symbol> nonTerminals = new HashMap<>();
 
@@ -245,13 +245,29 @@ public class Grammar {
         return productions.get(productionId);
     }
 
-    public ZeroList<Production> getProductionList() {
-        return productions;
+    @Override
+    public Iterator<Production> iterator() {
+        return productions.iterator();
     }
 
-    public ArrayList<Integer> getProductionsFor(Symbol nonTerminal) {
+    public Iterator<Integer> getProductionIdsFor(Symbol nonTerminal) {
         assert productionMap.containsKey(nonTerminal) : "invalid nonTerminal specified";
-        return productionMap.get(nonTerminal);
+        return productionMap.get(nonTerminal).iterator();
+    }
+
+    public Iterator<Production> getProductionsFor(Symbol nonTerminal) {
+        final Iterator<Integer> productionIds = getProductionIdsFor(nonTerminal);
+        return new Iterator<Production>() {
+            @Override
+            public boolean hasNext() {
+                return productionIds.hasNext();
+            }
+
+            @Override
+            public Production next() {
+                return getProduction(productionIds.next());
+            }
+        };
     }
 
     public Set<Map.Entry<Symbol, ArrayList<Integer>>> getProductions() {

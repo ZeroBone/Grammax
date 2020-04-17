@@ -7,6 +7,7 @@ import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -88,7 +89,8 @@ public class LR0ClosureCalculation {
             Symbol nonTerminal = pendingNonTerminals.poll();
             assert !nonTerminal.isTerminal;
 
-            for (int productionId : grammar.getProductionsFor(nonTerminal)) {
+            for (Iterator<Integer> it = grammar.getProductionIdsFor(nonTerminal); it.hasNext(); ) {
+                int productionId = it.next();
 
                 if (added.contains(productionId)) {
                     continue;

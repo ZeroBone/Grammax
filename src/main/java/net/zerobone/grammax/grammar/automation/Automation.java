@@ -105,7 +105,7 @@ public class Automation {
 
         counter = 0;
 
-        for (Production production : grammar.getProductionList()) {
+        for (Production production : grammar) {
 
             if (production.getNonTerminal() == grammar.getStartSymbol()) {
                 continue;

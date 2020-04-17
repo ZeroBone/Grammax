@@ -57,9 +57,9 @@ public class GrammarVerification {
 
                 Symbol adjacentNonTerminal = null;
 
-                for (Integer productionId : grammar.getProductionsFor(currentNonTerminal)) {
+                for (Iterator<Production> it = grammar.getProductionsFor(currentNonTerminal); it.hasNext();) {
 
-                    Production production = grammar.getProduction(productionId);
+                    Production production = it.next();
 
                     if (production.body.isEmpty()) {
                         continue;
@@ -140,7 +140,7 @@ public class GrammarVerification {
 
         for (Symbol nonTerminal : grammar.getNonTerminalSymbols()) {
 
-            if (grammar.getProductionsFor(nonTerminal) == null) {
+            if (grammar.getProductionIdsFor(nonTerminal) == null) {
                 messages.add(new NonTerminalNotDefinedMessage(nonTerminal));
             }
 
@@ -163,9 +163,9 @@ public class GrammarVerification {
 
             unreachableProductions.remove(nonTerminal);
 
-            for (int productionId : grammar.getProductionsFor(nonTerminal)) {
+            for (Iterator<Production> it = grammar.getProductionsFor(nonTerminal); it.hasNext(); ) {
 
-                Production production = grammar.getProduction(productionId);
+                Production production = it.next();
 
                 for (ProductionSymbol symbol : production.body) {
 

@@ -14,7 +14,7 @@ public final class Symbol {
 
     public final boolean isTerminal;
 
-    public Symbol(String id, boolean isTerminal) {
+    Symbol(String id, boolean isTerminal) {
         this.id = id;
         this.isTerminal = isTerminal;
     }
