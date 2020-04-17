@@ -62,7 +62,7 @@ public class LR0Items {
 
         int stateId = states.get(state);
 
-        HashMap<Symbol, HashSet<Point>> derivatives = grammar.calculateAllLr0Derivatives(state);
+        HashMap<Symbol, HashSet<Point>> derivatives = LR0DerivativeCalculation.calculateAllDerivatives(grammar, state);
 
         for (Map.Entry<Symbol, HashSet<Point>> derivativeEntry : derivatives.entrySet()) {
 
@@ -70,6 +70,8 @@ public class LR0Items {
 
             // kernels of the new state
             HashSet<Point> derivative = derivativeEntry.getValue();
+
+            assert debug_derivativeValid(derivative);
 
             Integer derivativeStateId = states.get(derivative);
 
@@ -103,6 +105,26 @@ public class LR0Items {
 
     public Set<Map.Entry<HashSet<Point>, Integer>> getStates() {
         return states.entrySet();
+    }
+
+    public static boolean debug_derivativeValid(HashSet<Point> derivative) {
+
+        if (derivative.isEmpty()) {
+            return false;
+        }
+
+        HashSet<Integer> pointProductions = new HashSet<>();
+
+        for (Point point : derivative) {
+            if (pointProductions.contains(point.productionId)) {
+                System.err.println("Duplicate derivative for production " + point.productionId);
+                return false;
+            }
+            pointProductions.add(point.productionId);
+        }
+
+        return true;
+
     }
 
 }

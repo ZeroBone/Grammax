@@ -15,7 +15,9 @@ public class LR0DerivativeCalculation {
 
     public static HashMap<Symbol, HashSet<Point>> calculateAllDerivatives(Grammar grammar, HashSet<Point> kernels) {
 
-        HashSet<Point> closure = grammar.lr0PointClosure(kernels);
+        HashSet<Point> closure = LR0ClosureCalculation.closure(grammar, kernels);
+
+        assert LR0Items.debug_derivativeValid(closure);
 
         HashMap<Symbol, HashSet<Point>> derivatives = new HashMap<>();
 
@@ -24,7 +26,6 @@ public class LR0DerivativeCalculation {
             Production production = grammar.getProduction(point.productionId);
 
             assert production != null;
-
             assert point.position <= production.body.size();
 
             if (point.position == production.body.size()) {
@@ -37,6 +38,8 @@ public class LR0DerivativeCalculation {
             HashSet<Point> correspondingDerivative = derivatives.computeIfAbsent(symbolAfterPoint.symbol, k -> new HashSet<>());
 
             correspondingDerivative.add(new Point(point.productionId, point.position + 1));
+
+            assert LR0Items.debug_derivativeValid(correspondingDerivative);
 
         }
 

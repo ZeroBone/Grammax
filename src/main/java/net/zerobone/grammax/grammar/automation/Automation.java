@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class Automation {
 
-    public static final int ACTION_ACCEPT = -1;
+    private static final int ACTION_ACCEPT = -1;
 
     public final int stateCount;
 
@@ -53,8 +53,10 @@ public class Automation {
 
         this.stateCount = stateCount;
 
+        // - 1 because we will ignore the augmenting symbol
         int nonTerminalCount = grammar.getNonTerminalCount() - 1;
 
+        // + 1 because of the eof token
         int terminalCount = grammar.getTerminalCount() + 1;
 
         // initialize non-terminals

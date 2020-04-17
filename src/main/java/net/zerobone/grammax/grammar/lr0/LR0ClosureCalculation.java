@@ -28,7 +28,7 @@ public class LR0ClosureCalculation {
 
     private static HashSet<Point> calculateClosure(Grammar grammar, HashSet<Point> kernels, boolean onlyEndPoint) {
 
-        HashSet<Symbol> added = new HashSet<>(grammar.getNonTerminalCount());
+        HashSet<Integer> added = new HashSet<>();
 
         Queue<Symbol> pendingNonTerminals = new LinkedList<>();
 
@@ -47,19 +47,19 @@ public class LR0ClosureCalculation {
 
             // non-terminal
 
-            if (added.contains(symbolAfterPoint.symbol)) {
+            if (added.contains(point.productionId)) {
                 continue;
             }
 
             pendingNonTerminals.add(symbolAfterPoint.symbol);
 
-            added.add(symbolAfterPoint.symbol);
+            added.add(point.productionId);
 
         }
 
-        HashSet<Point> closure;
+        HashSet<Point> closure = new HashSet<>(kernels);
 
-        if (onlyEndPoint) {
+        /*if (onlyEndPoint) {
 
             closure = new HashSet<>();
 
@@ -79,10 +79,7 @@ public class LR0ClosureCalculation {
 
             }
 
-        }
-        else {
-            closure = new HashSet<>(kernels);
-        }
+        }*/
 
         // bfs
 
@@ -93,16 +90,25 @@ public class LR0ClosureCalculation {
 
             for (int productionId : grammar.getProductionsFor(nonTerminal)) {
 
+                if (added.contains(productionId)) {
+                    continue;
+                }
+
                 Production production = grammar.getProduction(productionId);
 
                 assert production != null;
 
-                if (!onlyEndPoint || production.body.isEmpty()) {
+                /*if (!onlyEndPoint || production.body.isEmpty()) {
                     closure.add(new Point(productionId, 0));
-                }
+                }*/
 
                 if (production.body.isEmpty()) {
+                    closure.add(new Point(productionId, 0));
                     continue;
+                }
+
+                if (!onlyEndPoint) {
+                    closure.add(new Point(productionId, 0));
                 }
 
                 ProductionSymbol firstSymbol = production.body.get(0);
@@ -113,13 +119,9 @@ public class LR0ClosureCalculation {
 
                 // first symbol is a non-terminal
 
-                if (added.contains(firstSymbol.symbol)) {
-                    continue;
-                }
-
                 pendingNonTerminals.add(firstSymbol.symbol);
 
-                added.add(firstSymbol.symbol);
+                added.add(productionId);
 
             }
 

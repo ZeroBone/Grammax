@@ -1,7 +1,5 @@
 package net.zerobone.grammax.grammar;
 
-import net.zerobone.grammax.grammar.lr0.LR0ClosureCalculation;
-import net.zerobone.grammax.grammar.lr0.LR0DerivativeCalculation;
 import net.zerobone.grammax.grammar.utils.*;
 import net.zerobone.grammax.utils.zerolist.ZeroList;
 
@@ -167,25 +165,12 @@ public class Grammar {
         cachedFollowSets = null;
     }
 
-    // TODO: move all this functionality to grammar plugins
     public void augment() {
 
         Augmentor.augment(this);
 
         invalidateCaches();
 
-    }
-
-    public HashSet<Point> lr0PointClosure(HashSet<Point> kernels) {
-        return LR0ClosureCalculation.closure(this, kernels);
-    }
-
-    public HashSet<Point> lr0EndPointClosure(HashSet<Point> kernels) {
-        return LR0ClosureCalculation.endPointClosure(this, kernels);
-    }
-
-    public HashMap<Symbol, HashSet<Point>> calculateAllLr0Derivatives(HashSet<Point> kernels) {
-        return LR0DerivativeCalculation.calculateAllDerivatives(this, kernels);
     }
 
     public HashMap<Symbol, HashSet<Symbol>> firstSets() {

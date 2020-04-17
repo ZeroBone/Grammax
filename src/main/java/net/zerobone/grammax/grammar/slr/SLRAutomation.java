@@ -4,6 +4,7 @@ import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.Automation;
+import net.zerobone.grammax.grammar.lr0.LR0ClosureCalculation;
 import net.zerobone.grammax.grammar.lr0.LR0ItemTransition;
 import net.zerobone.grammax.grammar.lr0.LR0Items;
 import net.zerobone.grammax.grammar.utils.Point;
@@ -82,11 +83,15 @@ public class SLRAutomation extends Automation {
 
             HashSet<Point> derivative = entry.getKey();
 
+            assert !derivative.isEmpty();
+
             int stateId = entry.getValue();
 
-            HashSet<Point> fullDerivative = grammar.lr0EndPointClosure(derivative);
+            HashSet<Point> fullDerivative = LR0ClosureCalculation.endPointClosure(grammar, derivative);
 
-            System.out.println("[LOG]: State: " + stateId + " End point derivative: " + fullDerivative);
+            assert !fullDerivative.isEmpty();
+
+            System.out.println("[LOG]: State: " + stateId + " Derivative: " + derivative + " End point derivative: " + fullDerivative);
 
             for (Point kernelPoint : fullDerivative) {
 
@@ -107,9 +112,6 @@ public class SLRAutomation extends Automation {
 
                     continue;
                 }
-
-                // System.out.println("[LOG]: " + pointProduction.stringifyWithPointMarker(grammar, kernelPoint.position));
-                // System.out.println("[LOG]: Ending point for label '" + grammar.nonTerminalToSymbol(nonTerminal) + "' found in state " + stateId);
 
                 // compute the follow set of the label of the production with the point at the end
 
