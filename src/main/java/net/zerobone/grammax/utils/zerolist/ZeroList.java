@@ -1,8 +1,9 @@
 package net.zerobone.grammax.utils.zerolist;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class ZeroList<T extends ZeroListable> {
+public class ZeroList<T extends ZeroListable> implements Iterable<T> {
 
     /**
      * Internal element container.
@@ -205,6 +206,11 @@ public class ZeroList<T extends ZeroListable> {
 
         spaceIndexes.add(id);
 
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ZeroListIterator<>(elements);
     }
 
     /**

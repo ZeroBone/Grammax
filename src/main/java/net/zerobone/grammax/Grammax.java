@@ -4,9 +4,11 @@ import net.zerobone.grammax.ast.TranslationUnitNode;
 import net.zerobone.grammax.ast.statements.StatementNode;
 import net.zerobone.grammax.generator.slr.SLRGenerator;
 import net.zerobone.grammax.generator.GeneratorContext;
-import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.conflict.Conflict;
 import net.zerobone.grammax.grammar.automation.Automation;
+import net.zerobone.grammax.grammar.lr0.LR0Items;
+import net.zerobone.grammax.grammar.slr.SLRAutomation;
 import net.zerobone.grammax.grammar.verification.GrammarVerification;
 import net.zerobone.grammax.grammar.verification.messages.VerificationMessage;
 import net.zerobone.grammax.lexer.Lexer;
@@ -15,10 +17,7 @@ import net.zerobone.grammax.lexer.tokens.Token;
 import net.zerobone.grammax.parser.GrxParser;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 public class Grammax {
 
@@ -65,13 +64,11 @@ public class Grammax {
 
         }
 
-        // TODO: check that all the non-terminals are reachable from the start symbol
-        // TODO: check that all symbols are defined
-        // TODO: warn about right recursion in the grammar
-
         context.grammar.augment();
 
-        Automation automation = new Automation(context.grammar);
+        LR0Items items = new LR0Items(context.grammar);
+
+        Automation automation = new SLRAutomation(context.grammar, items);
 
         try {
             exportDebugInfo(automation);
@@ -125,27 +122,23 @@ public class Grammax {
         debugLogWriter.write("First sets:");
         debugLogWriter.newLine();
 
-        HashMap<Integer, HashSet<Integer>> firstSets = context.grammar.firstSets();
+        HashMap<Symbol, HashSet<Symbol>> firstSets = context.grammar.firstSets();
 
-        for (HashMap.Entry<Integer, HashSet<Integer>> entry : firstSets.entrySet()) {
+        for (Map.Entry<Symbol, HashSet<Symbol>> entry : firstSets.entrySet()) {
 
             debugLogWriter.write("FIRST(");
-            debugLogWriter.write(context.grammar.idToSymbol(entry.getKey()));
+            debugLogWriter.write(entry.getKey().id);
             debugLogWriter.write(") = {");
 
-            Iterator<Integer> firstSetIterator = entry.getValue().iterator();
+            Iterator<Symbol> firstSetIterator = entry.getValue().iterator();
 
             if (firstSetIterator.hasNext()) {
 
                 while (true) {
 
-                    int id = firstSetIterator.next();
+                    Symbol id = firstSetIterator.next();
 
-                    if (id != Grammar.FIRST_FOLLOW_SET_EPSILON) {
-
-                        debugLogWriter.write(context.grammar.idToSymbol(id));
-
-                    }
+                    debugLogWriter.write(id.id);
 
                     if (!firstSetIterator.hasNext()) {
                         break;
@@ -168,30 +161,23 @@ public class Grammax {
         debugLogWriter.write("Follow sets:");
         debugLogWriter.newLine();
 
-        HashMap<Integer, HashSet<Integer>> followSets = context.grammar.followSets();
+        HashMap<Symbol, HashSet<Symbol>> followSets = context.grammar.followSets();
 
-        for (HashMap.Entry<Integer, HashSet<Integer>> entry : followSets.entrySet()) {
+        for (Map.Entry<Symbol, HashSet<Symbol>> entry : followSets.entrySet()) {
 
             debugLogWriter.write("FOLLOW(");
-            debugLogWriter.write(context.grammar.idToSymbol(entry.getKey()));
+            debugLogWriter.write(entry.getKey().id);
             debugLogWriter.write(") = {");
 
-            Iterator<Integer> followSetIterator = entry.getValue().iterator();
+            Iterator<Symbol> followSetIterator = entry.getValue().iterator();
 
             if (followSetIterator.hasNext()) {
 
                 while (true) {
 
-                    int id = followSetIterator.next();
+                    Symbol id = followSetIterator.next();
 
-                    if (id == Grammar.TERMINAL_EOF) {
-                        debugLogWriter.write("$");
-                    }
-                    else if (id != Grammar.FIRST_FOLLOW_SET_EPSILON) {
-
-                        debugLogWriter.write(context.grammar.idToSymbol(id));
-
-                    }
+                    debugLogWriter.write(id.id);
 
                     if (!followSetIterator.hasNext()) {
                         break;

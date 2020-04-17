@@ -1,8 +1,9 @@
 package net.zerobone.grammax.grammar.verification;
 
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.id.IdProduction;
-import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.Production;
+import net.zerobone.grammax.grammar.ProductionSymbol;
+import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.verification.messages.RightRecursiveCycleMessage;
 import net.zerobone.grammax.grammar.verification.messages.NonTerminalNotDefinedMessage;
 import net.zerobone.grammax.grammar.verification.messages.UnreachableNonTerminalsMessage;
@@ -22,19 +23,19 @@ public class GrammarVerification {
 
     private void verifyNoRightRecursion() {
 
-        HashSet<Integer> unvisitedSet = new HashSet<>(grammar.getNonTerminals());
+        HashSet<Symbol> unvisitedSet = new HashSet<>(grammar.getNonTerminalSymbols());
 
-        HashSet<Integer> visitedAndOnTheStackSet = new HashSet<>();
+        HashSet<Symbol> visitedAndOnTheStackSet = new HashSet<>();
 
-        HashSet<Integer> visitedAndPoppedOutOfStackSet = new HashSet<>();
+        HashSet<Symbol> visitedAndPoppedOutOfStackSet = new HashSet<>();
 
-        HashMap<Integer, Integer> parentMap = new HashMap<>();
+        HashMap<Symbol, Symbol> parentMap = new HashMap<>();
 
-        Stack<Integer> stack = new Stack<>();
+        Stack<Symbol> stack = new Stack<>();
 
         while (!unvisitedSet.isEmpty()) {
 
-            int start = unvisitedSet.iterator().next();
+            Symbol start = unvisitedSet.iterator().next();
 
             stack.clear();
             visitedAndOnTheStackSet.clear();
@@ -49,40 +50,41 @@ public class GrammarVerification {
 
             while (!stack.isEmpty()) {
 
-                int currentNonTerminal = stack.peek();
+                Symbol currentNonTerminal = stack.peek();
+                assert !currentNonTerminal.isTerminal;
 
                 // find adjacent non-terminal
 
-                int adjacentNonTerminal = 0;
+                Symbol adjacentNonTerminal = null;
 
                 for (Integer productionId : grammar.getProductionsFor(currentNonTerminal)) {
 
-                    IdProduction production = grammar.getProduction(productionId);
+                    Production production = grammar.getProduction(productionId);
 
                     if (production.body.isEmpty()) {
                         continue;
                     }
 
-                    IdSymbol lastSymbol = production.body.get(production.body.size() - 1);
+                    ProductionSymbol lastSymbol = production.body.get(production.body.size() - 1);
 
-                    if (lastSymbol.isTerminal()) {
+                    if (lastSymbol.symbol.isTerminal) {
                         continue;
                     }
 
-                    if (visitedAndPoppedOutOfStackSet.contains(lastSymbol.id)) {
+                    if (visitedAndPoppedOutOfStackSet.contains(lastSymbol.symbol)) {
                         continue;
                     }
 
-                    if (visitedAndOnTheStackSet.contains(lastSymbol.id)) {
+                    if (visitedAndOnTheStackSet.contains(lastSymbol.symbol)) {
                         // we found a cycle
 
-                        int cycleEnd = lastSymbol.id;
-                        int currentNode = currentNonTerminal;
+                        Symbol cycleEnd = lastSymbol.symbol;
+                        Symbol currentNode = currentNonTerminal;
 
                         // visitedAndOnTheStackSet.remove(cycleEnd);
                         // visitedAndOnTheStackSet.remove(currentNode);
 
-                        LinkedList<Integer> cycle = new LinkedList<>();
+                        LinkedList<Symbol> cycle = new LinkedList<>();
 
                         cycle.addFirst(cycleEnd);
                         cycle.addFirst(currentNode);
@@ -102,11 +104,11 @@ public class GrammarVerification {
 
                     }
 
-                    adjacentNonTerminal = lastSymbol.id;
+                    adjacentNonTerminal = lastSymbol.symbol;
 
                 }
 
-                if (adjacentNonTerminal == 0) {
+                if (adjacentNonTerminal == null) {
 
                     // didn't find any other node
 
@@ -117,6 +119,7 @@ public class GrammarVerification {
                     stack.pop();
 
                     continue;
+
                 }
 
                 stack.push(adjacentNonTerminal);
@@ -135,7 +138,7 @@ public class GrammarVerification {
 
     private void verifyAllNonterminalsDefined() {
 
-        for (int nonTerminal : grammar.getNonTerminals()) {
+        for (Symbol nonTerminal : grammar.getNonTerminalSymbols()) {
 
             if (grammar.getProductionsFor(nonTerminal) == null) {
                 messages.add(new NonTerminalNotDefinedMessage(nonTerminal));
@@ -147,33 +150,34 @@ public class GrammarVerification {
 
     private void verifyNoUnreachableProduction() {
 
-        HashSet<Integer> unreachableProductions = new HashSet<>(grammar.getNonTerminals());
+        HashSet<Symbol> unreachableProductions = new HashSet<>(grammar.getNonTerminalSymbols());
 
-        Stack<Integer> stack = new Stack<>();
+        Stack<Symbol> stack = new Stack<>();
 
         stack.push(grammar.getStartSymbol());
 
         do {
 
-            int nonTerminal = stack.pop();
+            Symbol nonTerminal = stack.pop();
+            assert !nonTerminal.isTerminal;
 
             unreachableProductions.remove(nonTerminal);
 
             for (int productionId : grammar.getProductionsFor(nonTerminal)) {
 
-                IdProduction production = grammar.getProduction(productionId);
+                Production production = grammar.getProduction(productionId);
 
-                for (IdSymbol symbol : production.body) {
+                for (ProductionSymbol symbol : production.body) {
 
-                    if (symbol.isTerminal()) {
+                    if (symbol.symbol.isTerminal) {
                         continue;
                     }
 
-                    if (!unreachableProductions.contains(symbol.id)) {
+                    if (!unreachableProductions.contains(symbol.symbol)) {
                         continue;
                     }
 
-                    stack.push(symbol.id);
+                    stack.push(symbol.symbol);
 
                 }
 

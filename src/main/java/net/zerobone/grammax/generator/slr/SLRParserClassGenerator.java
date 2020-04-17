@@ -179,7 +179,7 @@ class SLRParserClassGenerator {
 
         // if action is shift
         writer.beginIndentedBlock("if (action > 0)");
-        writer.addStatement("stack.push(new StackEntry(action, tokenPayload))");
+        writer.addStatement("stack.push(new StackEntry(action - 1, tokenPayload))");
         writer.addStatement("return");
         writer.endIndentedBlock();
 
@@ -189,7 +189,7 @@ class SLRParserClassGenerator {
         writer.addStatement("Object reducedProduction = reductions[productionIndex].reduce(stack)");
         writer.addStatement("StackEntry newState = stack.peek()");
         writer.addStatement("int nextState = gotoTable[newState.previousState * nonTerminalCount + productionLabels[productionIndex]]");
-        writer.addStatement("stack.push(new StackEntry(nextState, reducedProduction))");
+        writer.addStatement("stack.push(new StackEntry(nextState - 1, reducedProduction))");
 
         // end of the outer infinite loop
         writer.endIndentedBlock();

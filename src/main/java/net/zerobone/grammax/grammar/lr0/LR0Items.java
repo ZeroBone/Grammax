@@ -1,6 +1,7 @@
 package net.zerobone.grammax.grammar.lr0;
 
 import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.*;
@@ -61,11 +62,11 @@ public class LR0Items {
 
         int stateId = states.get(state);
 
-        HashMap<Integer, HashSet<Point>> derivatives = grammar.calculateAllLr0Derivatives(state);
+        HashMap<Symbol, HashSet<Point>> derivatives = grammar.calculateAllLr0Derivatives(state);
 
-        for (HashMap.Entry<Integer, HashSet<Point>> derivativeEntry : derivatives.entrySet()) {
+        for (Map.Entry<Symbol, HashSet<Point>> derivativeEntry : derivatives.entrySet()) {
 
-            int grammarSymbol = derivativeEntry.getKey();
+            Symbol grammarSymbol = derivativeEntry.getKey();
 
             // kernels of the new state
             HashSet<Point> derivative = derivativeEntry.getValue();
@@ -84,7 +85,7 @@ public class LR0Items {
 
             }
 
-            System.out.println("[LOG]: Deriving: " + stateId + " / " + grammar.idToSymbol(grammarSymbol) + " = " + derivativeStateId);
+            System.out.println("[LOG]: Deriving: " + stateId + " / " + grammarSymbol.id + " = " + derivativeStateId);
 
             transitions.add(new LR0ItemTransition(stateId, grammarSymbol, derivativeStateId));
 

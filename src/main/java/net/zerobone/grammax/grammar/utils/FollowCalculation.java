@@ -1,8 +1,9 @@
 package net.zerobone.grammax.grammar.utils;
 
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.id.IdProduction;
-import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.Production;
+import net.zerobone.grammax.grammar.ProductionSymbol;
+import net.zerobone.grammax.grammar.Symbol;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ public class FollowCalculation {
 
     private final Grammar grammar;
 
-    private final HashMap<Integer, HashSet<Integer>> followSets = new HashMap<>();
+    private final HashMap<Symbol, HashSet<Symbol>> followSets = new HashMap<>();
 
     private FollowCalculation(Grammar grammar) {
         this.grammar = grammar;
@@ -21,9 +22,9 @@ public class FollowCalculation {
 
     private void computeFollowSets() {
 
-        for (Map.Entry<Integer, ArrayList<Integer>> pair : grammar.getProductions()) {
+        for (Map.Entry<Symbol, ArrayList<Integer>> pair : grammar.getProductions()) {
 
-            int nonTerminal = pair.getKey();
+            Symbol nonTerminal = pair.getKey();
 
             followSets.put(nonTerminal, initializeFollowSet(nonTerminal));
 
@@ -31,7 +32,7 @@ public class FollowCalculation {
 
         followSets
             .get(grammar.getStartSymbol())
-            .add(Grammar.TERMINAL_EOF);
+            .add(Symbol.EOF);
 
         while (true) {
             if (!updateFollowSets()) {
@@ -41,36 +42,36 @@ public class FollowCalculation {
 
     }
 
-    private HashSet<Integer> initializeFollowSet(int nonTerminal) {
+    private HashSet<Symbol> initializeFollowSet(Symbol nonTerminal) {
 
-        HashSet<Integer> set = new HashSet<>();
+        HashSet<Symbol> set = new HashSet<>();
 
         for (ArrayList<Integer> currentProductions : grammar.getProductionIds()) {
 
             for (int productionId : currentProductions) {
 
-                IdProduction production = grammar.getProduction(productionId);
+                Production production = grammar.getProduction(productionId);
 
                 for (int i = 0; i < production.body.size();) {
 
-                    IdSymbol symbol = production.body.get(i);
+                    ProductionSymbol symbol = production.body.get(i);
 
-                    if (symbol.id != nonTerminal) {
+                    if (symbol.symbol != nonTerminal) {
                         i++;
                         continue;
                     }
 
-                    assert !symbol.isTerminal();
+                    assert !symbol.symbol.isTerminal;
 
                     if (i == production.body.size() - 1) {
                         // epsilon tokens are never present in follow sets
                         break;
                     }
 
-                    IdSymbol nextSymbol = production.body.get(i + 1);
+                    ProductionSymbol nextSymbol = production.body.get(i + 1);
 
-                    if (nextSymbol.isTerminal()) {
-                        set.add(nextSymbol.id);
+                    if (nextSymbol.symbol.isTerminal) {
+                        set.add(nextSymbol.symbol);
                     }
 
                     i += 2;
@@ -89,23 +90,21 @@ public class FollowCalculation {
 
         boolean modified = false;
 
-        for (Map.Entry<Integer, ArrayList<Integer>> pair : grammar.getProductions()) {
+        for (Map.Entry<Symbol, ArrayList<Integer>> pair : grammar.getProductions()) {
 
-            int productionLabel = pair.getKey();
+            Symbol productionLabel = pair.getKey();
 
             ArrayList<Integer> thisLabelProductions = pair.getValue();
 
             for (int productionId : thisLabelProductions) {
 
-                IdProduction production = grammar.getProduction(productionId);
+                Production production = grammar.getProduction(productionId);
 
-                ArrayList<IdSymbol> body = production.body;
+                for (int i = 0; i < production.body.size();) {
 
-                for (int i = 0; i < body.size();) {
+                    ProductionSymbol symbol = production.body.get(i);
 
-                    IdSymbol symbol = body.get(i);
-
-                    if (symbol.isTerminal()) {
+                    if (symbol.symbol.isTerminal) {
                         i++;
                         continue;
                     }
@@ -114,11 +113,11 @@ public class FollowCalculation {
                     // or alpha A
                     // examine the next symbol to find out
 
-                    if (i == body.size() - 1) {
+                    if (i == production.body.size() - 1) {
                         // beta = epsilon
                         // so we are in the alpha A situation
 
-                        HashSet<Integer> followSet = followSets.get(symbol.id);
+                        HashSet<Symbol> followSet = followSets.get(symbol.symbol);
 
                         // System.out.println("Adding followset for " + productionLabel + " -> " + production.toString(this));
                         if (followSet.addAll(followSets.get(productionLabel))) {
@@ -126,33 +125,34 @@ public class FollowCalculation {
                         }
 
                         break;
+
                     }
 
                     // we are in the alpha A beta
 
-                    IdSymbol nextSymbol = body.get(i + 1);
+                    ProductionSymbol nextSymbol = production.body.get(i + 1);
 
-                    if (nextSymbol.isTerminal()) {
+                    if (nextSymbol.symbol.isTerminal) {
                         i += 2;
                         continue;
                     }
 
                     // nextSymbol (aka beta) is a nonterminal
 
-                    HashSet<Integer> nextSymbolFirstSet = grammar
+                    HashSet<Symbol> nextSymbolFirstSet = grammar
                         .firstSets()
-                        .get(nextSymbol.id);
+                        .get(nextSymbol.symbol);
 
-                    HashSet<Integer> followSet = followSets.get(symbol.id);
+                    HashSet<Symbol> followSet = followSets.get(symbol.symbol);
 
                     int oldSize = followSet.size();
 
                     // check if there is epsilon in the set
-                    if (nextSymbolFirstSet.contains(Grammar.FIRST_FOLLOW_SET_EPSILON)) {
+                    if (nextSymbolFirstSet.contains(Symbol.EPSILON)) {
 
                         // union with FIRST(beta) \ epsilon
                         followSet.addAll(nextSymbolFirstSet);
-                        followSet.remove(Grammar.FIRST_FOLLOW_SET_EPSILON);
+                        followSet.remove(Symbol.EPSILON);
 
                         // union with FOLLOW(A)
                         followSet.addAll(followSets.get(productionLabel));
@@ -181,7 +181,7 @@ public class FollowCalculation {
 
     }
 
-    public static HashMap<Integer, HashSet<Integer>> followSets(Grammar grammar) {
+    public static HashMap<Symbol, HashSet<Symbol>> followSets(Grammar grammar) {
 
         FollowCalculation calculation = new FollowCalculation(grammar);
 

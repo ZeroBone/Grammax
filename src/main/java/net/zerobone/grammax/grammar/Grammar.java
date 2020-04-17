@@ -1,138 +1,119 @@
 package net.zerobone.grammax.grammar;
 
-import net.zerobone.grammax.grammar.id.IdGrammar;
-import net.zerobone.grammax.grammar.id.IdProduction;
-import net.zerobone.grammax.grammar.id.IdSymbol;
 import net.zerobone.grammax.grammar.lr0.LR0ClosureCalculation;
 import net.zerobone.grammax.grammar.lr0.LR0DerivativeCalculation;
 import net.zerobone.grammax.grammar.utils.*;
-import net.zerobone.grammax.utils.BijectiveMap;
+import net.zerobone.grammax.utils.zerolist.ZeroList;
 
 import java.util.*;
 
-public class Grammar extends IdGrammar {
+public class Grammar {
 
-    private static final int START_SYMBOL_ID = -1;
+    private HashMap<String, Symbol> nonTerminals = new HashMap<>();
 
-    private int nonTerminalCounter = -2;
+    private HashMap<String, Symbol> terminals = new HashMap<>();
 
-    private int terminalCounter = 1;
+    private HashMap<Symbol, ArrayList<Integer>> productionMap = new HashMap<>();
 
-    private BijectiveMap<String, Integer> nonTerminals = new BijectiveMap<>();
+    private ZeroList<Production> productions = new ZeroList<>();
 
-    private BijectiveMap<String, Integer> terminals = new BijectiveMap<>();
+    private Symbol startSymbol;
 
-    private HashMap<Integer, HashSet<Integer>> cachedFirstSets = null;
+    private HashMap<Symbol, HashSet<Symbol>> cachedFirstSets = null;
 
-    private HashMap<Integer, HashSet<Integer>> cachedFollowSets = null;
+    private HashMap<Symbol, HashSet<Symbol>> cachedFollowSets = null;
 
     public Grammar(String startSymbol, Production startProduction) {
 
-        super(START_SYMBOL_ID);
+        this.startSymbol = new Symbol(startSymbol, false);
 
-        nonTerminals.put(startSymbol, START_SYMBOL_ID);
+        nonTerminals.put(startSymbol, this.startSymbol);
 
-        createFirstProduction(START_SYMBOL_ID, convertProduction(START_SYMBOL_ID, startProduction));
+        initializeProduction(this.startSymbol, startProduction);
 
-    }
-
-    public boolean symbolDefined(String symbol) {
-        return nonTerminals.containsKey(symbol) || terminals.containsKey(symbol);
-    }
-
-    public Collection<Integer> getNonTerminals() {
-        return nonTerminals.values();
-    }
-
-    public Collection<Integer> getTerminals() {
-        return terminals.values();
-    }
-
-    public String nonTerminalToSymbol(int id) {
-        assert id < 0 : "non-terminal expected";
-        assert nonTerminals.mapValue(id) != null : "Non-terminal " + id + " is not defined";
-        return nonTerminals.mapValue(id);
-    }
-
-    public String terminalToSymbol(int id) {
-        assert id >= 0 : "terminal expected";
-        assert id != TERMINAL_EOF : "eof-to-symbol convertion is restricted";
-        assert terminals.mapValue(id) != null : "Terminal " + id + " is not defined";
-        return terminals.mapValue(id);
-    }
-
-    public String idToSymbol(int id) {
-        return id < 0 ? nonTerminalToSymbol(id) : terminalToSymbol(id);
-    }
-
-    private Integer symbolToId(Symbol symbol) {
-
-        if (symbol.isTerminal) {
-            return terminals.mapKey(symbol.id);
-        }
-
-        return nonTerminals.mapKey(symbol.id);
+        createFirstProduction(startProduction);
 
     }
 
-    private IdSymbol convertSymbol(Symbol symbol) {
+    private void initializeProduction(Symbol symbol, Production production) {
 
-        Integer symbolId = symbolToId(symbol);
+        assert symbol != null : "symbol cannot be null";
+        assert !Symbol.isSpecial(symbol) : "symbol cannot be special";
+        assert production.getNonTerminal() == null : "production was already initialized";
+        assert production.getId() == Production.ID_INVALID : "production was already initialized by zerolist";
 
-        if (symbolId == null) {
+        production.setNonTerminal(symbol);
 
-            if (symbol.isTerminal) {
+        for (ProductionSymbol productionSymbol : production.body) {
 
-                symbolId = terminalCounter;
+            if (productionSymbol.symbol.isTerminal) {
+                // terminal symbol
 
-                terminals.put(symbol.id, terminalCounter);
+                Symbol registeredTerminal = terminals.get(productionSymbol.symbol.id);
 
-                terminalCounter++;
+                if (registeredTerminal == null) {
+                    // register new terminal symbol
+                    terminals.put(productionSymbol.symbol.id, productionSymbol.symbol);
+                    continue;
+                }
 
-            }
-            else {
+                // references of symbols must always lead to one of the hashmap values
+                productionSymbol.symbol = registeredTerminal;
 
-                symbolId = nonTerminalCounter;
-
-                nonTerminals.put(symbol.id, nonTerminalCounter);
-
-                nonTerminalCounter--;
+                continue;
 
             }
 
-        }
+            // non-terminal
 
-        return new IdSymbol(symbolId, symbol.argumentName);
+            Symbol registeredNonTerminal = nonTerminals.get(productionSymbol.symbol.id);
+
+            if (registeredNonTerminal == null) {
+                // register new terminal symbol
+                nonTerminals.put(productionSymbol.symbol.id, productionSymbol.symbol);
+                continue;
+            }
+
+            // references of symbols must always lead to one of the hashmap values
+            productionSymbol.symbol = registeredNonTerminal;
+
+        }
 
     }
 
-    private IdProduction convertProduction(int nonTerminal, Production production) {
+    private void createFirstProduction(Production production) {
 
-        IdProduction idProduction = new IdProduction(production.getCode());
+        assert production != null;
+        assert production.getId() == Production.ID_INVALID : "production is already registered";
+        assert production.getNonTerminal() != null : "production is not initialized";
 
-        idProduction.setNonTerminal(nonTerminal);
+        productions.add(production);
 
-        for (Symbol symbol : production.getBody()) {
-            idProduction.body.add(convertSymbol(symbol));
-        }
+        assert production.getId() != Production.ID_INVALID : "production should be now registered";
 
-        return idProduction;
+        ArrayList<Integer> createdProductions = new ArrayList<>();
+
+        createdProductions.add(production.getId());
+
+        productionMap.put(production.getNonTerminal(), createdProductions);
 
     }
 
-    public void addProduction(String symbol, Production production) {
+    public void addProduction(String symbolString, Production production) {
 
-        Integer symbolId = nonTerminals.mapKey(symbol);
+        Symbol symbol = nonTerminals.get(symbolString);
 
-        if (symbolId == null) {
+        if (symbol == null) {
 
             // no such symbol
 
-            nonTerminals.put(symbol, nonTerminalCounter);
+            Symbol newSymbol = new Symbol(symbolString, false);
 
-            createFirstProduction(nonTerminalCounter, convertProduction(nonTerminalCounter, production));
+            nonTerminals.put(symbolString, newSymbol);
 
-            nonTerminalCounter--;
+            initializeProduction(newSymbol, production);
+
+            createFirstProduction(production);
 
             return;
 
@@ -141,88 +122,44 @@ public class Grammar extends IdGrammar {
         // symbol already exists
         // but it doesn't mean the production exists
 
-        ArrayList<Integer> correspondingProductions = productionMap.get(symbolId);
+        ArrayList<Integer> correspondingProductions = productionMap.get(symbol);
 
         if (correspondingProductions == null) {
-            createFirstProduction(symbolId, convertProduction(symbolId, production));
+            initializeProduction(symbol, production);
+            createFirstProduction(production);
             return;
         }
 
         // add to existing production
 
-        IdProduction convertedProduction = convertProduction(symbolId, production);
+        initializeProduction(symbol, production);
 
-        assert convertedProduction.getId() == 0;
-
-        // assign an id to the production
-        createProduction(convertedProduction);
-
-        assert convertedProduction.getId() != 0;
-
-        correspondingProductions.add(convertedProduction.getId());
-
-    }
-
-    public int createNonTerminal(String newSymbol) {
-
-        if (nonTerminals.containsKey(newSymbol)) {
-
-            StringBuilder sb = new StringBuilder(newSymbol);
-
-            do {
-                sb.append('\'');
-                newSymbol = sb.toString();
-            } while (nonTerminals.containsKey(newSymbol));
-
-        }
-
-        nonTerminals.put(newSymbol, nonTerminalCounter);
-
-        return nonTerminalCounter--;
-
-    }
-
-    public int createNonTerminal(int analogyNonTerminal) {
-
-        String newSymbol = nonTerminalToSymbol(analogyNonTerminal) + "'";
-
-        return createNonTerminal(newSymbol);
-
-    }
-
-    public void addProduction(int symbolId, IdProduction production) {
-
-        assert production.getNonTerminal() == 0 : "production has already set is't non-terminal label";
-
-        production.setNonTerminal(symbolId);
-
-        assert production.getId() == 0;
-
-        ArrayList<Integer> correspondingProductions = productionMap.get(symbolId);
-
-        if (correspondingProductions == null) {
-
-            createFirstProduction(symbolId, production);
-
-            return;
-
-        }
+        assert production.getId() == Production.ID_INVALID;
 
         // assign an id to the production
-        createProduction(production);
+        productions.add(production);
 
-        assert production.getId() != 0;
+        assert production.getId() != Production.ID_INVALID;
 
         correspondingProductions.add(production.getId());
 
     }
 
-    public int getTerminalCount() {
-        return terminals.size() + 1;
-    }
+    public String createUniqueSymbol(String analogySymbol) {
 
-    public int getNonTerminalCount() {
-        return nonTerminals.size();
+        if (nonTerminals.containsKey(analogySymbol)) {
+
+            StringBuilder sb = new StringBuilder(analogySymbol);
+
+            do {
+                sb.append('\'');
+                analogySymbol = sb.toString();
+            } while (nonTerminals.containsKey(analogySymbol));
+
+        }
+
+        return analogySymbol;
+
     }
 
     private void invalidateCaches() {
@@ -230,6 +167,7 @@ public class Grammar extends IdGrammar {
         cachedFollowSets = null;
     }
 
+    // TODO: move all this functionality to grammar plugins
     public void augment() {
 
         Augmentor.augment(this);
@@ -246,11 +184,11 @@ public class Grammar extends IdGrammar {
         return LR0ClosureCalculation.endPointClosure(this, kernels);
     }
 
-    public HashMap<Integer, HashSet<Point>> calculateAllLr0Derivatives(HashSet<Point> kernels) {
+    public HashMap<Symbol, HashSet<Point>> calculateAllLr0Derivatives(HashSet<Point> kernels) {
         return LR0DerivativeCalculation.calculateAllDerivatives(this, kernels);
     }
 
-    public HashMap<Integer, HashSet<Integer>> firstSets() {
+    public HashMap<Symbol, HashSet<Symbol>> firstSets() {
 
         if (cachedFirstSets != null) {
             return cachedFirstSets;
@@ -262,7 +200,7 @@ public class Grammar extends IdGrammar {
 
     }
 
-    public HashMap<Integer, HashSet<Integer>> followSets() {
+    public HashMap<Symbol, HashSet<Symbol>> followSets() {
 
         if (cachedFollowSets != null) {
             return cachedFollowSets;
@@ -274,9 +212,9 @@ public class Grammar extends IdGrammar {
 
     }
 
-    public HashSet<Integer> followSet(int nonTerminal) {
+    public HashSet<Symbol> followSet(Symbol nonTerminal) {
 
-        HashMap<Integer, HashSet<Integer>> followSets = followSets();
+        HashMap<Symbol, HashSet<Symbol>> followSets = followSets();
 
         assert followSets.containsKey(nonTerminal);
 
@@ -284,9 +222,9 @@ public class Grammar extends IdGrammar {
 
     }
 
-    public HashSet<Integer> firstSet(int nonTerminal) {
+    public HashSet<Symbol> firstSet(Symbol nonTerminal) {
 
-        HashMap<Integer, HashSet<Integer>> firstSets = firstSets();
+        HashMap<Symbol, HashSet<Symbol>> firstSets = firstSets();
 
         assert firstSets.containsKey(nonTerminal);
 
@@ -294,29 +232,101 @@ public class Grammar extends IdGrammar {
 
     }
 
+    public int getTerminalCount() {
+        return terminals.size();
+    }
+
+    public int getNonTerminalCount() {
+        return nonTerminals.size();
+    }
+
+    public Collection<String> getNonTerminals() {
+        return nonTerminals.keySet();
+    }
+
+    public Collection<String> getTerminals() {
+        return terminals.keySet();
+    }
+
+    public Collection<Symbol> getNonTerminalSymbols() {
+        return nonTerminals.values();
+    }
+
+    public Collection<Symbol> getTerminalSymbols() {
+        return terminals.values();
+    }
+
+    public Production getProduction(int productionId) {
+        return productions.get(productionId);
+    }
+
+    public ZeroList<Production> getProductionList() {
+        return productions;
+    }
+
+    public ArrayList<Integer> getProductionsFor(Symbol nonTerminal) {
+        assert productionMap.containsKey(nonTerminal) : "invalid nonTerminal specified";
+        return productionMap.get(nonTerminal);
+    }
+
+    public Set<Map.Entry<Symbol, ArrayList<Integer>>> getProductions() {
+        return productionMap.entrySet();
+    }
+
+    public Collection<ArrayList<Integer>> getProductionIds() {
+        return productionMap.values();
+    }
+
+    public int getProductionCount() {
+        return productions.length();
+    }
+
+    public Symbol getStartSymbol() {
+        assert nonTerminals.containsKey(startSymbol.id) : "start symbol invariant check failed";
+        return startSymbol;
+    }
+
+    public void setStartSymbol(String newNonTerminal) {
+        assert nonTerminals.containsKey(newNonTerminal) : "unknown symbol";
+        startSymbol = nonTerminals.get(newNonTerminal);
+    }
+
+    public ProductionSymbol getSymbolAfter(Point point) {
+
+        Production production = getProduction(point.productionId);
+
+        assert production != null;
+        assert point.position >= 0;
+        assert point.position <= production.body.size();
+
+        if (point.position == production.body.size()) {
+            return null;
+        }
+
+        return production.body.get(point.position);
+
+    }
+
     public String toString(boolean debug) {
 
         StringBuilder sb = new StringBuilder();
 
-        Iterator<Map.Entry<Integer, ArrayList<Integer>>> it = productionMap.entrySet().iterator();
+        Iterator<Map.Entry<Symbol, ArrayList<Integer>>> it = productionMap.entrySet().iterator();
 
         while (it.hasNext()) {
 
-            Map.Entry<Integer, ArrayList<Integer>> pair = it.next();
+            Map.Entry<Symbol, ArrayList<Integer>> pair = it.next();
 
-            int labelId = pair.getKey();
+            Symbol labelSymbol = pair.getKey();
 
             String label =
-                (labelId == getStartSymbol() ? "S" : " ") +
-                (debug ? "(" + labelId + ") " : "") +
-                nonTerminalToSymbol(labelId);
+                (labelSymbol == getStartSymbol() ? "S" : " ") +
+                labelSymbol.id;
 
             sb.append(label);
             sb.append(" -> ");
 
             Iterator<Integer> productionIterator = pair.getValue().iterator();
-
-            // assert productionIterator.hasNext();
 
             if (productionIterator.hasNext()) {
 
@@ -324,7 +334,7 @@ public class Grammar extends IdGrammar {
 
                     int productionId = productionIterator.next();
 
-                    IdProduction ip = getProduction(productionId);
+                    Production ip = getProduction(productionId);
 
                     assert ip != null;
 
@@ -334,7 +344,7 @@ public class Grammar extends IdGrammar {
                         sb.append("> ");
                     }
 
-                    sb.append(ip.toString(this));
+                    sb.append(ip.toString());
 
                     if (!productionIterator.hasNext()) {
                         break;
@@ -365,18 +375,6 @@ public class Grammar extends IdGrammar {
     @Override
     public String toString() {
         return toString(false);
-    }
-
-    public static int nonTerminalToIndex(int nonTerminal) {
-        return -nonTerminal - 1;
-    }
-
-    public static int terminalToIndex(int terminal) {
-        return terminal;
-    }
-
-    public static boolean symbolIsTerminal(int id) {
-        return id > 0;
     }
 
 }

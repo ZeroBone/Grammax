@@ -16,65 +16,65 @@ import net.zerobone.grammax.utils.StringUtils;
 import java.util.Stack;
 
 public final class GrxParser {
-    public static final int T_EOF = 0;
-    public static final int T_ID = 1;
-    public static final int T_ASSIGN = 2;
-    public static final int T_SEMICOLON = 3;
-    public static final int T_CODE = 4;
-    public static final int T_LEFT_PAREN = 5;
-    public static final int T_RIGHT_PAREN = 6;
+    public static final int T_CODE = 0;
+    public static final int T_TOP = 1;
+    public static final int T_SEMICOLON = 2;
+    public static final int T_RIGHT_PAREN = 3;
+    public static final int T_ID = 4;
+    public static final int T_ASSIGN = 5;
+    public static final int T_LEFT_PAREN = 6;
     public static final int T_TYPE = 7;
-    public static final int T_TOP = 8;
-    public static final int T_NAME = 9;
+    public static final int T_NAME = 8;
+    public static final int T_EOF = 9;
     private static final int terminalCount = 10;
-    private static final int nonTerminalCount = 6;
+    private static final int nonTerminalCount = 5;
     private static final int[] gotoTable = {
-        1,0,0,0,0,0,
-        0,3,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,12,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,15,0,
-        0,0,0,0,0,0,
-        0,0,0,17,0,0,
-        0,0,0,0,0,0,
-        0,0,19,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0};
+        2,0,0,0,0,
+        0,0,0,5,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,14,
+        0,0,0,0,0,
+        0,17,0,0,0,
+        0,0,0,0,0,
+        0,0,18,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,20,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,0,0,0};
     private static final int[] actionTable = {
-        -2,-2,0,0,0,0,0,-2,-2,-2,
-        -1,2,0,0,0,0,0,4,5,6,
-        0,0,7,0,0,0,0,0,0,0,
-        -3,-3,0,0,0,0,0,-3,-3,-3,
-        0,8,0,0,0,0,0,0,0,0,
+        0,-2,0,0,-2,0,0,-2,-2,-2,
+        0,3,0,0,7,0,0,4,6,-1,
+        8,0,0,0,0,0,0,0,0,0,
         0,0,0,0,9,0,0,0,0,0,
-        0,10,0,0,0,0,0,0,0,0,
-        0,11,0,13,0,0,0,0,0,0,
-        0,14,0,0,0,0,0,0,0,0,
-        -12,-12,0,0,0,0,0,-12,-12,-12,
-        -13,-13,0,0,0,0,0,-13,-13,-13,
-        0,-9,0,-9,0,16,0,0,0,0,
-        -4,-4,0,0,0,0,0,-4,-4,-4,
-        -7,-7,0,0,18,0,0,-7,-7,-7,
-        -11,-11,0,0,0,0,0,-11,-11,-11,
-        0,11,0,13,0,0,0,0,0,0,
-        0,20,0,0,0,0,0,0,0,0,
-        -5,-5,0,0,0,0,0,-5,-5,-5,
-        -8,-8,0,0,0,0,0,-8,-8,-8,
-        -6,-6,0,0,0,0,0,-6,-6,-6,
-        0,0,0,0,0,0,21,0,0,0,
-        0,-10,0,-10,0,0,0,0,0,0};
-    private static final int[] productionLabels = {0,0,1,2,2,3,3,4,4,1,1,1,5};
+        0,-3,0,0,-3,0,0,-3,-3,-3,
+        0,0,0,0,10,0,0,0,0,0,
+        0,0,0,0,0,11,0,0,0,0,
+        0,-12,0,0,-12,0,0,-12,-12,-12,
+        0,0,0,0,12,0,0,0,0,0,
+        0,-13,0,0,-13,0,0,-13,-13,-13,
+        0,0,13,0,15,0,0,0,0,0,
+        0,-11,0,0,-11,0,0,-11,-11,-11,
+        16,-7,0,0,-7,0,0,-7,-7,-7,
+        0,-4,0,0,-4,0,0,-4,-4,-4,
+        0,0,-9,0,-9,0,19,0,0,0,
+        0,-8,0,0,-8,0,0,-8,-8,-8,
+        0,-5,0,0,-5,0,0,-5,-5,-5,
+        0,0,13,0,15,0,0,0,0,0,
+        0,0,0,0,21,0,0,0,0,0,
+        0,-6,0,0,-6,0,0,-6,-6,-6,
+        0,0,0,22,0,0,0,0,0,0,
+        0,0,-10,0,-10,0,0,0,0,0};
+    private static final int[] productionLabels = {0,0,3,4,4,1,1,2,2,3,3,3};
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {
         new Reductor() {
@@ -234,13 +234,6 @@ public final class GrxParser {
                 }
                 return v;
             }
-        },
-        new Reductor() {
-            @Override
-            public Object reduce(Stack<StackEntry> _grx_stack) {
-                _grx_stack.pop();
-                return null;
-            }
         }
     };
     private static final StackEntry initialStackEntry = new StackEntry(0, null);
@@ -277,14 +270,14 @@ public final class GrxParser {
                 return;
             }
             if (action > 0) {
-                stack.push(new StackEntry(action, tokenPayload));
+                stack.push(new StackEntry(action - 1, tokenPayload));
                 return;
             }
             int productionIndex = -action - 2;
             Object reducedProduction = reductions[productionIndex].reduce(stack);
             StackEntry newState = stack.peek();
             int nextState = gotoTable[newState.previousState * nonTerminalCount + productionLabels[productionIndex]];
-            stack.push(new StackEntry(nextState, reducedProduction));
+            stack.push(new StackEntry(nextState - 1, reducedProduction));
         }
     }
     public boolean successfullyParsed() {

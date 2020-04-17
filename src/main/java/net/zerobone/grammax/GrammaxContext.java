@@ -1,10 +1,9 @@
 package net.zerobone.grammax;
 
-import net.zerobone.grammax.ast.entities.ProductionSymbol;
 import net.zerobone.grammax.ast.statements.ProductionStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
-import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.ProductionSymbol;
 import net.zerobone.grammax.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -37,8 +36,8 @@ public class GrammaxContext {
 
         Production production = new Production(statement.code);
 
-        for (ProductionSymbol symbol : statement.production) {
-            production.append(new Symbol(symbol.id, symbol.terminal, symbol.argument));
+        for (net.zerobone.grammax.ast.entities.ProductionSymbol symbol : statement.production) {
+            production.body.add(new ProductionSymbol(symbol.id, symbol.terminal, symbol.argument));
         }
 
         return production;

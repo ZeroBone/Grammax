@@ -1,15 +1,16 @@
 package net.zerobone.grammax.grammar.verification.messages;
 
 import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.grammar.Symbol;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 
 public class RightRecursiveCycleMessage extends VerificationMessage {
 
-    public final LinkedList<Integer> cycle;
+    public final LinkedList<Symbol> cycle;
 
-    public RightRecursiveCycleMessage(LinkedList<Integer> cycle) {
+    public RightRecursiveCycleMessage(LinkedList<Symbol> cycle) {
         super(true);
         this.cycle = cycle;
     }
@@ -21,9 +22,9 @@ public class RightRecursiveCycleMessage extends VerificationMessage {
 
         sb.append("Non-terminal(s) ");
 
-        Iterator<Integer> cycleIterator = cycle.iterator();
+        Iterator<Symbol> cycleIterator = cycle.iterator();
 
-        appendListOfNonterminals(cycleIterator, sb, grammar);
+        appendListOfNonterminals(cycleIterator, sb);
 
         sb.append(" form a right-recursive cycle.");
 

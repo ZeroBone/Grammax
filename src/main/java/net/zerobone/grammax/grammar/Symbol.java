@@ -1,17 +1,24 @@
 package net.zerobone.grammax.grammar;
 
-public class Symbol {
+public final class Symbol {
 
-    public String id;
+    // used in first and follow sets
+    public static final Symbol EPSILON = new Symbol("", true);
 
-    public boolean isTerminal;
+    // used in follow sets
+    public static final Symbol EOF = new Symbol("EOF", true);
 
-    public final String argumentName;
+    public final String id;
 
-    public Symbol(String id, boolean isTerminal, String argumentName) {
+    public final boolean isTerminal;
+
+    public Symbol(String id, boolean isTerminal) {
         this.id = id;
         this.isTerminal = isTerminal;
-        this.argumentName = argumentName;
+    }
+
+    public static boolean isSpecial(Symbol symbol) {
+        return symbol == EPSILON || symbol == EOF;
     }
 
 }

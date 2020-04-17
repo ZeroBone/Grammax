@@ -1,8 +1,9 @@
 package net.zerobone.grammax.grammar.utils;
 
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.id.IdProduction;
-import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.Production;
+import net.zerobone.grammax.grammar.ProductionSymbol;
+import net.zerobone.grammax.grammar.Symbol;
 
 import java.util.*;
 
@@ -10,7 +11,7 @@ public class FirstCalculation {
 
     private final Grammar grammar;
 
-    private final HashMap<Integer, HashSet<Integer>> firstSets = new HashMap<>();
+    private final HashMap<Symbol, HashSet<Symbol>> firstSets = new HashMap<>();
 
     private FirstCalculation(Grammar grammar) {
         this.grammar = grammar;
@@ -18,9 +19,9 @@ public class FirstCalculation {
 
     private void computeFirstSets() {
 
-        for (Map.Entry<Integer, ArrayList<Integer>> pair : grammar.getProductions()) {
+        for (Map.Entry<Symbol, ArrayList<Integer>> pair : grammar.getProductions()) {
 
-            int nonTerminal = pair.getKey();
+            Symbol nonTerminal = pair.getKey();
 
             firstSets.put(nonTerminal, initializeFirstSet(nonTerminal));
 
@@ -34,26 +35,26 @@ public class FirstCalculation {
 
     }
 
-    private HashSet<Integer> initializeFirstSet(int nonTerminal) {
+    private HashSet<Symbol> initializeFirstSet(Symbol nonTerminal) {
 
-        HashSet<Integer> set = new HashSet<>();
+        HashSet<Symbol> set = new HashSet<>();
 
         for (int productionId : grammar.getProductionsFor(nonTerminal)) {
 
-            IdProduction production = grammar.getProduction(productionId);
+            Production production = grammar.getProduction(productionId);
 
             if (production.body.isEmpty()) {
 
-                set.add(Grammar.FIRST_FOLLOW_SET_EPSILON);
+                set.add(Symbol.EPSILON);
 
                 continue;
 
             }
 
-            IdSymbol firstSymbol = production.body.get(0);
+            ProductionSymbol firstSymbol = production.body.get(0);
 
-            if (firstSymbol.isTerminal()) {
-                set.add(firstSymbol.id);
+            if (firstSymbol.symbol.isTerminal) {
+                set.add(firstSymbol.symbol);
             }
 
         }
@@ -66,26 +67,24 @@ public class FirstCalculation {
 
         boolean modified = false;
 
-        for (Map.Entry<Integer, ArrayList<Integer>> pair : grammar.getProductions()) {
+        for (Map.Entry<Symbol, ArrayList<Integer>> pair : grammar.getProductions()) {
 
-            int label = pair.getKey();
+            Symbol label = pair.getKey();
 
-            HashSet<Integer> labelFirstSet = firstSets.get(label);
+            HashSet<Symbol> labelFirstSet = firstSets.get(label);
 
             for (int productionId : pair.getValue()) {
 
-                IdProduction production = grammar.getProduction(productionId);
+                Production production = grammar.getProduction(productionId);
 
-                ArrayList<IdSymbol> body = production.body;
-
-                if (body.isEmpty()) {
+                if (production.body.isEmpty()) {
                     continue;
                 }
 
-                for (IdSymbol symbol : body) {
+                for (ProductionSymbol symbol : production.body) {
 
-                    if (symbol.isTerminal()) {
-                        if (labelFirstSet.add(symbol.id)) {
+                    if (symbol.symbol.isTerminal) {
+                        if (labelFirstSet.add(symbol.symbol)) {
                             modified = true;
                         }
                         break;
@@ -93,13 +92,13 @@ public class FirstCalculation {
 
                     // non-terminal
 
-                    HashSet<Integer> currentFirstSet = firstSets.get(symbol.id);
+                    HashSet<Symbol> currentFirstSet = firstSets.get(symbol.symbol);
 
                     if (labelFirstSet.addAll(currentFirstSet)) {
                         modified = true;
                     }
 
-                    if (!currentFirstSet.contains(Grammar.FIRST_FOLLOW_SET_EPSILON)) {
+                    if (!currentFirstSet.contains(Symbol.EPSILON)) {
                         // the current nonterminal doesn't contain epsilon, so we don't need to move on to the next terminal
                         break;
                     }
@@ -117,7 +116,7 @@ public class FirstCalculation {
 
     }
 
-    public static HashMap<Integer, HashSet<Integer>> firstSets(Grammar grammar) {
+    public static HashMap<Symbol, HashSet<Symbol>> firstSets(Grammar grammar) {
 
         FirstCalculation calculation = new FirstCalculation(grammar);
 

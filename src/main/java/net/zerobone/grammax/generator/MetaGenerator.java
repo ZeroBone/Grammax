@@ -1,20 +1,15 @@
 package net.zerobone.grammax.generator;
 
-import net.zerobone.grammax.generator.slr.SLRGenerator;
 import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.grammar.automation.AutomationProduction;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class MetaGenerator {
 
     public static void writeConstants(JavaWriter writer, Automation automation) throws IOException {
 
-        writer.write("public static final int T_EOF = 0;");
-        writer.newLine();
-
-        for (int i = 1; i < automation.terminalCount; i++) {
+        for (int i = 0; i < automation.getTerminalCount(); i++) {
 
             writer.write("public static final int T_");
             writer.write(automation.terminalToSymbol(i));
@@ -28,14 +23,14 @@ public class MetaGenerator {
         // write terminal count
 
         writer.write("private static final int terminalCount = ");
-        writer.write(String.valueOf(automation.terminalCount));
+        writer.write(String.valueOf(automation.getTerminalCount()));
         writer.write(";");
         writer.newLine();
 
         // write non-terminal count
 
         writer.write("private static final int nonTerminalCount = ");
-        writer.write(String.valueOf(automation.nonTerminalCount));
+        writer.write(String.valueOf(automation.getNonTerminalCount()));
         writer.write(";");
         writer.newLine();
 
@@ -51,11 +46,11 @@ public class MetaGenerator {
 
             writer.newLine();
 
-            for (int nt = 0; nt < automation.nonTerminalCount; nt++) {
+            for (int nt = 0; nt < automation.getNonTerminalCount(); nt++) {
 
-                writer.write(String.valueOf(automation.gotoTable[s * automation.nonTerminalCount + nt]));
+                writer.write(String.valueOf(automation.gotoTable[s * automation.getNonTerminalCount() + nt]));
 
-                if (nt != automation.nonTerminalCount - 1 || s != automation.stateCount - 1) {
+                if (nt != automation.getNonTerminalCount() - 1 || s != automation.stateCount - 1) {
                     writer.write(',');
                 }
 
@@ -80,11 +75,11 @@ public class MetaGenerator {
 
             writer.newLine();
 
-            for (int t = 0; t < automation.terminalCount; t++) {
+            for (int t = 0; t < automation.getTerminalCount(); t++) {
 
-                writer.write(String.valueOf(automation.actionTable[s * automation.terminalCount + t]));
+                writer.write(String.valueOf(automation.actionTable[s * automation.getTerminalCount() + t]));
 
-                if (t != automation.terminalCount - 1 || s != automation.stateCount - 1) {
+                if (t != automation.getTerminalCount() - 1 || s != automation.stateCount - 1) {
                     writer.write(',');
                 }
 

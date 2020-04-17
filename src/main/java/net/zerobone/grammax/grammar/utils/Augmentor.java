@@ -1,8 +1,8 @@
 package net.zerobone.grammax.grammar.utils;
 
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.id.IdProduction;
-import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.Production;
+import net.zerobone.grammax.grammar.ProductionSymbol;
 
 public class Augmentor {
 
@@ -10,11 +10,11 @@ public class Augmentor {
 
     public static void augment(Grammar grammar) {
 
-        int newNonTerminal = grammar.createNonTerminal(grammar.getStartSymbol());
+        String newNonTerminal = grammar.createUniqueSymbol(grammar.getStartSymbol().id);
 
-        IdProduction production = new IdProduction(null);
+        Production production = new Production(null);
 
-        production.body.add(new IdSymbol(grammar.getStartSymbol(), null));
+        production.body.add(new ProductionSymbol(grammar.getStartSymbol(), null));
 
         grammar.addProduction(newNonTerminal, production);
 

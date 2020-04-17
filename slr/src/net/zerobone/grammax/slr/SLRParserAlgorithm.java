@@ -4,114 +4,116 @@ import java.util.Stack;
 
 public class SLRParserAlgorithm {
 
-    public static final int T_EOF = 0;
-
-    public static final int T_PLUS = 1;
-
-    public static final int T_MUL = 2;
-
-    public static final int T_LPAREN = 3;
-
-    public static final int T_RPAREN = 4;
-
-    public static final int T_NUM = 5;
-
+    public static final int T_MUL = 0;
+    public static final int T_NUM = 1;
+    public static final int T_LPAREN = 2;
+    public static final int T_RPAREN = 3;
+    public static final int T_PLUS = 4;
+    public static final int T_EOF = 5;
     private static final int terminalCount = 6;
-
-    private static final int nonTerminalCount = 4;
-
+    private static final int nonTerminalCount = 3;
     private static final int[] gotoTable = {
-        1,2,3,0,
-        0,0,0,0,
-        0,0,0,0,
-        0,0,0,0,
-        8,2,3,0,
-        0,0,0,0,
-        0,9,3,0,
-        0,0,10,0,
-        0,0,0,0,
-        0,0,0,0,
-        0,0,0,0,
-        0,0,0,0};
-
+        4,6,3,
+        0,0,0,
+        0,0,0,
+        0,0,0,
+        4,8,3,
+        0,0,0,
+        0,0,10,
+        0,0,0,
+        12,0,3,
+        0,0,0,
+        0,0,0,
+        0,0,0};
     private static final int[] actionTable = {
-        0,0,0,4,0,5,
-        -1,6,0,0,0,0,
-        -3,-3,7,0,-3,0,
-        -5,-5,-5,0,-5,0,
-        0,0,0,4,0,5,
-        -7,-7,-7,0,-7,0,
-        0,0,0,4,0,5,
-        0,0,0,4,0,5,
-        0,6,0,0,11,0,
-        -2,-2,7,0,-2,0,
-        -4,-4,-4,0,-4,0,
-        -6,-6,-6,0,-6,0};
-
-    private static final int[] productionLabels = {0,0,1,1,2,2,3};
-
+        0,2,5,0,0,0,
+        -7,0,0,-7,-7,-7,
+        -5,0,0,-5,-5,-5,
+        7,0,0,-3,-3,-3,
+        0,2,5,0,0,0,
+        0,0,0,0,9,-1,
+        0,2,5,0,0,0,
+        0,0,0,11,9,0,
+        0,2,5,0,0,0,
+        -4,0,0,-4,-4,-4,
+        -6,0,0,-6,-6,-6,
+        7,0,0,-2,-2,-2};
+    private static final int[] productionLabels = {1,1,0,0,2,2};
     @SuppressWarnings("Convert2Lambda")
-    private static final Reductor[] reductions = {new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object term = _grx_stack.pop().payload;
-            _grx_stack.pop();
-            Object expr = _grx_stack.pop().payload;
-            Object v;
-            { v = (int)expr + (int)term; }
-            return v;
+    private static final Reductor[] reductions = {
+        new Reductor() {
+            @Override
+            public Object reduce(Stack<StackEntry> _grx_stack) {
+                Object term = _grx_stack.pop().payload;
+                _grx_stack.pop();
+                Object expr = _grx_stack.pop().payload;
+                Object v;
+                {
+                    v = (int)expr + (int)term;
+                }
+                return v;
+            }
+        },
+        new Reductor() {
+            @Override
+            public Object reduce(Stack<StackEntry> _grx_stack) {
+                Object term = _grx_stack.pop().payload;
+                Object v;
+                {
+                    v = term;
+                }
+                return v;
+            }
+        },
+        new Reductor() {
+            @Override
+            public Object reduce(Stack<StackEntry> _grx_stack) {
+                Object factor = _grx_stack.pop().payload;
+                _grx_stack.pop();
+                Object term = _grx_stack.pop().payload;
+                Object v;
+                {
+                    v = (int)term * (int)factor;
+                }
+                return v;
+            }
+        },
+        new Reductor() {
+            @Override
+            public Object reduce(Stack<StackEntry> _grx_stack) {
+                Object factor = _grx_stack.pop().payload;
+                Object v;
+                {
+                    v = factor;
+                }
+                return v;
+            }
+        },
+        new Reductor() {
+            @Override
+            public Object reduce(Stack<StackEntry> _grx_stack) {
+                _grx_stack.pop();
+                Object expr = _grx_stack.pop().payload;
+                _grx_stack.pop();
+                Object v;
+                {
+                    v = expr;
+                }
+                return v;
+            }
+        },
+        new Reductor() {
+            @Override
+            public Object reduce(Stack<StackEntry> _grx_stack) {
+                Object n = _grx_stack.pop().payload;
+                Object v;
+                {
+                    v = n;
+                }
+                return v;
+            }
         }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object term = _grx_stack.pop().payload;
-            Object v;
-            { v = term; }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object factor = _grx_stack.pop().payload;
-            _grx_stack.pop();
-            Object term = _grx_stack.pop().payload;
-            Object v;
-            { v = (int)term * (int)factor; }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object factor = _grx_stack.pop().payload;
-            Object v;
-            { v = factor; }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            _grx_stack.pop();
-            Object expr = _grx_stack.pop().payload;
-            _grx_stack.pop();
-            Object v;
-            { v = expr; }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            Object n = _grx_stack.pop().payload;
-            Object v;
-            { v = n; }
-            return v;
-        }
-    },new Reductor() {
-        @Override
-        public Object reduce(Stack<StackEntry> _grx_stack) {
-            _grx_stack.pop();
-            return null;
-        }
-    }};
+    };
 
     private interface Reductor {
         Object reduce(Stack<StackEntry> grx_stack);
@@ -153,7 +155,7 @@ public class SLRParserAlgorithm {
         }
 
         if (action > 0) {
-            System.out.println("shift " + action);
+            System.out.println("shift " + (action - 1));
             return;
         }
 
@@ -194,7 +196,7 @@ public class SLRParserAlgorithm {
             if (action > 0) {
                 // shift action
 
-                stack.push(new StackEntry(action, tokenPayload));
+                stack.push(new StackEntry(action - 1, tokenPayload));
 
                 return;
 
@@ -224,7 +226,7 @@ public class SLRParserAlgorithm {
 
             assert nextState != 0;
 
-            stack.push(new StackEntry(nextState, reducedProduction));
+            stack.push(new StackEntry(nextState - 1, reducedProduction));
 
         }
 

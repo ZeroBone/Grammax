@@ -1,8 +1,9 @@
 package net.zerobone.grammax.grammar.lr0;
 
 import net.zerobone.grammax.grammar.Grammar;
-import net.zerobone.grammax.grammar.id.IdProduction;
-import net.zerobone.grammax.grammar.id.IdSymbol;
+import net.zerobone.grammax.grammar.Production;
+import net.zerobone.grammax.grammar.ProductionSymbol;
+import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.HashSet;
@@ -27,34 +28,32 @@ public class LR0ClosureCalculation {
 
     private static HashSet<Point> calculateClosure(Grammar grammar, HashSet<Point> kernels, boolean onlyEndPoint) {
 
-        boolean[] added = new boolean[grammar.getNonTerminalCount()];
+        HashSet<Symbol> added = new HashSet<>(grammar.getNonTerminalCount());
 
-        Queue<Integer> pendingNonTerminals = new LinkedList<>();
+        Queue<Symbol> pendingNonTerminals = new LinkedList<>();
 
         for (Point point : kernels) {
 
-            IdSymbol symbolAfterPoint = grammar.getSymbolAfter(point);
+            ProductionSymbol symbolAfterPoint = grammar.getSymbolAfter(point);
 
             if (symbolAfterPoint == null) {
                 // the point reached the end of the production
                 continue;
             }
 
-            if (symbolAfterPoint.isTerminal()) {
+            if (symbolAfterPoint.symbol.isTerminal) {
                 continue;
             }
 
             // non-terminal
 
-            int index = Grammar.nonTerminalToIndex(symbolAfterPoint.id);
-
-            if (added[index]) {
+            if (added.contains(symbolAfterPoint.symbol)) {
                 continue;
             }
 
-            pendingNonTerminals.add(symbolAfterPoint.id);
+            pendingNonTerminals.add(symbolAfterPoint.symbol);
 
-            added[index] = true;
+            added.add(symbolAfterPoint.symbol);
 
         }
 
@@ -66,7 +65,7 @@ public class LR0ClosureCalculation {
 
             for (Point kernel : kernels) {
 
-                IdProduction production = grammar.getProduction(kernel.productionId);
+                Production production = grammar.getProduction(kernel.productionId);
 
                 assert kernel.position <= production.body.size();
 
@@ -89,11 +88,12 @@ public class LR0ClosureCalculation {
 
         while (!pendingNonTerminals.isEmpty()) {
 
-            int nonTerminal = pendingNonTerminals.poll();
+            Symbol nonTerminal = pendingNonTerminals.poll();
+            assert !nonTerminal.isTerminal;
 
             for (int productionId : grammar.getProductionsFor(nonTerminal)) {
 
-                IdProduction production = grammar.getProduction(productionId);
+                Production production = grammar.getProduction(productionId);
 
                 assert production != null;
 
@@ -105,23 +105,21 @@ public class LR0ClosureCalculation {
                     continue;
                 }
 
-                IdSymbol firstSymbol = production.body.get(0);
+                ProductionSymbol firstSymbol = production.body.get(0);
 
-                if (firstSymbol.isTerminal()) {
+                if (firstSymbol.symbol.isTerminal) {
                     continue;
                 }
 
                 // first symbol is a non-terminal
 
-                int firstSymbolIndex = Grammar.nonTerminalToIndex(firstSymbol.id);
-
-                if (added[firstSymbolIndex]) {
+                if (added.contains(firstSymbol.symbol)) {
                     continue;
                 }
 
-                pendingNonTerminals.add(firstSymbol.id);
+                pendingNonTerminals.add(firstSymbol.symbol);
 
-                added[firstSymbolIndex] = true;
+                added.add(firstSymbol.symbol);
 
             }
 

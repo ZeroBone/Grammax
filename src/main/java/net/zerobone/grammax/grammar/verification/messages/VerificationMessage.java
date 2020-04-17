@@ -1,6 +1,7 @@
 package net.zerobone.grammax.grammar.verification.messages;
 
 import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.grammar.Symbol;
 
 import java.util.Iterator;
 
@@ -14,16 +15,17 @@ public abstract class VerificationMessage {
 
     public abstract String getMessage(Grammar grammar);
 
-    protected static void appendListOfNonterminals(Iterator<Integer> nonTerminalIterator, StringBuilder sb, Grammar grammar) {
+    protected static void appendListOfNonterminals(Iterator<Symbol> nonTerminalIterator, StringBuilder sb) {
 
         assert nonTerminalIterator.hasNext();
 
         while (true) {
 
-            int nonTerminal = nonTerminalIterator.next();
+            Symbol nonTerminal = nonTerminalIterator.next();
+            assert !nonTerminal.isTerminal;
 
             sb.append('\'');
-            sb.append(grammar.idToSymbol(nonTerminal));
+            sb.append(nonTerminal.id);
             sb.append('\'');
 
             if (!nonTerminalIterator.hasNext()) {

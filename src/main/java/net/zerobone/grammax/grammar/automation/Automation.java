@@ -1,16 +1,13 @@
 package net.zerobone.grammax.grammar.automation;
 
 import net.zerobone.grammax.grammar.Grammar;
+import net.zerobone.grammax.grammar.Production;
+import net.zerobone.grammax.grammar.ProductionSymbol;
+import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.conflict.*;
-import net.zerobone.grammax.grammar.id.IdProduction;
-import net.zerobone.grammax.grammar.id.IdSymbol;
-import net.zerobone.grammax.grammar.lr0.LR0ItemTransition;
-import net.zerobone.grammax.grammar.lr0.LR0Items;
-import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class Automation {
 
@@ -18,15 +15,17 @@ public class Automation {
 
     public final int stateCount;
 
-    public final int terminalCount;
-
-    public final int nonTerminalCount;
-
-    public final AutomationProduction[] productions;
-
     private final String[] nonTerminals;
 
     private final String[] terminals;
+
+    public final AutomationProduction[] productions;
+
+    private final HashMap<String, Integer> nonTerminalToIndex = new HashMap<>();
+
+    private final HashMap<String, Integer> terminalToIndex = new HashMap<>();
+
+    private final HashMap<Integer, Integer> productionIdToIndex = new HashMap<>();
 
     /**
      * Invariants:
@@ -44,59 +43,80 @@ public class Automation {
      */
     public final int[] actionTable;
 
-    private final String[] parserStateDescriptions;
+    protected final String[] parserStateDescriptions;
 
     private final ArrayList<Conflict> conflicts = new ArrayList<>();
 
-    public Automation(Grammar grammar) {
-
-        LR0Items items = new LR0Items(grammar);
-
-        // states
-
-        stateCount = items.getStateCount();
-
-        parserStateDescriptions = new String[stateCount];
-
-        initializeStates(grammar, items);
+    public Automation(Grammar grammar, int stateCount) {
 
         // counts
 
-        nonTerminalCount = grammar.getNonTerminalCount();
+        this.stateCount = stateCount;
 
-        terminalCount = grammar.getTerminalCount();
+        int nonTerminalCount = grammar.getNonTerminalCount() - 1;
 
-        // productions
-
-        productions = new AutomationProduction[grammar.getProductionCount()];
-
-        for (int productionId = 0; productionId < productions.length; productionId++) {
-            productions[productionId] = convertProduction(grammar.getProduction(productionId));
-        }
+        int terminalCount = grammar.getTerminalCount() + 1;
 
         // initialize non-terminals
 
         nonTerminals = new String[nonTerminalCount];
 
-        for (int nonTerminal : grammar.getNonTerminals()) {
+        int counter = 0;
 
-            nonTerminals[Grammar.nonTerminalToIndex(nonTerminal)] = grammar.nonTerminalToSymbol(nonTerminal);
+        for (Symbol nonTerminal : grammar.getNonTerminalSymbols()) {
+
+            if (nonTerminal == grammar.getStartSymbol()) {
+                continue;
+            }
+
+            nonTerminals[counter] = nonTerminal.id;
+            nonTerminalToIndex.put(nonTerminal.id, counter);
+            counter++;
 
         }
+
+        assert counter == nonTerminalCount;
 
         // initialize terminals
 
         terminals = new String[terminalCount];
 
-        for (int terminal : grammar.getTerminals()) {
+        counter = 0;
 
-            terminals[Grammar.terminalToIndex(terminal)] = grammar.terminalToSymbol(terminal);
+        for (String terminal : grammar.getTerminals()) {
+
+            terminals[counter] = terminal;
+            terminalToIndex.put(terminal, counter);
+
+            counter++;
 
         }
 
-        assert terminals[Grammar.TERMINAL_EOF] == null;
+        terminals[counter] = Symbol.EOF.id;
+        terminalToIndex.put(Symbol.EOF.id, counter);
 
-        terminals[Grammar.TERMINAL_EOF] = "$";
+        assert counter + 1 == terminalCount;
+
+        // initialize productions
+
+        productions = new AutomationProduction[grammar.getProductionCount() - 1];
+
+        counter = 0;
+
+        for (Production production : grammar.getProductionList()) {
+
+            if (production.getNonTerminal() == grammar.getStartSymbol()) {
+                continue;
+            }
+
+            AutomationProduction convertedProduction = convertProduction(production);
+
+            productions[counter] = convertedProduction;
+            productionIdToIndex.put(production.getId(), counter);
+
+            counter++;
+
+        }
 
         // initialize tables
 
@@ -104,40 +124,18 @@ public class Automation {
 
         gotoTable = new int[nonTerminalCount * stateCount];
 
-        // fill the tables
+        // state descriptions
 
-        writeShifts(items);
-
-        writeReduces(grammar, items);
+        parserStateDescriptions = new String[this.stateCount];
 
     }
 
-    private void initializeStates(Grammar grammar, LR0Items items) {
+    public int getTerminalCount() {
+        return terminals.length;
+    }
 
-        for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
-
-            HashSet<Point> kernels = entry.getKey();
-
-            int stateId = entry.getValue();
-
-            StringBuilder sb = new StringBuilder();
-
-            for (Point point : kernels) {
-
-                IdProduction production = grammar.getProduction(point.productionId);
-
-                sb.append("    ");
-
-                sb.append(production.stringifyWithPointMarker(grammar, point.position));
-
-                sb.append('\n');
-
-            }
-
-            parserStateDescriptions[stateId] = sb.toString();
-
-        }
-
+    public int getNonTerminalCount() {
+        return nonTerminals.length;
     }
 
     public String nonTerminalToSymbol(int nonTerminalIndex) {
@@ -148,99 +146,43 @@ public class Automation {
         return terminals[terminalIndex];
     }
 
-    private void writeShifts(LR0Items items) {
-
-        for (LR0ItemTransition transition : items.getTransitions()) {
-
-            if (Grammar.symbolIsTerminal(transition.grammarSymbol)) {
-                // write to action table
-
-                writeShift(transition.state, transition.grammarSymbol, transition.targetState);
-
-            }
-            else {
-                // write to goto table
-
-                writeGoto(transition.state, transition.grammarSymbol, transition.targetState);
-
-            }
-
-        }
-
+    private int symbolToNonTerminalIndex(String nonTerminal) {
+        return nonTerminalToIndex.get(nonTerminal);
     }
 
-    private void writeReduces(Grammar grammar, LR0Items items) {
+    private int symbolToTerminalIndex(String terminal) {
+        return terminalToIndex.get(terminal);
+    }
 
-        for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
-
-            HashSet<Point> derivative = entry.getKey();
-
-            int stateId = entry.getValue();
-
-            HashSet<Point> fullDerivative = grammar.lr0EndPointClosure(derivative);
-
-            System.out.println("[LOG]: State: " + stateId + " End point derivative: " + fullDerivative);
-
-            for (Point kernelPoint : fullDerivative) {
-
-                IdProduction pointProduction = grammar.getProduction(kernelPoint.productionId);
-
-                assert kernelPoint.position <= pointProduction.body.size();
-
-                if (kernelPoint.position != pointProduction.body.size()) {
-                    // if the point is not at the end of the production
-                    continue;
-                }
-
-                int nonTerminal = grammar.getProduction(kernelPoint.productionId).getNonTerminal();
-
-                if (nonTerminal == grammar.getStartSymbol()) {
-
-                    writeAccept(stateId);
-
-                    continue;
-                }
-
-                // System.out.println("[LOG]: " + pointProduction.stringifyWithPointMarker(grammar, kernelPoint.position));
-                // System.out.println("[LOG]: Ending point for label '" + grammar.nonTerminalToSymbol(nonTerminal) + "' found in state " + stateId);
-
-                // compute the follow set of the label of the production with the point at the end
-
-                for (int terminalOrEof : grammar.followSet(nonTerminal)) {
-
-                    writeReduce(stateId, terminalOrEof, kernelPoint.productionId);
-
-                }
-
-            }
-
-        }
-
+    private int productionIdToIndex(int productionId) {
+        return productionIdToIndex.get(productionId);
     }
 
     // helper methods
 
-    private AutomationProduction convertProduction(IdProduction idProduction) {
+    private AutomationProduction convertProduction(Production production) {
 
-        AutomationProduction production = new AutomationProduction(
-            Grammar.nonTerminalToIndex(idProduction.getNonTerminal()),
-            idProduction.code,
-            idProduction.body.size()
+        // production should not be the start symbol production
+
+        AutomationProduction automationProduction = new AutomationProduction(
+            symbolToNonTerminalIndex(production.getNonTerminal().id),
+            production.code,
+            production.body.size()
         );
 
         int i = 0;
 
-        for (IdSymbol symbol : idProduction.body) {
+        for (ProductionSymbol symbol : production.body) {
 
-            production.body[i++] = new AutomationSymbol(
-                symbol.isTerminal(),
-                symbol.isTerminal() ? Grammar.terminalToIndex(symbol.id) : Grammar.nonTerminalToIndex(symbol.id),
+            automationProduction.body[i++] = new AutomationSymbol(
+                symbol.symbol.isTerminal,
+                symbol.symbol.isTerminal ? symbolToTerminalIndex(symbol.symbol.id) : symbolToNonTerminalIndex(symbol.symbol.id),
                 symbol.argumentName
             );
 
         }
 
-        return production;
+        return automationProduction;
 
     }
 
@@ -261,42 +203,42 @@ public class Automation {
 
         // code > 0
         // shift
-        return new ShiftOption(actionTableIndex % terminalCount);
+        return new ShiftOption(actionTableIndex % getTerminalCount());
 
     }
 
-    private void writeShift(int state, int terminal, int targetState) {
+    protected void writeShift(int state, Symbol terminal, int targetState) {
 
         assert targetState >= 0: "negative target state";
-        assert targetState != 0: "initial state cannot have incoming edges";
+        assert terminal.isTerminal;
 
-        int terminalIndex = Grammar.terminalToIndex(terminal);
+        int terminalIndex = symbolToTerminalIndex(terminal.id);
 
-        if (actionTable[terminalCount * state + terminalIndex] != 0) {
+        if (actionTable[getTerminalCount() * state + terminalIndex] != 0) {
 
             conflicts.add(new Conflict(
                 new ShiftOption(terminalIndex),
-                codeToConflictOption(terminalCount * state + terminalIndex),
+                codeToConflictOption(getTerminalCount() * state + terminalIndex),
                 state
             ));
 
             return;
         }
 
-        actionTable[terminalCount * state + terminalIndex] = targetState;
+        actionTable[getTerminalCount() * state + terminalIndex] = encodeTargetState(targetState);
 
     }
 
-    private void writeReduce(int state, int terminal, int productionId) {
+    protected void writeReduce(int state, Symbol terminal, int grammarProductionId) {
 
-        assert productionId >= 0;
+        int productionId = productionIdToIndex(grammarProductionId);
 
-        int terminalIndex = Grammar.terminalToIndex(terminal);
+        int terminalIndex = symbolToTerminalIndex(terminal.id);
 
-        if (actionTable[terminalCount * state + terminalIndex] != 0) {
+        if (actionTable[getTerminalCount() * state + terminalIndex] != 0) {
 
             conflicts.add(new Conflict(
-                codeToConflictOption(terminalCount * state + terminalIndex),
+                codeToConflictOption(getTerminalCount() * state + terminalIndex),
                 new ReduceOption(productionId),
                 state
             ));
@@ -305,17 +247,19 @@ public class Automation {
 
         }
 
-        actionTable[terminalCount * state + terminalIndex] = encodeProductionId(productionId);
+        actionTable[getTerminalCount() * state + terminalIndex] = encodeProductionId(productionId);
 
     }
 
-    private void writeAccept(int state) {
+    protected void writeAccept(int state) {
 
-        if (actionTable[terminalCount * state + Grammar.TERMINAL_EOF] != 0) {
+        int eofIndex = symbolToTerminalIndex(Symbol.EOF.id);
+
+        if (actionTable[getTerminalCount() * state + eofIndex] != 0) {
 
             conflicts.add(new Conflict(
                 new AcceptOption(),
-                codeToConflictOption(terminalCount * state + Grammar.TERMINAL_EOF),
+                codeToConflictOption(getTerminalCount() * state + eofIndex),
                 state
             ));
 
@@ -323,20 +267,20 @@ public class Automation {
 
         }
 
-        actionTable[terminalCount * state + Grammar.TERMINAL_EOF] = ACTION_ACCEPT;
+        actionTable[getTerminalCount() * state + eofIndex] = ACTION_ACCEPT;
 
     }
 
-    private void writeGoto(int state, int nonTerminal, int targetState) {
+    protected void writeGoto(int state, Symbol nonTerminal, int targetState) {
 
         assert targetState >= 0 : "invalid target state.";
         assert targetState != 0 : "there cannot be any transitions to zero state";
 
-        int nonTerminalIndex = Grammar.nonTerminalToIndex(nonTerminal);
+        int nonTerminalIndex = symbolToNonTerminalIndex(nonTerminal.id);
 
-        assert gotoTable[nonTerminalCount * state + nonTerminalIndex] == 0;
+        assert gotoTable[getNonTerminalCount() * state + nonTerminalIndex] == 0;
 
-        gotoTable[nonTerminalCount * state + nonTerminalIndex] = targetState;
+        gotoTable[getNonTerminalCount() * state + nonTerminalIndex] = encodeTargetState(targetState);
 
     }
 
@@ -355,11 +299,11 @@ public class Automation {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Non-terminal count: ");
-        sb.append(nonTerminalCount);
+        sb.append(getNonTerminalCount());
         sb.append('\n');
 
         sb.append("Terminal count: ");
-        sb.append(terminalCount);
+        sb.append(getTerminalCount());
         sb.append('\n');
 
         sb.append("State count: ");
@@ -374,7 +318,7 @@ public class Automation {
 
         sb.append(String.format("%5s", "STATE"));
 
-        for (int t = 0; t < terminalCount; t++) {
+        for (int t = 0; t < getTerminalCount(); t++) {
 
             sb.append(' ');
             sb.append('|');
@@ -393,12 +337,12 @@ public class Automation {
 
             sb.append(' ');
 
-            for (int t = 0; t < terminalCount; t++) {
+            for (int t = 0; t < getTerminalCount(); t++) {
 
                 sb.append(' ');
                 sb.append('|');
 
-                int code = actionTable[s * terminalCount + t];
+                int code = actionTable[s * getTerminalCount() + t];
 
                 if (code == 0) {
                     sb.append(" -----------");
@@ -412,7 +356,7 @@ public class Automation {
 
                 if (code > 0) {
                     // shift
-                    sb.append(String.format("%12s", "s" + code));
+                    sb.append(String.format("%12s", "s" + decodeTargetState(code)));
                 }
                 else {
                     sb.append(String.format("%12s", "r" + decodeProductionId(code)));
@@ -430,7 +374,7 @@ public class Automation {
 
         sb.append(String.format("%5s", "STATE"));
 
-        for (int nt = 0; nt < nonTerminalCount; nt++) {
+        for (int nt = 0; nt < getNonTerminalCount(); nt++) {
 
             sb.append(" |");
 
@@ -448,12 +392,12 @@ public class Automation {
 
             sb.append(' ');
 
-            for (int t = 0; t < nonTerminalCount; t++) {
+            for (int t = 0; t < getNonTerminalCount(); t++) {
 
                 sb.append(' ');
                 sb.append('|');
 
-                int entry = gotoTable[s * nonTerminalCount + t];
+                int entry = gotoTable[s * getNonTerminalCount() + t];
 
                 if (entry == 0) {
                     sb.append(" -----------");
@@ -485,6 +429,14 @@ public class Automation {
 
         return sb.toString();
 
+    }
+
+    private static int encodeTargetState(int state) {
+        return state + 1;
+    }
+
+    private static int decodeTargetState(int state) {
+        return state - 1;
     }
 
     private static int encodeProductionId(int productionId) {
