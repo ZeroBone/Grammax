@@ -270,12 +270,16 @@ public class Grammar implements Iterable<Production> {
         };
     }
 
-    public Set<Map.Entry<Symbol, ArrayList<Integer>>> getProductions() {
-        return productionMap.entrySet();
+    public Iterator<Symbol> getProductionLabels() {
+        return productionMap.keySet().iterator();
     }
 
-    public Collection<ArrayList<Integer>> getProductionIds() {
-        return productionMap.values();
+    // TODO: get rid of this method
+    /**
+     * @deprecated
+     */
+    public Set<Map.Entry<Symbol, ArrayList<Integer>>> getProductions() {
+        return productionMap.entrySet();
     }
 
     public int getProductionCount() {

@@ -44,45 +44,41 @@ public class FollowCalculation {
 
     private HashSet<Symbol> initializeFollowSet(Symbol nonTerminal) {
 
-        HashSet<Symbol> set = new HashSet<>();
+        HashSet<Symbol> follow = new HashSet<>();
 
-        for (ArrayList<Integer> currentProductions : grammar.getProductionIds()) {
+        for (Production production : grammar) {
 
-            for (int productionId : currentProductions) {
+            for (int i = 0; i < production.body.size();) {
 
-                Production production = grammar.getProduction(productionId);
+                ProductionSymbol symbol = production.body.get(i);
 
-                for (int i = 0; i < production.body.size();) {
+                if (symbol.symbol != nonTerminal) {
+                    i++;
+                    continue;
+                }
 
-                    ProductionSymbol symbol = production.body.get(i);
+                assert !symbol.symbol.isTerminal;
 
-                    if (symbol.symbol != nonTerminal) {
-                        i++;
-                        continue;
-                    }
+                if (i == production.body.size() - 1) {
+                    // epsilon tokens are never present in follow sets
+                    break;
+                }
 
-                    assert !symbol.symbol.isTerminal;
+                ProductionSymbol nextSymbol = production.body.get(i + 1);
 
-                    if (i == production.body.size() - 1) {
-                        // epsilon tokens are never present in follow sets
-                        break;
-                    }
-
-                    ProductionSymbol nextSymbol = production.body.get(i + 1);
-
-                    if (nextSymbol.symbol.isTerminal) {
-                        set.add(nextSymbol.symbol);
-                    }
-
+                if (nextSymbol.symbol.isTerminal) {
+                    follow.add(nextSymbol.symbol);
                     i += 2;
-
+                }
+                else {
+                    i++;
                 }
 
             }
 
         }
 
-        return set;
+        return follow;
 
     }
 
@@ -102,6 +98,8 @@ public class FollowCalculation {
                     i++;
                     continue;
                 }
+
+                // symbol is a non-terminal
 
                 // we found a production either of the form alpha A beta
                 // or alpha A

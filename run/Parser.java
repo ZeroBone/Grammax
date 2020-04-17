@@ -18,11 +18,11 @@ public final class Parser {
         0};
     private static final int[] actionTable = {
         2,0,0,0,
-        -4,0,0,-4,
+        -4,-4,-4,-4,
         2,0,0,-1,
         0,6,5,0,
-        -2,0,0,-2,
-        -3,0,0,-3};
+        -2,-2,-2,-2,
+        -3,-3,-3,-3};
     private static final int[] productionLabels = {0,0,0};
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {

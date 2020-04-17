@@ -19,9 +19,9 @@ public class FirstCalculation {
 
     private void computeFirstSets() {
 
-        for (Map.Entry<Symbol, ArrayList<Integer>> pair : grammar.getProductions()) {
+        for (Iterator<Symbol> it = grammar.getProductionLabels(); it.hasNext();) {
 
-            Symbol nonTerminal = pair.getKey();
+            Symbol nonTerminal = it.next();
 
             firstSets.put(nonTerminal, initializeFirstSet(nonTerminal));
 
