@@ -1,4 +1,4 @@
-package net.zerobone.grammax.grammar.utils;
+package net.zerobone.grammax.grammar.lr;
 
 import java.util.Objects;
 

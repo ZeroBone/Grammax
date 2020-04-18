@@ -7,7 +7,7 @@ import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.conflict.Conflict;
 import net.zerobone.grammax.grammar.automation.Automation;
-import net.zerobone.grammax.grammar.lr0.LR0Items;
+import net.zerobone.grammax.grammar.lr.LRItems;
 import net.zerobone.grammax.grammar.slr.SLRAutomation;
 import net.zerobone.grammax.grammar.verification.GrammarVerification;
 import net.zerobone.grammax.grammar.verification.messages.VerificationMessage;
@@ -66,12 +66,14 @@ public class Grammax {
 
         context.grammar.augment();
 
-        LR0Items items = new LR0Items(context.grammar);
+        LRItems items = new LRItems(context.grammar);
 
         Automation automation = new SLRAutomation(context.grammar, items);
 
+        GrammaxConfiguration configuration = context.getConfiguration();
+
         try {
-            exportDebugInfo(automation);
+            exportDebugInfo(automation, configuration.getName());
         }
         catch (IOException e) {
             System.err.println("[ERR]: I/O error: " + e.getMessage());
@@ -93,7 +95,7 @@ public class Grammax {
 
         GeneratorContext generatorContext = new GeneratorContext(
             automation,
-            context.getConfiguration()
+            configuration
         );
 
         try {
@@ -107,9 +109,11 @@ public class Grammax {
 
     }
 
-    private void exportDebugInfo(Automation automation) throws IOException {
+    private void exportDebugInfo(Automation automation, String parserName) throws IOException {
 
-        BufferedWriter debugLogWriter = new BufferedWriter(new FileWriter("debug.txt"));
+        BufferedWriter debugLogWriter = new BufferedWriter(
+            new FileWriter(parserName + "_debug.txt")
+        );
 
         debugLogWriter.write("Grammar:");
         debugLogWriter.newLine();

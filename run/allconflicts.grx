@@ -1,3 +1,4 @@
+%name AllConflictParser
 e = e PLUS t;
 e = t;
 t = t MUL f;

@@ -1,2 +1,3 @@
+%name ComplexParenParser
 s = s LPAREN s RPAREN s;
 s = ;

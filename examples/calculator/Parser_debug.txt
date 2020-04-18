@@ -1,0 +1,108 @@
+Grammar:
+ f -> <4> LPAREN e(expr) RPAREN    {  v = expr;  }
+    | <5> NUM(n)    {  v = ((NumberToken)n).value;  }
+    | <6> ID NUM(n)    {  v = ((NumberToken)n).value;  };
+ t -> <2> t(term) MUL f(factor)    {  v = (double)term * (double)factor;  }
+    | <3> f(factor)    {  v = factor;  };
+ e -> <0> e(expr) PLUS t(term)    {  v = (double)expr + (double)term;  }
+    | <1> t(term)    {  v = term;  };
+Se' -> <7> e;
+
+First sets:
+FIRST(f) = {ID, LPAREN, NUM}
+FIRST(t) = {ID, LPAREN, NUM}
+FIRST(e) = {ID, LPAREN, NUM}
+FIRST(e') = {ID, LPAREN, NUM}
+
+Follow sets:
+FOLLOW(f) = {MUL, EOF, PLUS, RPAREN}
+FOLLOW(t) = {MUL, EOF, PLUS, RPAREN}
+FOLLOW(e) = {EOF, PLUS, RPAREN}
+FOLLOW(e') = {EOF}
+
+Automation:
+Non-terminal count: 3
+Terminal count: 7
+State count: 14 (0 - 13)
+
+Action table:
+STATE |         MUL |         NUM |      LPAREN |      RPAREN |          ID |        PLUS |         EOF
+   0  | ----------- |          s5 |          s4 | ----------- |          s1 | ----------- | -----------
+   1  | ----------- |          s7 | ----------- | ----------- | ----------- | ----------- | -----------
+   2  |          r3 | ----------- | ----------- |          r3 | ----------- |          r3 |          r3
+   3  |          s8 | ----------- | ----------- |          r1 | ----------- |          r1 |          r1
+   4  | ----------- |          s5 |          s4 | ----------- |          s1 | ----------- | -----------
+   5  |          r5 | ----------- | ----------- |          r5 | ----------- |          r5 |          r5
+   6  | ----------- | ----------- | ----------- | ----------- | ----------- |         s10 |      accept
+   7  |          r6 | ----------- | ----------- |          r6 | ----------- |          r6 |          r6
+   8  | ----------- |          s5 |          s4 | ----------- |          s1 | ----------- | -----------
+   9  | ----------- | ----------- | ----------- |         s12 | ----------- |         s10 | -----------
+  10  | ----------- |          s5 |          s4 | ----------- |          s1 | ----------- | -----------
+  11  |          r2 | ----------- | ----------- |          r2 | ----------- |          r2 |          r2
+  12  |          r4 | ----------- | ----------- |          r4 | ----------- |          r4 |          r4
+  13  |          s8 | ----------- | ----------- |          r0 | ----------- |          r0 |          r0
+
+
+Goto table:
+STATE |           t |           e |           f
+   0  |           4 |           7 |           3
+   1  | ----------- | ----------- | -----------
+   2  | ----------- | ----------- | -----------
+   3  | ----------- | ----------- | -----------
+   4  |           4 |          10 |           3
+   5  | ----------- | ----------- | -----------
+   6  | ----------- | ----------- | -----------
+   7  | ----------- | ----------- | -----------
+   8  | ----------- | ----------- |          12
+   9  | ----------- | ----------- | -----------
+  10  |          14 | ----------- |           3
+  11  | ----------- | ----------- | -----------
+  12  | ----------- | ----------- | -----------
+  13  | ----------- | ----------- | -----------
+
+
+State 0:
+    e' -> * e
+
+State 1:
+    f -> ID * NUM
+
+State 2:
+    t -> f *
+
+State 3:
+    t -> t * MUL f
+    e -> t *
+
+State 4:
+    f -> LPAREN * e RPAREN
+
+State 5:
+    f -> NUM *
+
+State 6:
+    e -> e * PLUS t
+    e' -> e *
+
+State 7:
+    f -> ID NUM *
+
+State 8:
+    t -> t MUL * f
+
+State 9:
+    e -> e * PLUS t
+    f -> LPAREN e * RPAREN
+
+State 10:
+    e -> e PLUS * t
+
+State 11:
+    t -> t MUL f *
+
+State 12:
+    f -> LPAREN e RPAREN *
+
+State 13:
+    t -> t * MUL f
+    e -> e PLUS t *

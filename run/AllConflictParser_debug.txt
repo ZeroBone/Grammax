@@ -1,0 +1,90 @@
+Grammar:
+ f -> <4> e
+    | <5> NUM;
+ t -> <2> t MUL f
+    | <3> f;
+ e -> <0> e PLUS t
+    | <1> t;
+Se' -> <6> e;
+
+First sets:
+FIRST(f) = {NUM}
+FIRST(t) = {NUM}
+FIRST(e) = {NUM}
+FIRST(e') = {NUM}
+
+Follow sets:
+FOLLOW(f) = {EOF, PLUS, MUL}
+FOLLOW(t) = {EOF, PLUS, MUL}
+FOLLOW(e) = {EOF, PLUS, MUL}
+FOLLOW(e') = {EOF}
+
+Automation:
+Non-terminal count: 3
+Terminal count: 4
+State count: 10 (0 - 9)
+
+Action table:
+STATE |         MUL |         NUM |        PLUS |         EOF
+   0  | ----------- |          s1 | ----------- | -----------
+   1  |          r5 | ----------- |          r5 |          r5
+   2  |          r3 | ----------- |          r3 |          r3
+   3  |          s5 | ----------- |          r1 |          r1
+   4  |          r4 | ----------- |          s6 |      accept
+   5  | ----------- |          s1 | ----------- | -----------
+   6  | ----------- |          s1 | ----------- | -----------
+   7  |          r2 | ----------- |          r2 |          r2
+   8  |          r4 | ----------- |          s6 |          r4
+   9  |          s5 | ----------- |          r1 |          r1
+
+
+Goto table:
+STATE |           t |           e |           f
+   0  |           4 |           5 |           3
+   1  | ----------- | ----------- | -----------
+   2  | ----------- | ----------- | -----------
+   3  | ----------- | ----------- | -----------
+   4  | ----------- | ----------- | -----------
+   5  |           4 |           9 |           8
+   6  |          10 |           9 |           3
+   7  | ----------- | ----------- | -----------
+   8  | ----------- | ----------- | -----------
+   9  | ----------- | ----------- | -----------
+
+
+State 0:
+    e' -> * e
+
+State 1:
+    f -> NUM *
+
+State 2:
+    t -> f *
+
+State 3:
+    t -> t * MUL f
+    e -> t *
+
+State 4:
+    e -> e * PLUS t
+    e' -> e *
+    f -> e *
+
+State 5:
+    t -> t MUL * f
+
+State 6:
+    e -> e PLUS * t
+
+State 7:
+    t -> t MUL f *
+    t -> f *
+
+State 8:
+    e -> e * PLUS t
+    f -> e *
+
+State 9:
+    t -> t * MUL f
+    e -> t *
+    e -> e PLUS t *

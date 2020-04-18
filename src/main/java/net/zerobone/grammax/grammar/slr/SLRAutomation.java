@@ -4,17 +4,17 @@ import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.Automation;
-import net.zerobone.grammax.grammar.lr0.LR0ClosureCalculation;
-import net.zerobone.grammax.grammar.lr0.LR0ItemTransition;
-import net.zerobone.grammax.grammar.lr0.LR0Items;
-import net.zerobone.grammax.grammar.utils.Point;
+import net.zerobone.grammax.grammar.lr.LR0ClosureCalculation;
+import net.zerobone.grammax.grammar.lr.LRItemTransition;
+import net.zerobone.grammax.grammar.lr.LRItems;
+import net.zerobone.grammax.grammar.lr.Point;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class SLRAutomation extends Automation {
 
-    public SLRAutomation(Grammar grammar, LR0Items items) {
+    public SLRAutomation(Grammar grammar, LRItems items) {
 
         super(grammar, items.getStateCount());
 
@@ -28,7 +28,7 @@ public class SLRAutomation extends Automation {
 
     }
 
-    private void initializeStates(Grammar grammar, LR0Items items) {
+    private void initializeStates(Grammar grammar, LRItems items) {
 
         for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
 
@@ -56,9 +56,9 @@ public class SLRAutomation extends Automation {
 
     }
 
-    private void writeShifts(LR0Items items) {
+    private void writeShifts(LRItems items) {
 
-        for (LR0ItemTransition transition : items.getTransitions()) {
+        for (LRItemTransition transition : items.getTransitions()) {
 
             if (transition.grammarSymbol.isTerminal) {
                 // write to action table
@@ -77,7 +77,7 @@ public class SLRAutomation extends Automation {
 
     }
 
-    private void writeReduces(Grammar grammar, LR0Items items) {
+    private void writeReduces(Grammar grammar, LRItems items) {
 
         for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
 

@@ -1,3 +1,4 @@
+%name PrefixParser
 s = PLUS s s;
 s = MUL s s;
 s = A;

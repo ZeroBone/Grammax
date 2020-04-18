@@ -2,7 +2,7 @@
 
 import java.util.Stack;
 
-public final class Parser {
+public final class PrefixParser {
     public static final int T_A = 0;
     public static final int T_MUL = 1;
     public static final int T_PLUS = 2;
@@ -72,7 +72,7 @@ public final class Parser {
     private interface Reductor {
         Object reduce(Stack<StackEntry> _grx_stack);
     }
-    public Parser() {
+    public PrefixParser() {
         stack = new Stack<>();
         stack.push(initialStackEntry);
     }

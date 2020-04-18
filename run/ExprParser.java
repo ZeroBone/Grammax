@@ -2,47 +2,42 @@
 
 import java.util.Stack;
 
-public final class Parser {
+public final class ExprParser {
     public static final int T_MUL = 0;
     public static final int T_NUM = 1;
     public static final int T_LPAREN = 2;
     public static final int T_RPAREN = 3;
-    public static final int T_ID = 4;
-    public static final int T_PLUS = 5;
-    public static final int T_EOF = 6;
-    private static final int terminalCount = 7;
+    public static final int T_PLUS = 4;
+    public static final int T_EOF = 5;
+    private static final int terminalCount = 6;
     private static final int nonTerminalCount = 3;
     private static final int[] gotoTable = {
-        4,7,3,
+        4,6,3,
         0,0,0,
         0,0,0,
         0,0,0,
-        4,10,3,
+        4,8,3,
         0,0,0,
+        0,0,10,
         0,0,0,
-        0,0,0,
-        0,0,12,
-        0,0,0,
-        14,0,3,
+        12,0,3,
         0,0,0,
         0,0,0,
         0,0,0};
     private static final int[] actionTable = {
-        0,6,5,0,2,0,0,
-        0,8,0,0,0,0,0,
-        -5,0,0,-5,0,-5,-5,
-        9,0,0,-3,0,-3,-3,
-        0,6,5,0,2,0,0,
-        -7,0,0,-7,0,-7,-7,
-        0,0,0,0,0,11,-1,
-        -8,0,0,-8,0,-8,-8,
-        0,6,5,0,2,0,0,
-        0,0,0,13,0,11,0,
-        0,6,5,0,2,0,0,
-        -4,0,0,-4,0,-4,-4,
-        -6,0,0,-6,0,-6,-6,
-        9,0,0,-2,0,-2,-2};
-    private static final int[] productionLabels = {1,1,0,0,2,2,2};
+        0,2,5,0,0,0,
+        -7,0,0,-7,-7,-7,
+        -5,0,0,-5,-5,-5,
+        7,0,0,-3,-3,-3,
+        0,2,5,0,0,0,
+        0,0,0,0,9,-1,
+        0,2,5,0,0,0,
+        0,0,0,11,9,0,
+        0,2,5,0,0,0,
+        -4,0,0,-4,-4,-4,
+        -6,0,0,-6,-6,-6,
+        7,0,0,-2,-2,-2};
+    private static final int[] productionLabels = {1,1,0,0,2,2};
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {
         new Reductor() {
@@ -53,7 +48,7 @@ public final class Parser {
                 Object expr = _grx_stack.pop().payload;
                 Object v;
                 {
-                 v = (double)expr + (double)term; 
+                 v = (int)expr + (int)term; 
                 }
                 return v;
             }
@@ -77,7 +72,7 @@ public final class Parser {
                 Object term = _grx_stack.pop().payload;
                 Object v;
                 {
-                 v = (double)term * (double)factor; 
+                 v = (int)term * (int)factor; 
                 }
                 return v;
             }
@@ -112,19 +107,7 @@ public final class Parser {
                 Object n = _grx_stack.pop().payload;
                 Object v;
                 {
-                 v = ((NumberToken)n).value; 
-                }
-                return v;
-            }
-        },
-        new Reductor() {
-            @Override
-            public Object reduce(Stack<StackEntry> _grx_stack) {
-                Object n = _grx_stack.pop().payload;
-                _grx_stack.pop();
-                Object v;
-                {
-                 v = ((NumberToken)n).value; 
+                 v = n; 
                 }
                 return v;
             }
@@ -144,7 +127,7 @@ public final class Parser {
     private interface Reductor {
         Object reduce(Stack<StackEntry> _grx_stack);
     }
-    public Parser() {
+    public ExprParser() {
         stack = new Stack<>();
         stack.push(initialStackEntry);
     }

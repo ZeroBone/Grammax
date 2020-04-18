@@ -1,3 +1,4 @@
+%name PostfixParser
 s = s s PLUS;
 s = s s MUL;
 s = A;

@@ -1,4 +1,5 @@
 // example of a reduce/reduce conflict
+%name RRConflictParser
 e = e n;
 e = n;
 e = ;

@@ -1,5 +1,6 @@
 package net.zerobone.grammax.grammar;
 
+import net.zerobone.grammax.grammar.lr.Point;
 import net.zerobone.grammax.grammar.utils.*;
 import net.zerobone.grammax.utils.zerolist.ZeroList;
 

@@ -1,22 +1,21 @@
-package net.zerobone.grammax.grammar.lr0;
+package net.zerobone.grammax.grammar.lr;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Symbol;
-import net.zerobone.grammax.grammar.utils.Point;
 
 import java.util.*;
 
-public class LR0Items {
+public class LRItems {
 
     private final HashMap<HashSet<Point>, Integer> states = new HashMap<>();
 
     private final Queue<HashSet<Point>> toDerive = new LinkedList<>();
 
-    private final ArrayList<LR0ItemTransition> transitions = new ArrayList<>();
+    private final ArrayList<LRItemTransition> transitions = new ArrayList<>();
 
     private int stateCount = 0;
 
-    public LR0Items(Grammar grammar) {
+    public LRItems(Grammar grammar) {
         addInitialState(grammar);
         populate(grammar);
     }
@@ -47,6 +46,8 @@ public class LR0Items {
     }
 
     private void populate(Grammar grammar) {
+
+        assert toDerive.size() == 1;
 
         do {
 
@@ -89,13 +90,13 @@ public class LR0Items {
 
             System.out.println("[LOG]: Deriving: " + stateId + " / " + grammarSymbol.id + " = " + derivativeStateId);
 
-            transitions.add(new LR0ItemTransition(stateId, grammarSymbol, derivativeStateId));
+            transitions.add(new LRItemTransition(stateId, grammarSymbol, derivativeStateId));
 
         }
 
     }
 
-    public ArrayList<LR0ItemTransition> getTransitions() {
+    public ArrayList<LRItemTransition> getTransitions() {
         return transitions;
     }
 

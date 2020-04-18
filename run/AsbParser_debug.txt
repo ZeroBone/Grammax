@@ -1,0 +1,56 @@
+Grammar:
+Ss' -> <2> s;
+ s -> <0> A s B
+    | <1> A B;
+
+First sets:
+FIRST(s') = {A}
+FIRST(s) = {A}
+
+Follow sets:
+FOLLOW(s') = {EOF}
+FOLLOW(s) = {B, EOF}
+
+Automation:
+Non-terminal count: 1
+Terminal count: 3
+State count: 6 (0 - 5)
+
+Action table:
+STATE |           A |           B |         EOF
+   0  |          s1 | ----------- | -----------
+   1  |          s1 |          s3 | -----------
+   2  | ----------- | ----------- |      accept
+   3  | ----------- |          r1 |          r1
+   4  | ----------- |          s5 | -----------
+   5  | ----------- |          r0 |          r0
+
+
+Goto table:
+STATE |           s
+   0  |           3
+   1  |           5
+   2  | -----------
+   3  | -----------
+   4  | -----------
+   5  | -----------
+
+
+State 0:
+    s' -> * s
+
+State 1:
+    s -> A * B
+    s -> A * s B
+
+State 2:
+    s' -> s *
+
+State 3:
+    s -> A B *
+
+State 4:
+    s -> A s * B
+
+State 5:
+    s -> A s B *

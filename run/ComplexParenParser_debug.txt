@@ -1,0 +1,58 @@
+Grammar:
+Ss' -> <2> s;
+ s -> <0> s LPAREN s RPAREN s
+    | <1> ;
+
+First sets:
+FIRST(s') = {LPAREN, }
+FIRST(s) = {LPAREN, }
+
+Follow sets:
+FOLLOW(s') = {EOF}
+FOLLOW(s) = {RPAREN, EOF, LPAREN}
+
+Automation:
+Non-terminal count: 1
+Terminal count: 3
+State count: 6 (0 - 5)
+
+Action table:
+STATE |      LPAREN |      RPAREN |         EOF
+   0  |          r1 |          r1 |          r1
+   1  |          s2 | ----------- |      accept
+   2  |          r1 |          r1 |          r1
+   3  |          s2 |          s4 | -----------
+   4  |          r1 |          r1 |          r1
+   5  |          s2 |          r0 |          r0
+
+
+Goto table:
+STATE |           s
+   0  |           2
+   1  | -----------
+   2  |           4
+   3  | -----------
+   4  |           6
+   5  | -----------
+
+
+State 0:
+    s' -> * s
+
+State 1:
+    s' -> s *
+    s -> s * LPAREN s RPAREN s
+
+State 2:
+    s -> s LPAREN * s RPAREN s
+
+State 3:
+    s -> s * LPAREN s RPAREN s
+    s -> s LPAREN s * RPAREN s
+
+State 4:
+    s -> s LPAREN s RPAREN * s
+
+State 5:
+    s -> s * LPAREN s RPAREN s
+    s -> s LPAREN s RPAREN s *

@@ -1,8 +1,8 @@
-package net.zerobone.grammax.grammar.lr0;
+package net.zerobone.grammax.grammar.lr;
 
 import net.zerobone.grammax.grammar.Symbol;
 
-public class LR0ItemTransition {
+public class LRItemTransition {
 
     public final int state;
 
@@ -10,7 +10,7 @@ public class LR0ItemTransition {
 
     public final int targetState;
 
-    public LR0ItemTransition(int state, Symbol grammarSymbol, int targetState) {
+    public LRItemTransition(int state, Symbol grammarSymbol, int targetState) {
         this.state = state;
         this.grammarSymbol = grammarSymbol;
         this.targetState = targetState;

@@ -1,0 +1,97 @@
+Grammar:
+ f -> <4> LPAREN e(expr) RPAREN    {  v = expr;  }
+    | <5> NUM(n)    {  v = n;  };
+ t -> <2> t(term) MUL f(factor)    {  v = (int)term * (int)factor;  }
+    | <3> f(factor)    {  v = factor;  };
+ e -> <0> e(expr) PLUS t(term)    {  v = (int)expr + (int)term;  }
+    | <1> t(term)    {  v = term;  };
+Se' -> <6> e;
+
+First sets:
+FIRST(f) = {NUM, LPAREN}
+FIRST(t) = {NUM, LPAREN}
+FIRST(e) = {NUM, LPAREN}
+FIRST(e') = {NUM, LPAREN}
+
+Follow sets:
+FOLLOW(f) = {PLUS, RPAREN, MUL, EOF}
+FOLLOW(t) = {PLUS, RPAREN, MUL, EOF}
+FOLLOW(e) = {PLUS, RPAREN, EOF}
+FOLLOW(e') = {EOF}
+
+Automation:
+Non-terminal count: 3
+Terminal count: 6
+State count: 12 (0 - 11)
+
+Action table:
+STATE |         MUL |         NUM |      LPAREN |      RPAREN |        PLUS |         EOF
+   0  | ----------- |          s1 |          s4 | ----------- | ----------- | -----------
+   1  |          r5 | ----------- | ----------- |          r5 |          r5 |          r5
+   2  |          r3 | ----------- | ----------- |          r3 |          r3 |          r3
+   3  |          s6 | ----------- | ----------- |          r1 |          r1 |          r1
+   4  | ----------- |          s1 |          s4 | ----------- | ----------- | -----------
+   5  | ----------- | ----------- | ----------- | ----------- |          s8 |      accept
+   6  | ----------- |          s1 |          s4 | ----------- | ----------- | -----------
+   7  | ----------- | ----------- | ----------- |         s10 |          s8 | -----------
+   8  | ----------- |          s1 |          s4 | ----------- | ----------- | -----------
+   9  |          r2 | ----------- | ----------- |          r2 |          r2 |          r2
+  10  |          r4 | ----------- | ----------- |          r4 |          r4 |          r4
+  11  |          s6 | ----------- | ----------- |          r0 |          r0 |          r0
+
+
+Goto table:
+STATE |           t |           e |           f
+   0  |           4 |           6 |           3
+   1  | ----------- | ----------- | -----------
+   2  | ----------- | ----------- | -----------
+   3  | ----------- | ----------- | -----------
+   4  |           4 |           8 |           3
+   5  | ----------- | ----------- | -----------
+   6  | ----------- | ----------- |          10
+   7  | ----------- | ----------- | -----------
+   8  |          12 | ----------- |           3
+   9  | ----------- | ----------- | -----------
+  10  | ----------- | ----------- | -----------
+  11  | ----------- | ----------- | -----------
+
+
+State 0:
+    e' -> * e
+
+State 1:
+    f -> NUM *
+
+State 2:
+    t -> f *
+
+State 3:
+    t -> t * MUL f
+    e -> t *
+
+State 4:
+    f -> LPAREN * e RPAREN
+
+State 5:
+    e -> e * PLUS t
+    e' -> e *
+
+State 6:
+    t -> t MUL * f
+
+State 7:
+    e -> e * PLUS t
+    f -> LPAREN e * RPAREN
+
+State 8:
+    e -> e PLUS * t
+
+State 9:
+    t -> t MUL f *
+
+State 10:
+    f -> LPAREN e RPAREN *
+
+State 11:
+    t -> t * MUL f
+    e -> e PLUS t *

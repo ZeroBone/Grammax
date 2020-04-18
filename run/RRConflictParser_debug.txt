@@ -1,0 +1,56 @@
+Grammar:
+Se' -> <5> e;
+ n -> <3> NUM
+    | <4> ;
+ e -> <0> e n
+    | <1> n
+    | <2> ;
+
+First sets:
+FIRST(e') = {NUM, }
+FIRST(n) = {NUM, }
+FIRST(e) = {NUM, }
+
+Follow sets:
+FOLLOW(e') = {EOF}
+FOLLOW(n) = {NUM, EOF}
+FOLLOW(e) = {NUM, EOF}
+
+Automation:
+Non-terminal count: 2
+Terminal count: 2
+State count: 5 (0 - 4)
+
+Action table:
+STATE |         NUM |         EOF
+   0  |          s1 |          r4
+   1  |          r3 |          r3
+   2  |          r1 |          r1
+   3  |          s1 |      accept
+   4  |          r0 |          r0
+
+
+Goto table:
+STATE |           e |           n
+   0  |           4 |           3
+   1  | ----------- | -----------
+   2  | ----------- | -----------
+   3  | ----------- |           5
+   4  | ----------- | -----------
+
+
+State 0:
+    e' -> * e
+
+State 1:
+    n -> NUM *
+
+State 2:
+    e -> n *
+
+State 3:
+    e -> e * n
+    e' -> e *
+
+State 4:
+    e -> e n *
