@@ -1,4 +1,4 @@
-package net.zerobone.grammax.slr;
+package net.zerobone.grammax.grammar.slr;
 
 import java.util.Stack;
 

@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class Automation {
 
-    private static final int ACTION_ACCEPT = -1;
+    public static final int ACTION_ACCEPT = -1;
 
     public final int stateCount;
 
@@ -148,15 +148,15 @@ public class Automation {
         return terminals[terminalIndex];
     }
 
-    private int symbolToNonTerminalIndex(String nonTerminal) {
+    public int symbolToNonTerminalIndex(String nonTerminal) {
         return nonTerminalToIndex.get(nonTerminal);
     }
 
-    private int symbolToTerminalIndex(String terminal) {
+    public int symbolToTerminalIndex(String terminal) {
         return terminalToIndex.get(terminal);
     }
 
-    private int productionIdToIndex(int productionId) {
+    public int productionIdToIndex(int productionId) {
         return productionIdToIndex.get(productionId);
     }
 
@@ -433,19 +433,19 @@ public class Automation {
 
     }
 
-    private static int encodeTargetState(int state) {
+    public static int encodeTargetState(int state) {
         return state + 1;
     }
 
-    private static int decodeTargetState(int state) {
+    public static int decodeTargetState(int state) {
         return state - 1;
     }
 
-    private static int encodeProductionId(int productionId) {
+    public static int encodeProductionId(int productionId) {
         return -productionId - 2;
     }
 
-    private static int decodeProductionId(int code) {
+    public static int decodeProductionId(int code) {
         return encodeProductionId(code);
     }
 

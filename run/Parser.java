@@ -10,17 +10,23 @@ public final class Parser {
     private static final int terminalCount = 4;
     private static final int nonTerminalCount = 1;
     private static final int[] gotoTable = {
-        3,
+        5,
         0,
-        4,
-        4,
+        6,
+        7,
+        0,
+        8,
+        9,
         0,
         0};
     private static final int[] actionTable = {
-        2,0,0,0,
+        2,4,3,0,
         -4,-4,-4,-4,
-        2,0,0,-1,
-        2,6,5,0,
+        2,4,3,0,
+        2,4,3,0,
+        0,0,0,-1,
+        2,4,3,0,
+        2,4,3,0,
         -2,-2,-2,-2,
         -3,-3,-3,-3};
     private static final int[] productionLabels = {0,0,0};
