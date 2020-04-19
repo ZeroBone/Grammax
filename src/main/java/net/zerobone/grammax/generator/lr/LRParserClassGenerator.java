@@ -1,4 +1,4 @@
-package net.zerobone.grammax.generator.slr;
+package net.zerobone.grammax.generator.lr;
 
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.generator.JavaWriter;
@@ -8,9 +8,9 @@ import net.zerobone.grammax.grammar.automation.AutomationSymbol;
 
 import java.io.IOException;
 
-class SLRParserClassGenerator {
+class LRParserClassGenerator {
 
-    private SLRParserClassGenerator() {}
+    private LRParserClassGenerator() {}
 
     private static void writeStackEntryClass(JavaWriter writer) throws IOException {
 

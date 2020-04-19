@@ -2,7 +2,7 @@ package net.zerobone.grammax.grammar.slr;
 
 import java.util.Stack;
 
-public class SLRParserAlgorithm {
+public class LRParsingAlgorithm {
 
     public static final int T_MUL = 0;
     public static final int T_NUM = 1;
@@ -136,7 +136,7 @@ public class SLRParserAlgorithm {
 
     private Object payload = null;
 
-    public SLRParserAlgorithm() {
+    public LRParsingAlgorithm() {
         stack.push(new StackEntry(0, null));
     }
 
@@ -243,16 +243,16 @@ public class SLRParserAlgorithm {
 
     public static void main(String[] args) {
 
-        SLRParserAlgorithm parser = new SLRParserAlgorithm();
+        LRParsingAlgorithm parser = new LRParsingAlgorithm();
 
-        parser.parse(SLRParserAlgorithm.T_LPAREN, "(");
-        parser.parse(SLRParserAlgorithm.T_NUM, 5);
-        parser.parse(SLRParserAlgorithm.T_PLUS, "+");
-        parser.parse(SLRParserAlgorithm.T_NUM, 7);
-        parser.parse(SLRParserAlgorithm.T_RPAREN, ")");
-        parser.parse(SLRParserAlgorithm.T_MUL, "*");
-        parser.parse(SLRParserAlgorithm.T_NUM, 2);
-        parser.parse(SLRParserAlgorithm.T_EOF, "eof");
+        parser.parse(LRParsingAlgorithm.T_LPAREN, "(");
+        parser.parse(LRParsingAlgorithm.T_NUM, 5);
+        parser.parse(LRParsingAlgorithm.T_PLUS, "+");
+        parser.parse(LRParsingAlgorithm.T_NUM, 7);
+        parser.parse(LRParsingAlgorithm.T_RPAREN, ")");
+        parser.parse(LRParsingAlgorithm.T_MUL, "*");
+        parser.parse(LRParsingAlgorithm.T_NUM, 2);
+        parser.parse(LRParsingAlgorithm.T_EOF, "eof");
 
         if (parser.successfullyParsed()) {
             System.out.println("Done: success");

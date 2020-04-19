@@ -1,4 +1,4 @@
-package net.zerobone.grammax.generator.slr;
+package net.zerobone.grammax.generator.lr;
 
 import net.zerobone.grammax.Grammax;
 import net.zerobone.grammax.generator.GeneratorContext;
@@ -8,7 +8,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class SLRGenerator {
+public class LRGenerator {
 
     private static void generateParserClass(GeneratorContext context) throws IOException {
 
@@ -33,7 +33,7 @@ public class SLRGenerator {
         writer.newLine();
         writer.newLine();
 
-        SLRParserClassGenerator.generate(writer, context);
+        LRParserClassGenerator.generate(writer, context);
 
         writer.close();
 

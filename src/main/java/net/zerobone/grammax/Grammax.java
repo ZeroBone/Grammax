@@ -2,7 +2,7 @@ package net.zerobone.grammax;
 
 import net.zerobone.grammax.ast.TranslationUnitNode;
 import net.zerobone.grammax.ast.statements.StatementNode;
-import net.zerobone.grammax.generator.slr.SLRGenerator;
+import net.zerobone.grammax.generator.lr.LRGenerator;
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.CLRAutomationBuilder;
@@ -66,8 +66,8 @@ public class Grammax {
 
         context.grammar.augment();
 
-        // Automation automation = new SLRAutomationBuilder(context.grammar).build();
-        Automation automation = new CLRAutomationBuilder(context.grammar).build();
+        Automation automation = new SLRAutomationBuilder(context.grammar).build();
+        // Automation automation = new CLRAutomationBuilder(context.grammar).build();
 
         GrammaxConfiguration configuration = context.getConfiguration();
 
@@ -98,7 +98,7 @@ public class Grammax {
         );
 
         try {
-            SLRGenerator.generate(generatorContext);
+            LRGenerator.generate(generatorContext);
         }
         catch (IOException e) {
             e.printStackTrace();

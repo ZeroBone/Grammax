@@ -70,3 +70,11 @@ statement = TOP CODE(c); { v = new TopStatementNode(c.code); }
 
 // %name statement
 statement = NAME ID(name); { v = new NameStatementNode(name.id); }
+
+// %algo statement
+statement = ALGO algorithm(alg); { v = new AlgoStatementNode(alg); }
+
+%type algorithm ParsingAlgorithm
+algorithm = SLR; { v = ParsingAlgorithm.SLR; }
+algorithm = CLR; { v = ParsingAlgorithm.CLR; }
+algorithm = LALR; { v = ParsingAlgorithm.LALR; }
