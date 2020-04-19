@@ -1,0 +1,78 @@
+Grammar:
+Ss' -> <3> s;
+ c -> <1> A c
+    | <2> D;
+ s -> <0> c c;
+
+First sets:
+FIRST(s') = {A, D}
+FIRST(c) = {A, D}
+FIRST(s) = {A, D}
+
+Follow sets:
+FOLLOW(s') = {EOF}
+FOLLOW(c) = {A, EOF, D}
+FOLLOW(s) = {EOF}
+
+Automation:
+Non-terminal count: 2
+Terminal count: 3
+State count: 10 (0 - 9)
+
+Action table:
+STATE |           A |           D |         EOF
+   0  |          s1 |          s4 | -----------
+   1  |          s1 |          s4 | -----------
+   2  |          s6 |          s8 | -----------
+   3  | ----------- | ----------- |      accept
+   4  |          r2 |          r2 | -----------
+   5  |          r1 |          r1 | -----------
+   6  |          s6 |          s8 | -----------
+   7  | ----------- | ----------- |          r0
+   8  | ----------- | ----------- |          r2
+   9  | ----------- | ----------- |          r1
+
+
+Goto table:
+STATE |           s |           c
+   0  |           3 |           2
+   1  | ----------- |           5
+   2  | ----------- |           7
+   3  | ----------- | -----------
+   4  | ----------- | -----------
+   5  | ----------- | -----------
+   6  | ----------- |           9
+   7  | ----------- | -----------
+   8  | ----------- | -----------
+   9  | ----------- | -----------
+
+
+State 0:
+    s' -> * s, {EOF}
+
+State 1:
+    c -> A * c, {A, D}
+
+State 2:
+    s -> c * c, {EOF}
+
+State 3:
+    s' -> s *, {EOF}
+
+State 4:
+    c -> D *, {A, D}
+
+State 5:
+    c -> A c *, {A, D}
+
+State 6:
+    c -> A * c, {EOF}
+
+State 7:
+    s -> c c *, {EOF}
+
+State 8:
+    c -> D *, {EOF}
+
+State 9:
+    c -> A c *, {EOF}

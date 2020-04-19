@@ -6,6 +6,7 @@ import net.zerobone.grammax.generator.slr.SLRGenerator;
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Symbol;
 import net.zerobone.grammax.grammar.automation.CLRAutomationBuilder;
+import net.zerobone.grammax.grammar.automation.SLRAutomationBuilder;
 import net.zerobone.grammax.grammar.automation.conflict.Conflict;
 import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.grammar.verification.GrammarVerification;

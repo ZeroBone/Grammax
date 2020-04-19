@@ -37,6 +37,8 @@ public class CLRAutomationBuilder {
 
             HashSet<LookaheadPoint> kernels = entry.getKey();
 
+            // kernels = LR1ClosureCalculation.closure(grammar, kernels);
+
             int stateId = entry.getValue();
 
             StringBuilder sb = new StringBuilder();

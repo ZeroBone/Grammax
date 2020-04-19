@@ -1,0 +1,4 @@
+%name CLRExampleParser
+s = c c;
+c = A c;
+c = D;

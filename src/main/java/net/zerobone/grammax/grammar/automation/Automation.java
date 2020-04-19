@@ -411,7 +411,7 @@ public final class Automation {
                     continue;
                 }
 
-                sb.append(String.format("%12s", entry));
+                sb.append(String.format("%12s", decodeTargetState(entry)));
 
             }
 
