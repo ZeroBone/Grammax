@@ -17,23 +17,23 @@ Terminal count: 3
 State count: 6 (0 - 5)
 
 Action table:
-STATE |      LPAREN |      RPAREN |         EOF
-   0  |          r1 |          r1 |          r1
-   1  |          s2 | ----------- |      accept
-   2  |          r1 |          r1 |          r1
-   3  |          s2 |          s4 | -----------
-   4  |          r1 |          r1 |          r1
-   5  |          s2 |          r0 |          r0
+STATE | LPAREN | RPAREN |    EOF
+   0  |     r1 |     r1 |     r1
+   1  |     s2 | ------ | accept
+   2  |     r1 |     r1 |     r1
+   3  |     s2 |     s4 | ------
+   4  |     r1 |     r1 |     r1
+   5  |     s2 |     r0 |     r0
 
 
 Goto table:
-STATE |           s
-   0  |           1
-   1  | -----------
-   2  |           3
-   3  | -----------
-   4  |           5
-   5  | -----------
+STATE |     s
+   0  |     1
+   1  | -----
+   2  |     3
+   3  | -----
+   4  |     5
+   5  | -----
 
 
 State 0:

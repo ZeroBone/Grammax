@@ -325,6 +325,29 @@ public final class Automation {
 
         sb.append(String.format("%5s", "STATE"));
 
+        // calculate cell width
+
+        int actionCellWidth = 6;
+
+        for (int t = 0; t < getTerminalCount(); t++) {
+
+            int terminalLength = terminals[t].length();
+
+            actionCellWidth = Math.max(actionCellWidth, terminalLength + 1);
+
+        }
+
+        String actionEmptyMarker;
+        {
+            StringBuilder markerBuilder = new StringBuilder(actionCellWidth - 1);
+            for (int i = 1; i < actionCellWidth; i++) {
+                markerBuilder.append('-');
+            }
+            actionEmptyMarker = markerBuilder.toString();
+        }
+
+        // write table header
+
         for (int t = 0; t < getTerminalCount(); t++) {
 
             sb.append(' ');
@@ -332,7 +355,7 @@ public final class Automation {
 
             String terminal = terminals[t];
 
-            sb.append(String.format("%12s", terminal));
+            sb.append(String.format("%"+actionCellWidth+"s", terminal));
 
         }
 
@@ -352,21 +375,22 @@ public final class Automation {
                 int code = actionTable[s * getTerminalCount() + t];
 
                 if (code == 0) {
-                    sb.append(" -----------");
+                    sb.append(' ');
+                    sb.append(actionEmptyMarker);
                     continue;
                 }
 
                 if (code == ACTION_ACCEPT) {
-                    sb.append(String.format("%12s", "accept"));
+                    sb.append(String.format("%"+actionCellWidth+"s", "accept"));
                     continue;
                 }
 
                 if (code > 0) {
                     // shift
-                    sb.append(String.format("%12s", "s" + decodeTargetState(code)));
+                    sb.append(String.format("%"+actionCellWidth+"s", "s" + decodeTargetState(code)));
                 }
                 else {
-                    sb.append(String.format("%12s", "r" + decodeProductionId(code)));
+                    sb.append(String.format("%"+actionCellWidth+"s", "r" + decodeProductionId(code)));
                 }
 
             }
@@ -381,13 +405,36 @@ public final class Automation {
 
         sb.append(String.format("%5s", "STATE"));
 
+        // calculate cell width
+
+        int gotoCellWidth = 6;
+
+        for (int nt = 0; nt < getNonTerminalCount(); nt++) {
+
+            int nonTerminalLength = nonTerminals[nt].length();
+
+            gotoCellWidth = Math.max(gotoCellWidth, nonTerminalLength + 1);
+
+        }
+
+        String gotoEmptyMarker;
+        {
+            StringBuilder markerBuilder = new StringBuilder(gotoCellWidth - 1);
+            for (int i = 1; i < gotoCellWidth; i++) {
+                markerBuilder.append('-');
+            }
+            gotoEmptyMarker = markerBuilder.toString();
+        }
+
+        // write table header
+
         for (int nt = 0; nt < getNonTerminalCount(); nt++) {
 
             sb.append(" |");
 
             String nonTerminal = nonTerminals[nt];
 
-            sb.append(String.format("%12s", nonTerminal));
+            sb.append(String.format("%"+gotoCellWidth+"s", nonTerminal));
 
         }
 
@@ -407,11 +454,12 @@ public final class Automation {
                 int entry = gotoTable[s * getNonTerminalCount() + t];
 
                 if (entry == 0) {
-                    sb.append(" -----------");
+                    sb.append(' ');
+                    sb.append(gotoEmptyMarker);
                     continue;
                 }
 
-                sb.append(String.format("%12s", decodeTargetState(entry)));
+                sb.append(String.format("%"+gotoCellWidth+"s", decodeTargetState(entry)));
 
             }
 

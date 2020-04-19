@@ -22,21 +22,21 @@ Terminal count: 2
 State count: 5 (0 - 4)
 
 Action table:
-STATE |         NUM |         EOF
-   0  |          s1 |          r4
-   1  |          r3 |          r3
-   2  |          r1 |          r1
-   3  |          s1 |      accept
-   4  |          r0 |          r0
+STATE |   NUM |   EOF
+   0  |    s1 |    r4
+   1  |    r3 |    r3
+   2  |    r1 |    r1
+   3  |    s1 |accept
+   4  |    r0 |    r0
 
 
 Goto table:
-STATE |           e |           n
-   0  |           3 |           2
-   1  | ----------- | -----------
-   2  | ----------- | -----------
-   3  | ----------- |           4
-   4  | ----------- | -----------
+STATE |     e |     n
+   0  |     3 |     2
+   1  | ----- | -----
+   2  | ----- | -----
+   3  | ----- |     4
+   4  | ----- | -----
 
 
 State 0:
