@@ -66,7 +66,7 @@ public class LR1ClosureCalculation {
 
     private static HashSet<LookaheadPoint> calculateClosure(Grammar grammar, HashSet<LookaheadPoint> kernels, boolean onlyEndPoint) {
 
-        HashSet<Symbol> added = new HashSet<>(grammar.getNonTerminalCount());
+        HashSet<PendingLookaheadSymbol> added = new HashSet<>(grammar.getNonTerminalCount());
 
         Queue<PendingLookaheadSymbol> pendingNonTerminals = new LinkedList<>();
 
@@ -91,10 +91,6 @@ public class LR1ClosureCalculation {
 
             // non-terminal
 
-            if (added.contains(symbolAfterPoint.symbol)) {
-                continue;
-            }
-
             HashSet<Symbol> newLookahead = calculateFirstAfter(
                 grammar,
                 production,
@@ -102,11 +98,15 @@ public class LR1ClosureCalculation {
                 point.lookahead
             );
 
-            pendingNonTerminals.add(
-                new PendingLookaheadSymbol(symbolAfterPoint.symbol, newLookahead)
-            );
+            PendingLookaheadSymbol pendingLookahead = new PendingLookaheadSymbol(symbolAfterPoint.symbol, newLookahead);
 
-            added.add(symbolAfterPoint.symbol);
+            if (added.contains(pendingLookahead)) {
+                continue;
+            }
+
+            pendingNonTerminals.add(pendingLookahead);
+
+            added.add(pendingLookahead);
 
         }
 
@@ -178,10 +178,6 @@ public class LR1ClosureCalculation {
 
                 // first symbol is a non-terminal
 
-                if (added.contains(firstSymbol.symbol)) {
-                    continue;
-                }
-
                 HashSet<Symbol> newLookahead = calculateFirstAfter(
                     grammar,
                     production,
@@ -189,11 +185,15 @@ public class LR1ClosureCalculation {
                     lookahead
                 );
 
-                pendingNonTerminals.add(
-                    new PendingLookaheadSymbol(firstSymbol.symbol, newLookahead)
-                );
+                PendingLookaheadSymbol pendingLookaheadSymbol = new PendingLookaheadSymbol(firstSymbol.symbol, newLookahead);
 
-                added.add(firstSymbol.symbol);
+                if (added.contains(pendingLookaheadSymbol)) {
+                    continue;
+                }
+
+                pendingNonTerminals.add(pendingLookaheadSymbol);
+
+                added.add(pendingLookaheadSymbol);
 
             }
 
