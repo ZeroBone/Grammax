@@ -4,6 +4,7 @@ import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.ProductionSymbol;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.point.Point;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -1,14 +1,14 @@
-package net.zerobone.grammax.grammar.lr;
+package net.zerobone.grammax.grammar.point;
 
 import java.util.Objects;
 
-public class Point {
+public abstract class BasePoint {
 
-    public int productionId;
+    public final int productionId;
 
-    public int position;
+    public final int position;
 
-    public Point(int productionId, int position) {
+    protected BasePoint(int productionId, int position) {
         this.productionId = productionId;
         this.position = position;
     }
@@ -22,9 +22,9 @@ public class Point {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Point point = (Point)o;
-        return productionId == point.productionId &&
-            position == point.position;
+        BasePoint basePoint = (BasePoint)o;
+        return productionId == basePoint.productionId &&
+            position == basePoint.position;
     }
 
     @Override

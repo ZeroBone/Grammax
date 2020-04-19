@@ -7,7 +7,7 @@ import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.grammar.lr.LR0ClosureCalculation;
 import net.zerobone.grammax.grammar.lr.LRItemTransition;
 import net.zerobone.grammax.grammar.lr.LRItems;
-import net.zerobone.grammax.grammar.lr.Point;
+import net.zerobone.grammax.grammar.point.Point;
 
 import java.util.HashMap;
 import java.util.HashSet;

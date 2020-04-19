@@ -2,6 +2,7 @@ package net.zerobone.grammax.grammar.lr;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.point.Point;
 
 import java.util.*;
 
@@ -22,14 +23,14 @@ public class LRItems {
 
     private void addInitialState(Grammar grammar) {
 
-        int productionId;
+        int startProductionId;
 
         {
             Iterator<Integer> startSymbolProductions = grammar.getProductionIdsFor(grammar.getStartSymbol());
 
             assert startSymbolProductions.hasNext() : "grammar is not augmented";
 
-            productionId = startSymbolProductions.next();
+            startProductionId = startSymbolProductions.next();
 
             assert !startSymbolProductions.hasNext() : "grammar is not augmented";
 
@@ -37,7 +38,7 @@ public class LRItems {
 
         HashSet<Point> initialKernels = new HashSet<>(1);
 
-        initialKernels.add(new Point(productionId, 0));
+        initialKernels.add(new Point(startProductionId, 0));
 
         toDerive.add(initialKernels);
 

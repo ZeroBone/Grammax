@@ -4,6 +4,7 @@ import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.ProductionSymbol;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.point.Point;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -91,7 +92,7 @@ public class LR0ClosureCalculation {
             Symbol nonTerminal = pendingNonTerminals.poll();
             assert !nonTerminal.isTerminal;
 
-            for (Iterator<Integer> it = grammar.getProductionIdsFor(nonTerminal); it.hasNext(); ) {
+            for (Iterator<Integer> it = grammar.getProductionIdsFor(nonTerminal); it.hasNext();) {
 
                 int productionId = it.next();
 
@@ -99,12 +100,13 @@ public class LR0ClosureCalculation {
 
                 assert production != null;
 
-                if (!onlyEndPoint || production.body.isEmpty()) {
+                if (production.body.isEmpty()) {
                     closure.add(new Point(productionId, 0));
+                    continue;
                 }
 
-                if (production.body.isEmpty()) {
-                    continue;
+                if (!onlyEndPoint) {
+                    closure.add(new Point(productionId, 0));
                 }
 
                 ProductionSymbol firstSymbol = production.body.get(0);
