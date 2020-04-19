@@ -9,7 +9,7 @@ import net.zerobone.grammax.grammar.automation.conflict.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Automation {
+public final class Automation {
 
     public static final int ACTION_ACCEPT = -1;
 
@@ -43,7 +43,7 @@ public class Automation {
      */
     public final int[] actionTable;
 
-    protected final String[] parserStateDescriptions;
+    private final String[] parserStateDescriptions;
 
     private final ArrayList<Conflict> conflicts = new ArrayList<>();
 
@@ -209,7 +209,7 @@ public class Automation {
 
     }
 
-    protected void writeShift(int state, Symbol terminal, int targetState) {
+    void writeShift(int state, Symbol terminal, int targetState) {
 
         assert targetState >= 0: "negative target state";
         assert terminal.isTerminal;
@@ -231,7 +231,7 @@ public class Automation {
 
     }
 
-    protected void writeReduce(int state, Symbol terminal, int grammarProductionId) {
+    void writeReduce(int state, Symbol terminal, int grammarProductionId) {
 
         int productionId = productionIdToIndex(grammarProductionId);
 
@@ -253,7 +253,7 @@ public class Automation {
 
     }
 
-    protected void writeAccept(int state) {
+    void writeAccept(int state) {
 
         int eofIndex = symbolToTerminalIndex(Symbol.EOF.id);
 
@@ -273,7 +273,7 @@ public class Automation {
 
     }
 
-    protected void writeGoto(int state, Symbol nonTerminal, int targetState) {
+    void writeGoto(int state, Symbol nonTerminal, int targetState) {
 
         assert targetState >= 0 : "invalid target state.";
         assert targetState != 0 : "there cannot be any transitions to zero state";
@@ -293,6 +293,11 @@ public class Automation {
     public String getParsingStateDescription(int state) {
         assert state >= 0;
         return parserStateDescriptions[state];
+    }
+
+    void setParsingStateDescription(int state, String desc) {
+        assert state >= 0;
+        parserStateDescriptions[state] = desc;
     }
 
     @Override

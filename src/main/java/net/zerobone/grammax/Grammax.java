@@ -5,10 +5,9 @@ import net.zerobone.grammax.ast.statements.StatementNode;
 import net.zerobone.grammax.generator.slr.SLRGenerator;
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.automation.CLRAutomationBuilder;
 import net.zerobone.grammax.grammar.automation.conflict.Conflict;
 import net.zerobone.grammax.grammar.automation.Automation;
-import net.zerobone.grammax.grammar.lr.LRItems;
-import net.zerobone.grammax.grammar.slr.SLRAutomation;
 import net.zerobone.grammax.grammar.verification.GrammarVerification;
 import net.zerobone.grammax.grammar.verification.messages.VerificationMessage;
 import net.zerobone.grammax.lexer.Lexer;
@@ -66,9 +65,8 @@ public class Grammax {
 
         context.grammar.augment();
 
-        LRItems items = new LRItems(context.grammar);
-
-        Automation automation = new SLRAutomation(context.grammar, items);
+        // Automation automation = new SLRAutomationBuilder(context.grammar).build();
+        Automation automation = new CLRAutomationBuilder(context.grammar).build();
 
         GrammaxConfiguration configuration = context.getConfiguration();
 
@@ -132,29 +130,9 @@ public class Grammax {
 
             debugLogWriter.write("FIRST(");
             debugLogWriter.write(entry.getKey().id);
-            debugLogWriter.write(") = {");
+            debugLogWriter.write(") = ");
 
-            Iterator<Symbol> firstSetIterator = entry.getValue().iterator();
-
-            if (firstSetIterator.hasNext()) {
-
-                while (true) {
-
-                    Symbol id = firstSetIterator.next();
-
-                    debugLogWriter.write(id.id);
-
-                    if (!firstSetIterator.hasNext()) {
-                        break;
-                    }
-
-                    debugLogWriter.write(", ");
-
-                }
-
-            }
-
-            debugLogWriter.write('}');
+            debugLogWriter.write(Symbol.prettyPrintSet(entry.getValue()));
 
             debugLogWriter.newLine();
 
@@ -171,29 +149,9 @@ public class Grammax {
 
             debugLogWriter.write("FOLLOW(");
             debugLogWriter.write(entry.getKey().id);
-            debugLogWriter.write(") = {");
+            debugLogWriter.write(") = ");
 
-            Iterator<Symbol> followSetIterator = entry.getValue().iterator();
-
-            if (followSetIterator.hasNext()) {
-
-                while (true) {
-
-                    Symbol id = followSetIterator.next();
-
-                    debugLogWriter.write(id.id);
-
-                    if (!followSetIterator.hasNext()) {
-                        break;
-                    }
-
-                    debugLogWriter.write(", ");
-
-                }
-
-            }
-
-            debugLogWriter.write('}');
+            debugLogWriter.write(Symbol.prettyPrintSet(entry.getValue()));
 
             debugLogWriter.newLine();
 

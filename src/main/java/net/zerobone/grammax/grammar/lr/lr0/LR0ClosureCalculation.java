@@ -1,9 +1,10 @@
-package net.zerobone.grammax.grammar.lr;
+package net.zerobone.grammax.grammar.lr.lr0;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.ProductionSymbol;
 import net.zerobone.grammax.grammar.Symbol;
+import net.zerobone.grammax.grammar.point.LookaheadPoint;
 import net.zerobone.grammax.grammar.point.Point;
 
 import java.util.HashSet;

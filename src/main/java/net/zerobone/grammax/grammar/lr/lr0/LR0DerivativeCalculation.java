@@ -1,4 +1,4 @@
-package net.zerobone.grammax.grammar.lr;
+package net.zerobone.grammax.grammar.lr.lr0;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
@@ -9,11 +9,11 @@ import net.zerobone.grammax.grammar.point.Point;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class LR0DerivativeCalculation {
+class LR0DerivativeCalculation {
 
     private LR0DerivativeCalculation() {}
 
-    public static HashMap<Symbol, HashSet<Point>> calculateAllDerivatives(Grammar grammar, HashSet<Point> kernels) {
+    static HashMap<Symbol, HashSet<Point>> calculateAllDerivatives(Grammar grammar, HashSet<Point> kernels) {
 
         HashSet<Point> closure = LR0ClosureCalculation.closure(grammar, kernels);
 

@@ -1,22 +1,25 @@
-package net.zerobone.grammax.grammar.slr;
+package net.zerobone.grammax.grammar.automation;
 
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.Symbol;
-import net.zerobone.grammax.grammar.automation.Automation;
-import net.zerobone.grammax.grammar.lr.LR0ClosureCalculation;
+import net.zerobone.grammax.grammar.lr.lr0.LR0ClosureCalculation;
 import net.zerobone.grammax.grammar.lr.LRItemTransition;
-import net.zerobone.grammax.grammar.lr.LRItems;
+import net.zerobone.grammax.grammar.lr.lr0.LR0Items;
 import net.zerobone.grammax.grammar.point.Point;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class SLRAutomation extends Automation {
+public class SLRAutomationBuilder {
 
-    public SLRAutomation(Grammar grammar, LRItems items) {
+    private final Automation automation;
 
-        super(grammar, items.getStateCount());
+    public SLRAutomationBuilder(Grammar grammar) {
+
+        LR0Items items = new LR0Items(grammar);
+
+        automation = new Automation(grammar, items.getStateCount());
 
         initializeStates(grammar, items);
 
@@ -28,7 +31,7 @@ public class SLRAutomation extends Automation {
 
     }
 
-    private void initializeStates(Grammar grammar, LRItems items) {
+    private void initializeStates(Grammar grammar, LR0Items items) {
 
         for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
 
@@ -50,26 +53,26 @@ public class SLRAutomation extends Automation {
 
             }
 
-            parserStateDescriptions[stateId] = sb.toString();
+            automation.setParsingStateDescription(stateId, sb.toString());
 
         }
 
     }
 
-    private void writeShifts(LRItems items) {
+    private void writeShifts(LR0Items items) {
 
         for (LRItemTransition transition : items.getTransitions()) {
 
             if (transition.grammarSymbol.isTerminal) {
                 // write to action table
 
-                writeShift(transition.state, transition.grammarSymbol, transition.targetState);
+                automation.writeShift(transition.state, transition.grammarSymbol, transition.targetState);
 
             }
             else {
                 // write to goto table
 
-                writeGoto(transition.state, transition.grammarSymbol, transition.targetState);
+                automation.writeGoto(transition.state, transition.grammarSymbol, transition.targetState);
 
             }
 
@@ -77,7 +80,7 @@ public class SLRAutomation extends Automation {
 
     }
 
-    private void writeReduces(Grammar grammar, LRItems items) {
+    private void writeReduces(Grammar grammar, LR0Items items) {
 
         for (HashMap.Entry<HashSet<Point>, Integer> entry : items.getStates()) {
 
@@ -89,24 +92,19 @@ public class SLRAutomation extends Automation {
 
             HashSet<Point> endPoints = LR0ClosureCalculation.endPointClosure(grammar, derivative);
 
-            System.out.println("[LOG]: State: " + stateId + " Derivative: " + derivative + " End points: " + endPoints);
+            System.out.println("[LOG]: LR0 state: " + stateId + " Derivative: " + derivative + " End points: " + endPoints);
 
             for (Point kernelPoint : endPoints) {
 
                 Production pointProduction = grammar.getProduction(kernelPoint.productionId);
 
-                assert kernelPoint.position <= pointProduction.body.size();
-
-                if (kernelPoint.position != pointProduction.body.size()) {
-                    // if the point is not at the end of the production
-                    continue;
-                }
+                assert kernelPoint.position == pointProduction.body.size();
 
                 Symbol nonTerminal = grammar.getProduction(kernelPoint.productionId).getNonTerminal();
 
                 if (nonTerminal == grammar.getStartSymbol()) {
 
-                    writeAccept(stateId);
+                    automation.writeAccept(stateId);
 
                     continue;
                 }
@@ -115,7 +113,7 @@ public class SLRAutomation extends Automation {
 
                 for (Symbol terminalOrEof : grammar.followSet(nonTerminal)) {
 
-                    writeReduce(stateId, terminalOrEof, kernelPoint.productionId);
+                    automation.writeReduce(stateId, terminalOrEof, kernelPoint.productionId);
 
                 }
 
@@ -123,6 +121,10 @@ public class SLRAutomation extends Automation {
 
         }
 
+    }
+
+    public Automation build() {
+        return automation;
     }
 
 }

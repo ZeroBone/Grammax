@@ -297,6 +297,9 @@ public class Grammar implements Iterable<Production> {
         startSymbol = nonTerminals.get(newNonTerminal);
     }
 
+    /**
+     * @deprecated
+     */
     public ProductionSymbol getSymbolAfter(Point point) {
 
         Production production = getProduction(point.productionId);

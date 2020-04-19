@@ -32,7 +32,7 @@ public final class LookaheadPoint extends BasePoint {
 
     @Override
     public String toString() {
-        return "(" + productionId + ", " + position + ", " + lookahead + ")";
+        return "(" + productionId + ", " + position + ", " + Symbol.prettyPrintSet(lookahead) + ")";
     }
 
 }

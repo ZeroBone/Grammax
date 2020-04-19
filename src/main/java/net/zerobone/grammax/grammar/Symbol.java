@@ -1,5 +1,8 @@
 package net.zerobone.grammax.grammar;
 
+import java.util.HashSet;
+import java.util.Iterator;
+
 public final class Symbol {
 
     // used in first and follow sets
@@ -23,7 +26,39 @@ public final class Symbol {
 
     @Override
     public boolean equals(Object o) {
-        return this == o;
+        return o == this;
+    }
+
+    public static String prettyPrintSet(HashSet<Symbol> symbols) {
+
+        Iterator<Symbol> symbolIterator = symbols.iterator();
+
+        if (!symbolIterator.hasNext()) {
+            return "{}";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('{');
+
+        for (;;) {
+
+            Symbol next = symbolIterator.next();
+
+            sb.append(next.id);
+
+            if (!symbolIterator.hasNext()) {
+                break;
+            }
+
+            sb.append(", ");
+
+        }
+
+        sb.append('}');
+
+        return sb.toString();
+
     }
 
 }

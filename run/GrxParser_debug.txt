@@ -14,19 +14,19 @@ Grammar:
 StranslationUnit' -> <12> translationUnit;
 
 First sets:
-FIRST(productionStatementBody) = {SEMICOLON, ID}
+FIRST(productionStatementBody) = {ID, SEMICOLON}
 FIRST(productionStatementArgument) = {, LEFT_PAREN}
-FIRST(statement) = {TOP, TYPE, NAME, ID}
-FIRST(translationUnit) = {TOP, , TYPE, NAME, ID}
+FIRST(statement) = {TYPE, ID, NAME, TOP}
+FIRST(translationUnit) = {TYPE, ID, NAME, , TOP}
 FIRST(productionStatementCode) = {CODE, }
-FIRST(translationUnit') = {TOP, , TYPE, NAME, ID}
+FIRST(translationUnit') = {TYPE, ID, NAME, , TOP}
 
 Follow sets:
-FOLLOW(productionStatementBody) = {TOP, TYPE, NAME, ID, EOF}
-FOLLOW(productionStatementArgument) = {SEMICOLON, ID}
-FOLLOW(statement) = {TOP, TYPE, NAME, ID, EOF}
-FOLLOW(translationUnit) = {TOP, TYPE, NAME, ID, EOF}
-FOLLOW(productionStatementCode) = {TOP, TYPE, NAME, ID, EOF}
+FOLLOW(productionStatementBody) = {TYPE, ID, NAME, EOF, TOP}
+FOLLOW(productionStatementArgument) = {ID, SEMICOLON}
+FOLLOW(statement) = {TYPE, ID, NAME, EOF, TOP}
+FOLLOW(translationUnit) = {TYPE, ID, NAME, EOF, TOP}
+FOLLOW(productionStatementCode) = {TYPE, ID, NAME, EOF, TOP}
 FOLLOW(translationUnit') = {EOF}
 
 Automation:
@@ -36,26 +36,26 @@ State count: 22 (0 - 21)
 
 Action table:
 STATE |        CODE |         TOP |   SEMICOLON | RIGHT_PAREN |          ID |      ASSIGN |  LEFT_PAREN |        TYPE |        NAME |         EOF
-   0  | ----------- |          r0 | ----------- | ----------- |          r0 | ----------- | ----------- |          r0 |          r0 |          r0
-   1  | ----------- |          s2 | ----------- | ----------- |          s6 | ----------- | ----------- |          s3 |          s5 |      accept
-   2  |          s7 | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | -----------
-   3  | ----------- | ----------- | ----------- | ----------- |          s8 | ----------- | ----------- | ----------- | ----------- | -----------
-   4  | ----------- |          r1 | ----------- | ----------- |          r1 | ----------- | ----------- |          r1 |          r1 |          r1
-   5  | ----------- | ----------- | ----------- | ----------- |          s9 | ----------- | ----------- | ----------- | ----------- | -----------
-   6  | ----------- | ----------- | ----------- | ----------- | ----------- |         s10 | ----------- | ----------- | ----------- | -----------
-   7  | ----------- |         r10 | ----------- | ----------- |         r10 | ----------- | ----------- |         r10 |         r10 |         r10
-   8  | ----------- | ----------- | ----------- | ----------- |         s11 | ----------- | ----------- | ----------- | ----------- | -----------
-   9  | ----------- |         r11 | ----------- | ----------- |         r11 | ----------- | ----------- |         r11 |         r11 |         r11
-  10  | ----------- | ----------- |         s12 | ----------- |         s14 | ----------- | ----------- | ----------- | ----------- | -----------
-  11  | ----------- |          r9 | ----------- | ----------- |          r9 | ----------- | ----------- |          r9 |          r9 |          r9
-  12  |         s15 |          r5 | ----------- | ----------- |          r5 | ----------- | ----------- |          r5 |          r5 |          r5
-  13  | ----------- |          r2 | ----------- | ----------- |          r2 | ----------- | ----------- |          r2 |          r2 |          r2
-  14  | ----------- | ----------- |          r7 | ----------- |          r7 | ----------- |         s18 | ----------- | ----------- | -----------
-  15  | ----------- |          r6 | ----------- | ----------- |          r6 | ----------- | ----------- |          r6 |          r6 |          r6
-  16  | ----------- |          r3 | ----------- | ----------- |          r3 | ----------- | ----------- |          r3 |          r3 |          r3
-  17  | ----------- | ----------- |         s12 | ----------- |         s14 | ----------- | ----------- | ----------- | ----------- | -----------
-  18  | ----------- | ----------- | ----------- | ----------- |         s20 | ----------- | ----------- | ----------- | ----------- | -----------
-  19  | ----------- |          r4 | ----------- | ----------- |          r4 | ----------- | ----------- |          r4 |          r4 |          r4
+   0  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r0
+   1  | ----------- |          s6 | ----------- | ----------- |          s3 | ----------- | ----------- |          s2 |          s4 |      accept
+   2  | ----------- | ----------- | ----------- | ----------- |          s7 | ----------- | ----------- | ----------- | ----------- | -----------
+   3  | ----------- | ----------- | ----------- | ----------- | ----------- |          s8 | ----------- | ----------- | ----------- | -----------
+   4  | ----------- | ----------- | ----------- | ----------- |          s9 | ----------- | ----------- | ----------- | ----------- | -----------
+   5  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r1
+   6  |         s10 | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | -----------
+   7  | ----------- | ----------- | ----------- | ----------- |         s11 | ----------- | ----------- | ----------- | ----------- | -----------
+   8  | ----------- | ----------- |         s14 | ----------- |         s13 | ----------- | ----------- | ----------- | ----------- | -----------
+   9  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |         r11
+  10  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |         r10
+  11  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r9
+  12  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r2
+  13  | ----------- | ----------- |          r7 | ----------- |          r7 | ----------- |         s16 | ----------- | ----------- | -----------
+  14  |         s17 | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r5
+  15  | ----------- | ----------- |         s14 | ----------- |         s13 | ----------- | ----------- | ----------- | ----------- | -----------
+  16  | ----------- | ----------- | ----------- | ----------- |         s20 | ----------- | ----------- | ----------- | ----------- | -----------
+  17  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r6
+  18  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r3
+  19  | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |          r4
   20  | ----------- | ----------- | ----------- |         s21 | ----------- | ----------- | ----------- | ----------- | ----------- | -----------
   21  | ----------- | ----------- |          r8 | ----------- |          r8 | ----------- | ----------- | ----------- | ----------- | -----------
 
@@ -63,23 +63,23 @@ STATE |        CODE |         TOP |   SEMICOLON | RIGHT_PAREN |          ID |   
 Goto table:
 STATE |translationUnit |productionStatementCode |productionStatementArgument |   statement |productionStatementBody
    0  |           2 | ----------- | ----------- | ----------- | -----------
-   1  | ----------- | ----------- | ----------- |           5 | -----------
+   1  | ----------- | ----------- | ----------- |           6 | -----------
    2  | ----------- | ----------- | ----------- | ----------- | -----------
    3  | ----------- | ----------- | ----------- | ----------- | -----------
    4  | ----------- | ----------- | ----------- | ----------- | -----------
    5  | ----------- | ----------- | ----------- | ----------- | -----------
    6  | ----------- | ----------- | ----------- | ----------- | -----------
    7  | ----------- | ----------- | ----------- | ----------- | -----------
-   8  | ----------- | ----------- | ----------- | ----------- | -----------
+   8  | ----------- | ----------- | ----------- | ----------- |          13
    9  | ----------- | ----------- | ----------- | ----------- | -----------
-  10  | ----------- | ----------- | ----------- | ----------- |          14
+  10  | ----------- | ----------- | ----------- | ----------- | -----------
   11  | ----------- | ----------- | ----------- | ----------- | -----------
-  12  | ----------- |          17 | ----------- | ----------- | -----------
-  13  | ----------- | ----------- | ----------- | ----------- | -----------
-  14  | ----------- | ----------- |          18 | ----------- | -----------
-  15  | ----------- | ----------- | ----------- | ----------- | -----------
+  12  | ----------- | ----------- | ----------- | ----------- | -----------
+  13  | ----------- | ----------- |          16 | ----------- | -----------
+  14  | ----------- |          19 | ----------- | ----------- | -----------
+  15  | ----------- | ----------- | ----------- | ----------- |          20
   16  | ----------- | ----------- | ----------- | ----------- | -----------
-  17  | ----------- | ----------- | ----------- | ----------- |          20
+  17  | ----------- | ----------- | ----------- | ----------- | -----------
   18  | ----------- | ----------- | ----------- | ----------- | -----------
   19  | ----------- | ----------- | ----------- | ----------- | -----------
   20  | ----------- | ----------- | ----------- | ----------- | -----------
@@ -87,68 +87,68 @@ STATE |translationUnit |productionStatementCode |productionStatementArgument |  
 
 
 State 0:
-    translationUnit' -> * translationUnit
+    translationUnit' -> * translationUnit, {EOF}
 
 State 1:
-    translationUnit -> translationUnit * statement
-    translationUnit' -> translationUnit *
+    translationUnit' -> translationUnit *, {EOF}
+    translationUnit -> translationUnit * statement, {EOF}
 
 State 2:
-    statement -> TOP * CODE
+    statement -> TYPE * ID ID, {EOF}
 
 State 3:
-    statement -> TYPE * ID ID
+    statement -> ID * ASSIGN productionStatementBody, {EOF}
 
 State 4:
-    translationUnit -> translationUnit statement *
+    statement -> NAME * ID, {EOF}
 
 State 5:
-    statement -> NAME * ID
+    translationUnit -> translationUnit statement *, {EOF}
 
 State 6:
-    statement -> ID * ASSIGN productionStatementBody
+    statement -> TOP * CODE, {EOF}
 
 State 7:
-    statement -> TOP CODE *
+    statement -> TYPE ID * ID, {EOF}
 
 State 8:
-    statement -> TYPE ID * ID
+    statement -> ID ASSIGN * productionStatementBody, {EOF}
 
 State 9:
-    statement -> NAME ID *
+    statement -> NAME ID *, {EOF}
 
 State 10:
-    statement -> ID ASSIGN * productionStatementBody
+    statement -> TOP CODE *, {EOF}
 
 State 11:
-    statement -> TYPE ID ID *
+    statement -> TYPE ID ID *, {EOF}
 
 State 12:
-    productionStatementBody -> SEMICOLON * productionStatementCode
+    statement -> ID ASSIGN productionStatementBody *, {EOF}
 
 State 13:
-    statement -> ID ASSIGN productionStatementBody *
+    productionStatementBody -> ID * productionStatementArgument productionStatementBody, {EOF}
 
 State 14:
-    productionStatementBody -> ID * productionStatementArgument productionStatementBody
+    productionStatementBody -> SEMICOLON * productionStatementCode, {EOF}
 
 State 15:
-    productionStatementCode -> CODE *
+    productionStatementBody -> ID productionStatementArgument * productionStatementBody, {EOF}
 
 State 16:
-    productionStatementBody -> SEMICOLON productionStatementCode *
+    productionStatementArgument -> LEFT_PAREN * ID RIGHT_PAREN, {ID, SEMICOLON}
 
 State 17:
-    productionStatementBody -> ID productionStatementArgument * productionStatementBody
+    productionStatementCode -> CODE *, {EOF}
 
 State 18:
-    productionStatementArgument -> LEFT_PAREN * ID RIGHT_PAREN
+    productionStatementBody -> SEMICOLON productionStatementCode *, {EOF}
 
 State 19:
-    productionStatementBody -> ID productionStatementArgument productionStatementBody *
+    productionStatementBody -> ID productionStatementArgument productionStatementBody *, {EOF}
 
 State 20:
-    productionStatementArgument -> LEFT_PAREN ID * RIGHT_PAREN
+    productionStatementArgument -> LEFT_PAREN ID * RIGHT_PAREN, {ID, SEMICOLON}
 
 State 21:
-    productionStatementArgument -> LEFT_PAREN ID RIGHT_PAREN *
+    productionStatementArgument -> LEFT_PAREN ID RIGHT_PAREN *, {ID, SEMICOLON}
