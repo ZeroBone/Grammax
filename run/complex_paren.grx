@@ -1,3 +1,4 @@
 %name ComplexParenParser
+%algo SLR
 s = s LPAREN s RPAREN s;
 s = ;

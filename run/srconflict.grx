@@ -1,5 +1,6 @@
 // example of a shift/reduce conflict
 %name SRConflictParser
+%algo SLR
 s = l EQUALS r;
 s = r;
 l = MUL r;

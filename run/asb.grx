@@ -1,3 +1,4 @@
 %name AsbParser
+%algo SLR
 s = A s B;
 s = A B;

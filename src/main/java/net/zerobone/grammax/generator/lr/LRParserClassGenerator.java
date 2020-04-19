@@ -72,10 +72,10 @@ class LRParserClassGenerator {
             }
 
             String symbolName = symbol.isTerminal ?
-                context.automation.terminalToSymbol(symbol.index) :
-                context.automation.nonTerminalToSymbol(symbol.index);
+                context.config.automation.terminalToSymbol(symbol.index) :
+                context.config.automation.nonTerminalToSymbol(symbol.index);
 
-            String symbolType = context.configuration.getTypeForSymbol(symbolName);
+            String symbolType = context.config.getTypeForSymbol(symbolName);
 
             if (symbolType == null) {
                 writer.addStatement("Object " + symbol.argumentName + " = _grx_stack.pop().payload");
@@ -125,7 +125,7 @@ class LRParserClassGenerator {
 
     private static void writeReductionsArray(JavaWriter writer, GeneratorContext context) throws IOException {
 
-        assert context.automation.productions.length != 0;
+        assert context.config.automation.productions.length != 0;
 
         writer.write("@SuppressWarnings(\"Convert2Lambda\")");
         writer.newLine();
@@ -136,11 +136,11 @@ class LRParserClassGenerator {
 
         for (int i = 0;;i++) {
 
-            AutomationProduction production = context.automation.productions[i];
+            AutomationProduction production = context.config.automation.productions[i];
 
             writeReductorFor(writer, context, production);
 
-            if (i == context.automation.productions.length - 1) {
+            if (i == context.config.automation.productions.length - 1) {
                 writer.newLine();
                 break;
             }
@@ -201,7 +201,7 @@ class LRParserClassGenerator {
     private static void writeConstructor(JavaWriter writer, GeneratorContext context) throws IOException {
 
         writer.write("public ");
-        writer.write(context.configuration.getName());
+        writer.write(context.config.getName());
         writer.write("() ");
 
         writer.beginIndentedBlock();
@@ -249,20 +249,20 @@ class LRParserClassGenerator {
     static void generate(JavaWriter writer, GeneratorContext context) throws IOException {
 
         writer.write("public final class ");
-        writer.write(context.configuration.getName());
+        writer.write(context.config.getName());
         writer.write(" {");
         writer.newLine();
         writer.enterIndent();
 
         // fields
 
-        MetaGenerator.writeConstants(writer, context.automation);
+        MetaGenerator.writeConstants(writer, context.config.automation);
 
-        MetaGenerator.writeGotoTable(writer, context.automation);
+        MetaGenerator.writeGotoTable(writer, context.config.automation);
 
-        MetaGenerator.writeActionTable(writer, context.automation);
+        MetaGenerator.writeActionTable(writer, context.config.automation);
 
-        MetaGenerator.writeProductionLabelTable(writer, context.automation);
+        MetaGenerator.writeProductionLabelTable(writer, context.config.automation);
 
         writeReductionsArray(writer, context);
 

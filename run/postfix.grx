@@ -1,4 +1,5 @@
 %name PostfixParser
+%algo SLR
 s = s s PLUS;
 s = s s MUL;
 s = A;

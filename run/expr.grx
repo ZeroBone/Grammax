@@ -1,6 +1,7 @@
 // this is a grammar for parsing arithmetic expressions
 // it is SLR(1), not LR(0)
 %name ExprParser
+%algo SLR
 e = e(expr) PLUS t(term); { v = (int)expr + (int)term; }
 e = t(term); { v = term; }
 t = t(term) MUL f(factor); { v = (int)term * (int)factor; }

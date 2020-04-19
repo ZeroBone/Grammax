@@ -4,6 +4,9 @@ import net.zerobone.grammax.ast.statements.ProductionStatementNode;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Production;
 import net.zerobone.grammax.grammar.ProductionSymbol;
+import net.zerobone.grammax.grammar.automation.Automation;
+import net.zerobone.grammax.grammar.automation.CLRAutomationBuilder;
+import net.zerobone.grammax.grammar.automation.SLRAutomationBuilder;
 import net.zerobone.grammax.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -12,6 +15,8 @@ import java.util.HashMap;
 public class GrammaxContext {
 
     public Grammar grammar = null;
+
+    private ParsingAlgorithm algorithm = null;
 
     private String topCode = null;
 
@@ -55,7 +60,7 @@ public class GrammaxContext {
 
     }
 
-    private void addError(String error) {
+    public void addError(String error) {
         errors.add(error);
     }
 
@@ -80,8 +85,52 @@ public class GrammaxContext {
 
     }
 
+    private ParsingAlgorithm getAlgorithm() {
+        return algorithm == null ? ParsingAlgorithm.DEFAULT : algorithm;
+    }
+
+    private Automation createAutomation() {
+
+        switch (getAlgorithm()) {
+
+            case SLR:
+                return new SLRAutomationBuilder(grammar).build();
+
+            case CLR:
+                return new CLRAutomationBuilder(grammar).build();
+
+            case LALR:
+                return new CLRAutomationBuilder(grammar).build();
+
+            default:
+                assert false;
+                return null;
+
+        }
+
+    }
+
     public GrammaxConfiguration getConfiguration() {
-        return new GrammaxConfiguration(topCode, name, typeMap);
+
+        return new GrammaxConfiguration(
+            createAutomation(),
+            getAlgorithm(),
+            topCode,
+            name,
+            typeMap
+        );
+
+    }
+
+    public void setParsingAlgorithm(ParsingAlgorithm algorithm) {
+
+        if (this.algorithm != null) {
+            addError("Duplicate %algo statement.");
+            return;
+        }
+
+        this.algorithm = algorithm;
+
     }
 
     public void setTopCode(String topCode) {

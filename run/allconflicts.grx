@@ -1,4 +1,5 @@
 %name AllConflictParser
+%algo SLR
 e = e PLUS t;
 e = t;
 t = t MUL f;

@@ -1,5 +1,6 @@
 // example of a reduce/reduce conflict
 %name RRConflictParser
+%algo SLR
 e = e n;
 e = n;
 e = ;

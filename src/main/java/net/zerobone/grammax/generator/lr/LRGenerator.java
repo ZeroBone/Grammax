@@ -12,7 +12,7 @@ public class LRGenerator {
 
     private static void generateParserClass(GeneratorContext context) throws IOException {
 
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(context.configuration.getName() + ".java"));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(context.config.getName() + ".java"));
 
         JavaWriter writer = new JavaWriter(bufferedWriter);
 
@@ -21,8 +21,8 @@ public class LRGenerator {
         writer.write(" */");
         writer.newLine();
 
-        if (context.configuration.topCode != null) {
-            writer.writeAlignTrim(context.configuration.topCode);
+        if (context.config.topCode != null) {
+            writer.writeAlignTrim(context.config.topCode);
         }
 
         writer.newLine();

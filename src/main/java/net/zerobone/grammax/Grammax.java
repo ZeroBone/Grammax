@@ -5,8 +5,6 @@ import net.zerobone.grammax.ast.statements.StatementNode;
 import net.zerobone.grammax.generator.lr.LRGenerator;
 import net.zerobone.grammax.generator.GeneratorContext;
 import net.zerobone.grammax.grammar.Symbol;
-import net.zerobone.grammax.grammar.automation.CLRAutomationBuilder;
-import net.zerobone.grammax.grammar.automation.SLRAutomationBuilder;
 import net.zerobone.grammax.grammar.automation.conflict.Conflict;
 import net.zerobone.grammax.grammar.automation.Automation;
 import net.zerobone.grammax.grammar.verification.GrammarVerification;
@@ -66,25 +64,22 @@ public class Grammax {
 
         context.grammar.augment();
 
-        Automation automation = new SLRAutomationBuilder(context.grammar).build();
-        // Automation automation = new CLRAutomationBuilder(context.grammar).build();
-
         GrammaxConfiguration configuration = context.getConfiguration();
 
         try {
-            exportDebugInfo(automation, configuration.getName());
+            exportDebugInfo(configuration.automation, configuration.getName());
         }
         catch (IOException e) {
             System.err.println("[ERR]: I/O error: " + e.getMessage());
             return;
         }
 
-        if (!automation.getConflicts().isEmpty()) {
+        if (!configuration.automation.getConflicts().isEmpty()) {
 
-            for (Conflict conflict : automation.getConflicts()) {
+            for (Conflict conflict : configuration.automation.getConflicts()) {
 
                 System.err.print("[ERR]: ");
-                System.err.println(conflict.toString(automation));
+                System.err.println(conflict.toString(configuration.automation));
 
             }
 
@@ -92,10 +87,7 @@ public class Grammax {
 
         }
 
-        GeneratorContext generatorContext = new GeneratorContext(
-            automation,
-            configuration
-        );
+        GeneratorContext generatorContext = new GeneratorContext(configuration);
 
         try {
             LRGenerator.generate(generatorContext);

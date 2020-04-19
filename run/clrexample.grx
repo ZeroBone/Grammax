@@ -1,5 +1,5 @@
 %name CLRExampleParser
-%algo CLR(1)
+%algo CLR
 s = c c;
 c = A c;
 c = D;
