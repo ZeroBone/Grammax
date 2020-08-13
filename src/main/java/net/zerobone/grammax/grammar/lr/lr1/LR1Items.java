@@ -14,7 +14,7 @@ public class LR1Items extends LRItems<LookaheadPoint> {
     private static class Logic implements LRItemsLogic<LookaheadPoint> {
 
         @Override
-        public LookaheadPoint createInitialKernal(int startProductionId) {
+        public LookaheadPoint createInitialKernel(int startProductionId) {
 
             HashSet<Symbol> initialLookahead = new HashSet<>(1);
 

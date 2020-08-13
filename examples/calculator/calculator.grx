@@ -1,7 +1,23 @@
-e = e(expr) PLUS t(term); { v = (double)expr + (double)term; }
+%top {
+    package net.zerobone.grammax.examples.calculator.parser;
+
+    import net.zerobone.grammax.examples.calculator.tokens.NumberToken;
+}
+
+%name CalcParser
+
+%type e double
+%type t double
+%type f double
+
+%type NUM NumberToken
+
+e = e(expr) PLUS t(term); { v = expr + term; }
+e = e(expr) MINUS t(term); { v = expr - term; }
 e = t(term); { v = term; }
-t = t(term) MUL f(factor); { v = (double)term * (double)factor; }
+t = t(term) MUL f(factor); { v = term * factor; }
+t = t(term) DIV f(factor); { v = term / factor; }
 t = f(factor); { v = factor; }
 f = LPAREN e(expr) RPAREN; { v = expr; }
-f = NUM(n); { v = ((NumberToken)n).value; }
-f = ID NUM(n); { v = ((NumberToken)n).value; }
+f = NUM(n); { v = n.value; }
+f = ID NUM(n); { v = n.value; }

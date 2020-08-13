@@ -14,7 +14,7 @@ public class LR0Items extends LRItems<Point> {
     private static class Logic implements LRItemsLogic<Point> {
 
         @Override
-        public Point createInitialKernal(int startProductionId) {
+        public Point createInitialKernel(int startProductionId) {
             return new Point(startProductionId, 0);
         }
 

@@ -1,6 +1,6 @@
 package net.zerobone.grammax.examples.calculator;
 
-import net.zerobone.grammax.examples.calculator.parser.Parser;
+import net.zerobone.grammax.examples.calculator.parser.CalcParser;
 import net.zerobone.grammax.examples.calculator.tokens.IdToken;
 import net.zerobone.grammax.examples.calculator.tokens.NumberToken;
 import net.zerobone.grammax.examples.calculator.tokens.Token;
@@ -46,8 +46,6 @@ public class Lexer {
 
     private void peekChar() throws IOException {
 
-        // assert !peeking;
-
         peeking = true;
 
         current = stream.read();
@@ -74,7 +72,7 @@ public class Lexer {
             readChar();
 
             if (current == -1) {
-                return constructPrimitiveToken(Parser.T_EOF);
+                return constructPrimitiveToken(CalcParser.T_EOF);
             }
 
             if (current == ' ' || current == '\t' || current == '\r') {
@@ -88,19 +86,25 @@ public class Lexer {
         switch (current) {
 
             case '+':
-                return constructPrimitiveToken(Parser.T_PLUS);
+                return constructPrimitiveToken(CalcParser.T_PLUS);
+
+            case '-':
+                return constructPrimitiveToken(CalcParser.T_MINUS);
 
             case '*':
-                return constructPrimitiveToken(Parser.T_MUL);
+                return constructPrimitiveToken(CalcParser.T_MUL);
+
+            case '/':
+                return constructPrimitiveToken(CalcParser.T_DIV);
 
             case '(':
-                return constructPrimitiveToken(Parser.T_LPAREN);
+                return constructPrimitiveToken(CalcParser.T_LPAREN);
 
             case ')':
-                return constructPrimitiveToken(Parser.T_RPAREN);
+                return constructPrimitiveToken(CalcParser.T_RPAREN);
 
             case '\n':
-                return constructPrimitiveToken(Parser.T_EOF);
+                return constructPrimitiveToken(CalcParser.T_EOF);
 
             default:
                 break;

@@ -9,7 +9,7 @@ import java.util.HashSet;
 
 public interface LRItemsLogic<P extends BasePoint> {
 
-    P createInitialKernal(int startProductionId);
+    P createInitialKernel(int startProductionId);
 
     HashMap<Symbol, HashSet<P>> calculateAllDerivatives(Grammar grammar, HashSet<P> state);
 

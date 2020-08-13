@@ -1,6 +1,6 @@
 package net.zerobone.grammax.examples.calculator;
 
-import net.zerobone.grammax.examples.calculator.parser.Parser;
+import net.zerobone.grammax.examples.calculator.parser.CalcParser;
 import net.zerobone.grammax.examples.calculator.tokens.Token;
 
 import java.io.IOException;
@@ -10,11 +10,11 @@ public class Calculator {
 
     private final Lexer lexer;
 
-    private final Parser parser;
+    private final CalcParser parser;
 
     public Calculator(InputStream is) {
         lexer = new Lexer(is);
-        parser = new Parser();
+        parser = new CalcParser();
     }
 
     private void repl() {
@@ -28,7 +28,7 @@ public class Calculator {
             do {
                 currentToken = lexer.lex();
                 parser.parse(currentToken.type, currentToken);
-            } while (currentToken.type != Parser.T_EOF);
+            } while (currentToken.type != CalcParser.T_EOF);
 
         }
         catch (LexerException e) {

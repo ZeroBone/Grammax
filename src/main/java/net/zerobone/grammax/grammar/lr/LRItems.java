@@ -39,7 +39,7 @@ public class LRItems<P extends BasePoint> {
         HashSet<P> initialKernels = new HashSet<>(1);
 
         // initialKernels.add(new Point(startProductionId, 0));
-        initialKernels.add(itemsProvider.createInitialKernal(startProductionId));
+        initialKernels.add(itemsProvider.createInitialKernel(startProductionId));
 
         toDerive.add(initialKernels);
 

@@ -1,0 +1,392 @@
+Grammar:
+ f -> <6> LPAREN e(expr) RPAREN    {  v = expr;  }
+    | <7> NUM(n)    {  v = n.value;  }
+    | <8> ID NUM(n)    {  v = n.value;  };
+ t -> <3> t(term) MUL f(factor)    {  v = term * factor;  }
+    | <4> t(term) DIV f(factor)    {  v = term / factor;  }
+    | <5> f(factor)    {  v = factor;  };
+ e -> <0> e(expr) PLUS t(term)    {  v = expr + term;  }
+    | <1> e(expr) MINUS t(term)    {  v = expr - term;  }
+    | <2> t(term)    {  v = term;  };
+Se' -> <9> e;
+
+First sets:
+FIRST(f) = {ID, LPAREN, NUM}
+FIRST(t) = {ID, LPAREN, NUM}
+FIRST(e) = {ID, LPAREN, NUM}
+FIRST(e') = {ID, LPAREN, NUM}
+
+Follow sets:
+FOLLOW(f) = {RPAREN, EOF, MUL, DIV, MINUS, PLUS}
+FOLLOW(t) = {RPAREN, EOF, MUL, DIV, MINUS, PLUS}
+FOLLOW(e) = {RPAREN, EOF, MINUS, PLUS}
+FOLLOW(e') = {EOF}
+
+Automation:
+Non-terminal count: 3
+Terminal count: 9
+State count: 34 (0 - 33)
+
+Action table:
+STATE |    DIV |    MUL |    NUM | LPAREN | RPAREN |     ID |   PLUS |  MINUS |    EOF
+   0  | ------ | ------ |     s6 |     s5 | ------ |     s2 | ------ | ------ | ------
+   1  |     r5 |     r5 | ------ | ------ | ------ | ------ |     r5 |     r5 |     r5
+   2  | ------ | ------ |     s7 | ------ | ------ | ------ | ------ | ------ | ------
+   3  |     s9 |     s8 | ------ | ------ | ------ | ------ |     r2 |     r2 |     r2
+   4  | ------ | ------ | ------ | ------ | ------ | ------ |    s11 |    s10 | accept
+   5  | ------ | ------ |    s17 |    s16 | ------ |    s13 | ------ | ------ | ------
+   6  |     r7 |     r7 | ------ | ------ | ------ | ------ |     r7 |     r7 |     r7
+   7  |     r8 |     r8 | ------ | ------ | ------ | ------ |     r8 |     r8 |     r8
+   8  | ------ | ------ |     s6 |     s5 | ------ |     s2 | ------ | ------ | ------
+   9  | ------ | ------ |     s6 |     s5 | ------ |     s2 | ------ | ------ | ------
+  10  | ------ | ------ |     s6 |     s5 | ------ |     s2 | ------ | ------ | ------
+  11  | ------ | ------ |     s6 |     s5 | ------ |     s2 | ------ | ------ | ------
+  12  |     r5 |     r5 | ------ | ------ |     r5 | ------ |     r5 |     r5 | ------
+  13  | ------ | ------ |    s22 | ------ | ------ | ------ | ------ | ------ | ------
+  14  |    s24 |    s23 | ------ | ------ |     r2 | ------ |     r2 |     r2 | ------
+  15  | ------ | ------ | ------ | ------ |    s25 | ------ |    s27 |    s26 | ------
+  16  | ------ | ------ |    s17 |    s16 | ------ |    s13 | ------ | ------ | ------
+  17  |     r7 |     r7 | ------ | ------ |     r7 | ------ |     r7 |     r7 | ------
+  18  |     r3 |     r3 | ------ | ------ | ------ | ------ |     r3 |     r3 |     r3
+  19  |     r4 |     r4 | ------ | ------ | ------ | ------ |     r4 |     r4 |     r4
+  20  |     s9 |     s8 | ------ | ------ | ------ | ------ |     r1 |     r1 |     r1
+  21  |     s9 |     s8 | ------ | ------ | ------ | ------ |     r0 |     r0 |     r0
+  22  |     r8 |     r8 | ------ | ------ |     r8 | ------ |     r8 |     r8 | ------
+  23  | ------ | ------ |    s17 |    s16 | ------ |    s13 | ------ | ------ | ------
+  24  | ------ | ------ |    s17 |    s16 | ------ |    s13 | ------ | ------ | ------
+  25  |     r6 |     r6 | ------ | ------ | ------ | ------ |     r6 |     r6 |     r6
+  26  | ------ | ------ |    s17 |    s16 | ------ |    s13 | ------ | ------ | ------
+  27  | ------ | ------ |    s17 |    s16 | ------ |    s13 | ------ | ------ | ------
+  28  | ------ | ------ | ------ | ------ |    s33 | ------ |    s27 |    s26 | ------
+  29  |     r3 |     r3 | ------ | ------ |     r3 | ------ |     r3 |     r3 | ------
+  30  |     r4 |     r4 | ------ | ------ |     r4 | ------ |     r4 |     r4 | ------
+  31  |    s24 |    s23 | ------ | ------ |     r1 | ------ |     r1 |     r1 | ------
+  32  |    s24 |    s23 | ------ | ------ |     r0 | ------ |     r0 |     r0 | ------
+  33  |     r6 |     r6 | ------ | ------ |     r6 | ------ |     r6 |     r6 | ------
+
+
+Goto table:
+STATE |     t |     e |     f
+   0  |     3 |     4 |     1
+   1  | ----- | ----- | -----
+   2  | ----- | ----- | -----
+   3  | ----- | ----- | -----
+   4  | ----- | ----- | -----
+   5  |    14 |    15 |    12
+   6  | ----- | ----- | -----
+   7  | ----- | ----- | -----
+   8  | ----- | ----- |    18
+   9  | ----- | ----- |    19
+  10  |    20 | ----- |     1
+  11  |    21 | ----- |     1
+  12  | ----- | ----- | -----
+  13  | ----- | ----- | -----
+  14  | ----- | ----- | -----
+  15  | ----- | ----- | -----
+  16  |    14 |    28 |    12
+  17  | ----- | ----- | -----
+  18  | ----- | ----- | -----
+  19  | ----- | ----- | -----
+  20  | ----- | ----- | -----
+  21  | ----- | ----- | -----
+  22  | ----- | ----- | -----
+  23  | ----- | ----- |    29
+  24  | ----- | ----- |    30
+  25  | ----- | ----- | -----
+  26  |    31 | ----- |    12
+  27  |    32 | ----- |    12
+  28  | ----- | ----- | -----
+  29  | ----- | ----- | -----
+  30  | ----- | ----- | -----
+  31  | ----- | ----- | -----
+  32  | ----- | ----- | -----
+  33  | ----- | ----- | -----
+
+
+State 0:
+    e' -> * e, {EOF}
+
+State 1:
+    t -> f *, {PLUS}
+    t -> f *, {MUL}
+    t -> f *, {DIV}
+    t -> f *, {EOF}
+    t -> f *, {MINUS}
+
+State 2:
+    f -> ID * NUM, {MINUS}
+    f -> ID * NUM, {PLUS}
+    f -> ID * NUM, {DIV}
+    f -> ID * NUM, {EOF}
+    f -> ID * NUM, {MUL}
+
+State 3:
+    t -> t * DIV f, {PLUS}
+    t -> t * DIV f, {MUL}
+    e -> t *, {EOF}
+    t -> t * MUL f, {MUL}
+    t -> t * MUL f, {DIV}
+    t -> t * DIV f, {DIV}
+    e -> t *, {MINUS}
+    t -> t * DIV f, {EOF}
+    t -> t * MUL f, {EOF}
+    t -> t * MUL f, {PLUS}
+    t -> t * DIV f, {MINUS}
+    e -> t *, {PLUS}
+    t -> t * MUL f, {MINUS}
+
+State 4:
+    e -> e * MINUS t, {EOF}
+    e -> e * PLUS t, {EOF}
+    e -> e * PLUS t, {MINUS}
+    e -> e * MINUS t, {MINUS}
+    e' -> e *, {EOF}
+    e -> e * MINUS t, {PLUS}
+    e -> e * PLUS t, {PLUS}
+
+State 5:
+    f -> LPAREN * e RPAREN, {PLUS}
+    f -> LPAREN * e RPAREN, {MUL}
+    f -> LPAREN * e RPAREN, {EOF}
+    f -> LPAREN * e RPAREN, {DIV}
+    f -> LPAREN * e RPAREN, {MINUS}
+
+State 6:
+    f -> NUM *, {PLUS}
+    f -> NUM *, {MINUS}
+    f -> NUM *, {DIV}
+    f -> NUM *, {MUL}
+    f -> NUM *, {EOF}
+
+State 7:
+    f -> ID NUM *, {PLUS}
+    f -> ID NUM *, {MINUS}
+    f -> ID NUM *, {DIV}
+    f -> ID NUM *, {MUL}
+    f -> ID NUM *, {EOF}
+
+State 8:
+    t -> t MUL * f, {EOF}
+    t -> t MUL * f, {DIV}
+    t -> t MUL * f, {MUL}
+    t -> t MUL * f, {MINUS}
+    t -> t MUL * f, {PLUS}
+
+State 9:
+    t -> t DIV * f, {MUL}
+    t -> t DIV * f, {DIV}
+    t -> t DIV * f, {EOF}
+    t -> t DIV * f, {PLUS}
+    t -> t DIV * f, {MINUS}
+
+State 10:
+    e -> e MINUS * t, {EOF}
+    e -> e MINUS * t, {MINUS}
+    e -> e MINUS * t, {PLUS}
+
+State 11:
+    e -> e PLUS * t, {EOF}
+    e -> e PLUS * t, {PLUS}
+    e -> e PLUS * t, {MINUS}
+
+State 12:
+    t -> f *, {RPAREN}
+    t -> f *, {PLUS}
+    t -> f *, {MUL}
+    t -> f *, {DIV}
+    t -> f *, {MINUS}
+
+State 13:
+    f -> ID * NUM, {MINUS}
+    f -> ID * NUM, {PLUS}
+    f -> ID * NUM, {DIV}
+    f -> ID * NUM, {RPAREN}
+    f -> ID * NUM, {MUL}
+
+State 14:
+    t -> t * DIV f, {RPAREN}
+    t -> t * DIV f, {PLUS}
+    t -> t * DIV f, {MUL}
+    t -> t * MUL f, {MUL}
+    e -> t *, {RPAREN}
+    t -> t * MUL f, {DIV}
+    t -> t * MUL f, {RPAREN}
+    t -> t * DIV f, {DIV}
+    e -> t *, {MINUS}
+    t -> t * MUL f, {PLUS}
+    t -> t * DIV f, {MINUS}
+    e -> t *, {PLUS}
+    t -> t * MUL f, {MINUS}
+
+State 15:
+    f -> LPAREN e * RPAREN, {PLUS}
+    f -> LPAREN e * RPAREN, {MUL}
+    e -> e * PLUS t, {RPAREN}
+    e -> e * MINUS t, {RPAREN}
+    f -> LPAREN e * RPAREN, {DIV}
+    e -> e * PLUS t, {MINUS}
+    f -> LPAREN e * RPAREN, {EOF}
+    e -> e * MINUS t, {MINUS}
+    e -> e * MINUS t, {PLUS}
+    e -> e * PLUS t, {PLUS}
+    f -> LPAREN e * RPAREN, {MINUS}
+
+State 16:
+    f -> LPAREN * e RPAREN, {PLUS}
+    f -> LPAREN * e RPAREN, {MUL}
+    f -> LPAREN * e RPAREN, {RPAREN}
+    f -> LPAREN * e RPAREN, {DIV}
+    f -> LPAREN * e RPAREN, {MINUS}
+
+State 17:
+    f -> NUM *, {PLUS}
+    f -> NUM *, {MINUS}
+    f -> NUM *, {RPAREN}
+    f -> NUM *, {DIV}
+    f -> NUM *, {MUL}
+
+State 18:
+    t -> t MUL f *, {DIV}
+    t -> t MUL f *, {EOF}
+    t -> t MUL f *, {MUL}
+    t -> t MUL f *, {MINUS}
+    t -> t MUL f *, {PLUS}
+
+State 19:
+    t -> t DIV f *, {EOF}
+    t -> t DIV f *, {DIV}
+    t -> t DIV f *, {MUL}
+    t -> t DIV f *, {MINUS}
+    t -> t DIV f *, {PLUS}
+
+State 20:
+    t -> t * DIV f, {PLUS}
+    t -> t * DIV f, {MUL}
+    t -> t * MUL f, {MUL}
+    t -> t * MUL f, {DIV}
+    e -> e MINUS t *, {EOF}
+    t -> t * DIV f, {DIV}
+    e -> e MINUS t *, {PLUS}
+    e -> e MINUS t *, {MINUS}
+    t -> t * DIV f, {EOF}
+    t -> t * MUL f, {EOF}
+    t -> t * MUL f, {PLUS}
+    t -> t * DIV f, {MINUS}
+    t -> t * MUL f, {MINUS}
+
+State 21:
+    e -> e PLUS t *, {EOF}
+    t -> t * DIV f, {PLUS}
+    t -> t * DIV f, {MUL}
+    t -> t * MUL f, {MUL}
+    e -> e PLUS t *, {MINUS}
+    t -> t * MUL f, {DIV}
+    t -> t * DIV f, {DIV}
+    e -> e PLUS t *, {PLUS}
+    t -> t * DIV f, {EOF}
+    t -> t * MUL f, {EOF}
+    t -> t * MUL f, {PLUS}
+    t -> t * DIV f, {MINUS}
+    t -> t * MUL f, {MINUS}
+
+State 22:
+    f -> ID NUM *, {PLUS}
+    f -> ID NUM *, {MINUS}
+    f -> ID NUM *, {RPAREN}
+    f -> ID NUM *, {DIV}
+    f -> ID NUM *, {MUL}
+
+State 23:
+    t -> t MUL * f, {DIV}
+    t -> t MUL * f, {MUL}
+    t -> t MUL * f, {RPAREN}
+    t -> t MUL * f, {MINUS}
+    t -> t MUL * f, {PLUS}
+
+State 24:
+    t -> t DIV * f, {MUL}
+    t -> t DIV * f, {DIV}
+    t -> t DIV * f, {RPAREN}
+    t -> t DIV * f, {PLUS}
+    t -> t DIV * f, {MINUS}
+
+State 25:
+    f -> LPAREN e RPAREN *, {PLUS}
+    f -> LPAREN e RPAREN *, {MUL}
+    f -> LPAREN e RPAREN *, {DIV}
+    f -> LPAREN e RPAREN *, {EOF}
+    f -> LPAREN e RPAREN *, {MINUS}
+
+State 26:
+    e -> e MINUS * t, {RPAREN}
+    e -> e MINUS * t, {MINUS}
+    e -> e MINUS * t, {PLUS}
+
+State 27:
+    e -> e PLUS * t, {PLUS}
+    e -> e PLUS * t, {MINUS}
+    e -> e PLUS * t, {RPAREN}
+
+State 28:
+    f -> LPAREN e * RPAREN, {RPAREN}
+    f -> LPAREN e * RPAREN, {PLUS}
+    f -> LPAREN e * RPAREN, {MUL}
+    e -> e * PLUS t, {RPAREN}
+    e -> e * MINUS t, {RPAREN}
+    f -> LPAREN e * RPAREN, {DIV}
+    e -> e * PLUS t, {MINUS}
+    e -> e * MINUS t, {MINUS}
+    e -> e * MINUS t, {PLUS}
+    e -> e * PLUS t, {PLUS}
+    f -> LPAREN e * RPAREN, {MINUS}
+
+State 29:
+    t -> t MUL f *, {DIV}
+    t -> t MUL f *, {RPAREN}
+    t -> t MUL f *, {MUL}
+    t -> t MUL f *, {MINUS}
+    t -> t MUL f *, {PLUS}
+
+State 30:
+    t -> t DIV f *, {DIV}
+    t -> t DIV f *, {MUL}
+    t -> t DIV f *, {RPAREN}
+    t -> t DIV f *, {MINUS}
+    t -> t DIV f *, {PLUS}
+
+State 31:
+    t -> t * DIV f, {RPAREN}
+    t -> t * DIV f, {PLUS}
+    t -> t * DIV f, {MUL}
+    t -> t * MUL f, {MUL}
+    t -> t * MUL f, {DIV}
+    t -> t * MUL f, {RPAREN}
+    t -> t * DIV f, {DIV}
+    e -> e MINUS t *, {PLUS}
+    e -> e MINUS t *, {MINUS}
+    e -> e MINUS t *, {RPAREN}
+    t -> t * MUL f, {PLUS}
+    t -> t * DIV f, {MINUS}
+    t -> t * MUL f, {MINUS}
+
+State 32:
+    t -> t * DIV f, {RPAREN}
+    t -> t * DIV f, {PLUS}
+    t -> t * DIV f, {MUL}
+    t -> t * MUL f, {MUL}
+    e -> e PLUS t *, {MINUS}
+    t -> t * MUL f, {DIV}
+    t -> t * MUL f, {RPAREN}
+    t -> t * DIV f, {DIV}
+    e -> e PLUS t *, {PLUS}
+    e -> e PLUS t *, {RPAREN}
+    t -> t * MUL f, {PLUS}
+    t -> t * DIV f, {MINUS}
+    t -> t * MUL f, {MINUS}
+
+State 33:
+    f -> LPAREN e RPAREN *, {RPAREN}
+    f -> LPAREN e RPAREN *, {PLUS}
+    f -> LPAREN e RPAREN *, {MUL}
+    f -> LPAREN e RPAREN *, {DIV}
+    f -> LPAREN e RPAREN *, {MINUS}
