@@ -3,14 +3,14 @@ package net.zerobone.grammax.grammar.verification.messages;
 import net.zerobone.grammax.grammar.Grammar;
 import net.zerobone.grammax.grammar.Symbol;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 public class RightRecursiveCycleMessage extends VerificationMessage {
 
-    public final LinkedList<Symbol> cycle;
+    public final ArrayList<Symbol> cycle;
 
-    public RightRecursiveCycleMessage(LinkedList<Symbol> cycle) {
+    public RightRecursiveCycleMessage(ArrayList<Symbol> cycle) {
         super(true);
         this.cycle = cycle;
     }

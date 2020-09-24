@@ -4,3 +4,11 @@
 
 e = T e;
 e = B b;
+
+b = A K d;
+b = T K f;
+
+d = f H e;
+d = K d;
+
+f = B e;
