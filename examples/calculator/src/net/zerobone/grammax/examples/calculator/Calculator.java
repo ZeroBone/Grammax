@@ -31,8 +31,12 @@ public class Calculator {
             } while (currentToken.type != CalcParser.T_EOF);
 
         }
+        catch (RuntimeException e) {
+            System.err.println("[ERR]: Syntax error.");
+            return;
+        }
         catch (LexerException e) {
-            System.err.println("[ERR]: Syntax error: " + e.getMessage());
+            System.err.println("[ERR]: Lexeme syntax error: " + e.getMessage());
             return;
         }
         catch (IOException e) {
