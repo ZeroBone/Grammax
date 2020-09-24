@@ -27,12 +27,12 @@ translationUnit = translationUnit(t) statement(s); { t.addStatement(s); v = t; }
 %type statement StatementNode
 
 // production statement
-statement = ID(nonTerminal) ASSIGN productionStatementBody(body); { v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), body.getCode()); }
+statement = ID(nonTerminal) ASSIGN productionStatementBody(body) SEMICOLON productionStatementCode(code);
+    { v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), code); }
 
-// TODO: remove right recursion
 %type productionStatementBody ProductionStatementBody
-productionStatementBody = SEMICOLON productionStatementCode(code); { v = new ProductionStatementBody(code == null ? null : code.code); }
-productionStatementBody = ID(s) productionStatementArgument(arg) productionStatementBody(b); {
+productionStatementBody = ; { v = new ProductionStatementBody(); }
+productionStatementBody = productionStatementBody(b) ID(s) productionStatementArgument(arg); {
     if (StringUtils.isTerminal(s.id)) {
         if (arg == null) {
             b.addTerminal(s.id);

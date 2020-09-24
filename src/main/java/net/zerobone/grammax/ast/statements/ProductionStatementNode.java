@@ -2,21 +2,22 @@ package net.zerobone.grammax.ast.statements;
 
 import net.zerobone.grammax.GrammaxContext;
 import net.zerobone.grammax.ast.entities.ProductionSymbol;
+import net.zerobone.grammax.lexer.tokens.CodeToken;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class ProductionStatementNode extends StatementNode {
 
     public String nonTerminal;
 
-    public LinkedList<ProductionSymbol> production;
+    public ArrayList<ProductionSymbol> production;
 
     public String code;
 
-    public ProductionStatementNode(String nonTerminal, LinkedList<ProductionSymbol> production, String code) {
+    public ProductionStatementNode(String nonTerminal, ArrayList<ProductionSymbol> production, CodeToken code) {
         this.nonTerminal = nonTerminal;
         this.production = production;
-        this.code = code;
+        this.code = code == null ? null : code.code;
     }
 
     @Override

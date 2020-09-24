@@ -40,10 +40,9 @@ public final class GrxParser {
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
+        0,0,0,0,0,
         0,0,18,0,0,
         0,21,0,0,0,
-        0,0,0,0,0,
-        0,0,0,0,22,
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
@@ -60,20 +59,19 @@ public final class GrxParser {
         0,0,0,0,12,0,0,0,0,0,0,
         0,0,0,0,13,0,0,0,0,0,0,
         0,-13,0,0,-13,0,0,-13,-13,-13,-13,
-        0,0,16,0,15,0,0,0,0,0,0,
+        0,0,-5,0,-5,0,0,0,0,0,0,
         0,-12,0,0,-12,0,0,-12,-12,-12,-12,
         0,-14,0,0,-14,0,0,-14,-14,-14,-14,
-        0,0,0,0,17,0,0,0,0,0,0,
-        0,-4,0,0,-4,0,0,-4,-4,-4,-4,
+        0,0,0,0,15,0,0,0,0,0,0,
+        0,0,17,0,16,0,0,0,0,0,0,
+        0,-11,0,0,-11,0,0,-11,-11,-11,-11,
         0,0,-9,0,-9,0,19,0,0,0,0,
         20,-7,0,0,-7,0,0,-7,-7,-7,-7,
-        0,-11,0,0,-11,0,0,-11,-11,-11,-11,
-        0,0,16,0,15,0,0,0,0,0,0,
-        0,0,0,0,23,0,0,0,0,0,0,
+        0,0,-6,0,-6,0,0,0,0,0,0,
+        0,0,0,0,22,0,0,0,0,0,0,
         0,-8,0,0,-8,0,0,-8,-8,-8,-8,
-        0,-5,0,0,-5,0,0,-5,-5,-5,-5,
-        0,-6,0,0,-6,0,0,-6,-6,-6,-6,
-        0,0,0,24,0,0,0,0,0,0,0,
+        0,-4,0,0,-4,0,0,-4,-4,-4,-4,
+        0,0,0,23,0,0,0,0,0,0,0,
         0,0,-10,0,-10,0,0,0,0,0,0};
     private static final int[] productionLabels = {0,0,3,4,4,1,1,2,2,3,3,3,3};
     @SuppressWarnings("Convert2Lambda")
@@ -103,12 +101,14 @@ public final class GrxParser {
         new Reductor() {
             @Override
             public Object reduce(Stack<StackEntry> _grx_stack) {
+                CodeToken code = (CodeToken)_grx_stack.pop().payload;
+                _grx_stack.pop();
                 ProductionStatementBody body = (ProductionStatementBody)_grx_stack.pop().payload;
                 _grx_stack.pop();
                 IdToken nonTerminal = (IdToken)_grx_stack.pop().payload;
                 Object v;
                 {
-                    v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), body.getCode());
+                    v = new ProductionStatementNode(nonTerminal.id, body.getProduction(), code);
                 }
                 return v;
             }
@@ -116,11 +116,9 @@ public final class GrxParser {
         new Reductor() {
             @Override
             public Object reduce(Stack<StackEntry> _grx_stack) {
-                CodeToken code = (CodeToken)_grx_stack.pop().payload;
-                _grx_stack.pop();
                 Object v;
                 {
-                    v = new ProductionStatementBody(code == null ? null : code.code);
+                    v = new ProductionStatementBody();
                 }
                 return v;
             }
@@ -128,9 +126,9 @@ public final class GrxParser {
         new Reductor() {
             @Override
             public Object reduce(Stack<StackEntry> _grx_stack) {
-                ProductionStatementBody b = (ProductionStatementBody)_grx_stack.pop().payload;
                 IdToken arg = (IdToken)_grx_stack.pop().payload;
                 IdToken s = (IdToken)_grx_stack.pop().payload;
+                ProductionStatementBody b = (ProductionStatementBody)_grx_stack.pop().payload;
                 Object v;
                 {
 

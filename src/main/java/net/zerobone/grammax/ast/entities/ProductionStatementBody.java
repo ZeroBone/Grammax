@@ -1,39 +1,31 @@
 package net.zerobone.grammax.ast.entities;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class ProductionStatementBody {
 
-    private final String code;
+    private ArrayList<ProductionSymbol> production = new ArrayList<>();
 
-    private LinkedList<ProductionSymbol> production = new LinkedList<>();
-
-    public ProductionStatementBody(String code) {
-        this.code = code;
-    }
+    public ProductionStatementBody() {}
 
     public void addNonTerminal(String id) {
-        production.addFirst(new ProductionSymbol(id, false));
+        production.add(new ProductionSymbol(id, false));
     }
 
     public void addNonTerminal(String id, String argument) {
-        production.addFirst(new ProductionSymbol(id, argument,false));
+        production.add(new ProductionSymbol(id, argument,false));
     }
 
     public void addTerminal(String id) {
-        production.addFirst(new ProductionSymbol(id, true));
+        production.add(new ProductionSymbol(id, true));
     }
 
     public void addTerminal(String id, String argument) {
-        production.addFirst(new ProductionSymbol(id, argument,true));
+        production.add(new ProductionSymbol(id, argument,true));
     }
 
-    public LinkedList<ProductionSymbol> getProduction() {
+    public ArrayList<ProductionSymbol> getProduction() {
         return production;
-    }
-
-    public String getCode() {
-        return code;
     }
 
 }
