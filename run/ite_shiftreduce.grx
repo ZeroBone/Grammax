@@ -1,0 +1,6 @@
+%algo SLR
+
+%name Ite_ShiftReduce
+
+e = IF e;
+e = IF e ELSE e;

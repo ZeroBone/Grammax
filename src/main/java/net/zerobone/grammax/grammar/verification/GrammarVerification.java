@@ -39,7 +39,7 @@ public class GrammarVerification {
 
             stack.clear();
             visitedAndOnTheStackSet.clear();
-            parentMap.clear(); // actually this is not needed
+            // parentMap.clear(); // actually this is not needed
 
             stack.push(start);
             visitedAndOnTheStackSet.add(start);
@@ -140,7 +140,7 @@ public class GrammarVerification {
 
         for (Symbol nonTerminal : grammar.getNonTerminalSymbols()) {
 
-            if (grammar.getProductionIdsFor(nonTerminal) == null) {
+            if (!grammar.nonTerminalDefined(nonTerminal)) {
                 messages.add(new NonTerminalNotDefinedMessage(nonTerminal));
             }
 

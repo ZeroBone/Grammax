@@ -1,0 +1,57 @@
+Grammar:
+Se' -> <2> e;
+ e -> <0> IF e
+    | <1> IF e ELSE e;
+
+First sets:
+FIRST(e') = {IF}
+FIRST(e) = {IF}
+
+Follow sets:
+FOLLOW(e') = {EOF}
+FOLLOW(e) = {ELSE, EOF}
+
+Automation:
+Non-terminal count: 1
+Terminal count: 3
+State count: 6 (0 - 5)
+
+Action table:
+STATE |  ELSE |    IF |   EOF
+   0  | ----- |    s1 | -----
+   1  | ----- |    s1 | -----
+   2  | ----- | ----- |accept
+   3  |    s4 | ----- |    r0
+   4  | ----- |    s1 | -----
+   5  |    r1 | ----- |    r1
+
+
+Goto table:
+STATE |     e
+   0  |     2
+   1  |     3
+   2  | -----
+   3  | -----
+   4  |     5
+   5  | -----
+
+
+State 0:
+    e' -> * e
+
+State 1:
+    e -> IF * e ELSE e
+    e -> IF * e
+
+State 2:
+    e' -> e *
+
+State 3:
+    e -> IF e * ELSE e
+    e -> IF e *
+
+State 4:
+    e -> IF e ELSE * e
+
+State 5:
+    e -> IF e ELSE e *

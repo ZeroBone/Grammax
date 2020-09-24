@@ -1,0 +1,6 @@
+%algo SLR
+
+%name RRCycle
+
+e = T e;
+e = B b;

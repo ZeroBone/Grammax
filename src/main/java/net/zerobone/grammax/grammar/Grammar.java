@@ -251,6 +251,10 @@ public class Grammar implements Iterable<Production> {
         return productions.iterator();
     }
 
+    public boolean nonTerminalDefined(Symbol nonTerminal) {
+        return productionMap.containsKey(nonTerminal);
+    }
+
     public Iterator<Integer> getProductionIdsFor(Symbol nonTerminal) {
         assert productionMap.containsKey(nonTerminal) : "invalid nonTerminal specified";
         return productionMap.get(nonTerminal).iterator();
