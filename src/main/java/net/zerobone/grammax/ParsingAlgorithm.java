@@ -5,7 +5,7 @@ public enum ParsingAlgorithm {
     CLR,
     LALR;
 
-    public static final ParsingAlgorithm DEFAULT = LALR;
+    public static final ParsingAlgorithm DEFAULT = SLR;
 
     public static ParsingAlgorithm fromString(String algorithmName) {
 

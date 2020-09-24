@@ -14,6 +14,9 @@ public class ParseUtils {
             case GrxParser.T_CODE:
                 return "<code-block>";
 
+            case GrxParser.T_TOP:
+                return "%top";
+
             case GrxParser.T_SEMICOLON:
                 return ";";
 
@@ -31,6 +34,12 @@ public class ParseUtils {
 
             case GrxParser.T_TYPE:
                 return "%type";
+
+            case GrxParser.T_ALGO:
+                return "%algo";
+
+            case GrxParser.T_NAME:
+                return "%name";
 
             default:
                 return "<" + terminal + ">";

@@ -13,6 +13,7 @@ import net.zerobone.grammax.lexer.Lexer;
 import net.zerobone.grammax.lexer.LexerException;
 import net.zerobone.grammax.lexer.tokens.Token;
 import net.zerobone.grammax.parser.GrxParser;
+import net.zerobone.grammax.utils.ParseUtils;
 
 import java.io.*;
 import java.util.*;
@@ -194,23 +195,35 @@ public class Grammax {
             Lexer lexer = new Lexer(is);
             GrxParser parser = new GrxParser();
 
-            try {
+            {
+                Token currentToken = null;
 
-                Token currentToken;
+                try {
 
-                do {
-                    currentToken = lexer.lex();
-                    parser.parse(currentToken.type, currentToken);
-                } while (currentToken.type != GrxParser.T_EOF);
+                    do {
+                        currentToken = lexer.lex();
+                        parser.parse(currentToken.type, currentToken);
+                    } while (currentToken.type != GrxParser.T_EOF);
 
-            }
-            catch (LexerException e) {
-                System.err.println("[ERR]: Syntax error: " + e.getMessage());
-                return;
-            }
-            catch (IOException e) {
-                System.err.println("[ERR]: I/O error: " + e.getMessage());
-                return;
+                }
+                catch (RuntimeException e) {
+                    if (currentToken == null) {
+                        System.err.println("[ERR]: Fatal syntax error!");
+                    }
+                    else {
+                        System.err.println("[ERR]: Syntax error at line " + currentToken.line
+                            + ", before " + ParseUtils.convertTerminal(currentToken.type) + ".");
+                    }
+                    return;
+                }
+                catch (LexerException e) {
+                    System.err.println("[ERR]: Syntax error: " + e.getMessage());
+                    return;
+                }
+                catch (IOException e) {
+                    System.err.println("[ERR]: I/O error: " + e.getMessage());
+                    return;
+                }
             }
 
             if (!parser.successfullyParsed()) {
