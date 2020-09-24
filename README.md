@@ -149,7 +149,7 @@ f = NUM(n); { v = n.value; }
 f = ID NUM(n); { v = n.value; }
 ```
 
-Grammax will create a working parser based on this grammar.
+Grammax will create a [working parser](https://github.com/ZeroBone/Grammax/tree/master/examples/calculator) based on this grammar.
 
 ## Support
 
