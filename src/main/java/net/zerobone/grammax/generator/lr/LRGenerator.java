@@ -73,7 +73,6 @@ public class LRGenerator {
         writer.newLine();
         writer.newLine();
         writer.write("#endif");
-        writer.newLine();
 
         writer.close();
 
