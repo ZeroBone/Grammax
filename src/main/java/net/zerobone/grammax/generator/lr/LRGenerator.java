@@ -62,6 +62,11 @@ public class LRGenerator {
         writer.write(guardDefineVariableName);
         writer.newLine();
 
+        writer.write("#include <vector>");
+        writer.newLine();
+        writer.write("#include <cstring> // for std::memcpy");
+        writer.newLine();
+
         if (context.config.topCode != null) {
             writer.writeAlignTrim(context.config.topCode);
         }

@@ -60,6 +60,42 @@ class LRParserClassGenerator {
             writer.newLine();
         }
 
+        writer.newLine();
+
+        // constructor
+        writer.write("StackEntryPayload() {}");
+        writer.newLine();
+
+        // destructor
+        writer.write("~StackEntryPayload() {}");
+        writer.newLine();
+
+        // move constructor
+        writer.beginIndentedBlock("StackEntryPayload(StackEntryPayload&& other) noexcept");
+        writer.addStatement("std::memcpy(this, &other, sizeof(StackEntryPayload))");
+        writer.endIndentedBlock();
+
+        // copy constructor
+        writer.beginIndentedBlock("StackEntryPayload(const StackEntryPayload& other) noexcept");
+        writer.addStatement("std::memcpy(this, &other, sizeof(StackEntryPayload))");
+        writer.endIndentedBlock();
+
+        // move assignment operator
+        writer.beginIndentedBlock("StackEntryPayload& operator=(StackEntryPayload&& other) noexcept");
+        writer.beginIndentedBlock("if (this != &other)");
+        writer.addStatement("std::memcpy(this, &other, sizeof(StackEntryPayload))");
+        writer.endIndentedBlock();
+        writer.addStatement("return *this");
+        writer.endIndentedBlock();
+
+        // copy assignment operator
+        writer.beginIndentedBlock("StackEntryPayload& operator=(const StackEntryPayload& other)");
+        writer.beginIndentedBlock("if (this != &other)");
+        writer.addStatement("std::memcpy(this, &other, sizeof(StackEntryPayload))");
+        writer.endIndentedBlock();
+        writer.addStatement("return *this");
+        writer.endIndentedBlock();
+
         writer.endIndentedBlock(true);
 
         writer.cancelIndentationForPresentLine();
@@ -78,10 +114,16 @@ class LRParserClassGenerator {
         writer.write("StackEntryPayload payload;");
         writer.newLine();
 
-        writer.write("StackEntry(int previousState, StackEntryPayload payload) : previousState(previousState), payload(payload) {}");
+        writer.write("StackEntry(int previousState, StackEntryPayload payload) : previousState(previousState), payload(std::move(payload)) {}");
         writer.newLine();
 
-        writer.write("StackEntry() : previousState(0), payload({._grx_object = nullptr}) {}");
+        writer.beginIndentedBlock("StackEntry() : previousState(0)");
+        writer.addStatement("payload._grx_object = nullptr");
+        writer.endIndentedBlock();
+        // writer.newLine();
+
+        // move constructor
+        writer.write("StackEntry(StackEntry&&) = default;");
         writer.newLine();
 
         writer.endIndentedBlock(true);
@@ -224,7 +266,8 @@ class LRParserClassGenerator {
                 writer.addStatement("return v");
                 break;
             case CPP:
-                writer.addStatement("StackEntryPayload _grx_v = {." + productionNonTerminalSymbol + " = v}");
+                writer.addStatement("StackEntryPayload _grx_v");
+                writer.addStatement("_grx_v." + productionNonTerminalSymbol + " = v");
                 writer.addStatement("return _grx_v");
                 break;
             default:
@@ -426,7 +469,7 @@ class LRParserClassGenerator {
             case CPP:
                 writer.addStatement("const int productionIndex = -action - 2");
                 writer.addStatement("const StackEntryPayload reducedProduction = reductions[productionIndex](&stack)");
-                writer.addStatement("const StackEntry newState = stack.back()");
+                writer.addStatement("const StackEntry& newState = stack.back()");
                 writer.addStatement("const int nextState = gotoTable[newState.previousState * NON_TERMINAL_COUNT + productionLabels[productionIndex]]");
                 writer.addStatement("stack.emplace_back(nextState - 1, reducedProduction)");
                 break;
