@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringReader;
 
-public class JavaWriter {
+public class ProgramWriter {
 
     private static final String INDENT = "    ";
 
@@ -15,7 +15,7 @@ public class JavaWriter {
 
     private int indent = 0;
 
-    public JavaWriter(BufferedWriter writer) {
+    public ProgramWriter(BufferedWriter writer) {
         this.writer = writer;
     }
 
@@ -72,6 +72,10 @@ public class JavaWriter {
         writer.newLine();
     }
 
+    public void cancelIndentationForPresentLine() {
+        indenting = false;
+    }
+
     public void addStatement(String stmt) throws IOException {
         write(stmt);
         write(';');
@@ -101,10 +105,17 @@ public class JavaWriter {
         enterIndent();
     }
 
-    public void endIndentedBlock() throws IOException {
+    public void endIndentedBlock(boolean addSemicolon) throws IOException {
         exitIndent();
         write('}');
+        if (addSemicolon) {
+            write(';');
+        }
         newLine();
+    }
+
+    public void endIndentedBlock() throws IOException {
+        endIndentedBlock(false);
     }
 
     public void close() throws IOException {

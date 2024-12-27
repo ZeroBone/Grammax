@@ -12,22 +12,23 @@ import net.zerobone.grammax.utils.StringUtils;
 import java.util.Stack;
 
 public final class GrxParser {
-    public static final int T_CODE = 0;
-    public static final int T_TOP = 1;
-    public static final int T_SEMICOLON = 2;
-    public static final int T_RIGHT_PAREN = 3;
-    public static final int T_ID = 4;
-    public static final int T_ASSIGN = 5;
-    public static final int T_LEFT_PAREN = 6;
-    public static final int T_TYPE = 7;
-    public static final int T_ALGO = 8;
-    public static final int T_NAME = 9;
-    public static final int T_EOF = 10;
-    private static final int terminalCount = 11;
+    public static final int T_TARGET = 0;
+    public static final int T_CODE = 1;
+    public static final int T_TOP = 2;
+    public static final int T_SEMICOLON = 3;
+    public static final int T_RIGHT_PAREN = 4;
+    public static final int T_ID = 5;
+    public static final int T_ASSIGN = 6;
+    public static final int T_LEFT_PAREN = 7;
+    public static final int T_TYPE = 8;
+    public static final int T_ALGO = 9;
+    public static final int T_NAME = 10;
+    public static final int T_EOF = 11;
+    private static final int terminalCount = 12;
     private static final int nonTerminalCount = 5;
     private static final int[] gotoTable = {
         2,0,0,0,0,
-        0,0,0,6,0,
+        0,0,0,8,0,
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
@@ -35,14 +36,16 @@ public final class GrxParser {
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
-        0,0,0,0,14,
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
-        0,0,18,0,0,
-        0,21,0,0,0,
+        0,0,0,0,17,
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,20,0,0,0,
+        0,0,23,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
         0,0,0,0,0,
@@ -50,30 +53,32 @@ public final class GrxParser {
         0,0,0,0,0,
         0,0,0,0,0};
     private static final int[] actionTable = {
-        0,-2,0,0,-2,0,0,-2,-2,-2,-2,
-        0,5,0,0,4,0,0,8,7,3,-1,
-        0,0,0,0,9,0,0,0,0,0,0,
-        0,0,0,0,0,10,0,0,0,0,0,
-        11,0,0,0,0,0,0,0,0,0,0,
-        0,-3,0,0,-3,0,0,-3,-3,-3,-3,
-        0,0,0,0,12,0,0,0,0,0,0,
-        0,0,0,0,13,0,0,0,0,0,0,
-        0,-13,0,0,-13,0,0,-13,-13,-13,-13,
-        0,0,-5,0,-5,0,0,0,0,0,0,
-        0,-12,0,0,-12,0,0,-12,-12,-12,-12,
-        0,-14,0,0,-14,0,0,-14,-14,-14,-14,
-        0,0,0,0,15,0,0,0,0,0,0,
-        0,0,17,0,16,0,0,0,0,0,0,
-        0,-11,0,0,-11,0,0,-11,-11,-11,-11,
-        0,0,-9,0,-9,0,19,0,0,0,0,
-        20,-7,0,0,-7,0,0,-7,-7,-7,-7,
-        0,0,-6,0,-6,0,0,0,0,0,0,
-        0,0,0,0,22,0,0,0,0,0,0,
-        0,-8,0,0,-8,0,0,-8,-8,-8,-8,
-        0,-4,0,0,-4,0,0,-4,-4,-4,-4,
-        0,0,0,23,0,0,0,0,0,0,0,
-        0,0,-10,0,-10,0,0,0,0,0,0};
-    private static final int[] productionLabels = {0,0,3,4,4,1,1,2,2,3,3,3,3};
+        -2,0,-2,0,0,-2,0,0,-2,-2,-2,-2,
+        3,0,4,0,0,9,0,0,6,7,5,-1,
+        0,0,0,0,0,10,0,0,0,0,0,0,
+        0,11,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,12,0,0,0,0,0,0,
+        0,0,0,0,0,13,0,0,0,0,0,0,
+        0,0,0,0,0,14,0,0,0,0,0,0,
+        -3,0,-3,0,0,-3,0,0,-3,-3,-3,-3,
+        0,0,0,0,0,0,15,0,0,0,0,0,
+        -15,0,-15,0,0,-15,0,0,-15,-15,-15,-15,
+        -12,0,-12,0,0,-12,0,0,-12,-12,-12,-12,
+        -13,0,-13,0,0,-13,0,0,-13,-13,-13,-13,
+        0,0,0,0,0,16,0,0,0,0,0,0,
+        -14,0,-14,0,0,-14,0,0,-14,-14,-14,-14,
+        0,0,0,-5,0,-5,0,0,0,0,0,0,
+        -11,0,-11,0,0,-11,0,0,-11,-11,-11,-11,
+        0,0,0,18,0,19,0,0,0,0,0,0,
+        -7,21,-7,0,0,-7,0,0,-7,-7,-7,-7,
+        0,0,0,-9,0,-9,0,22,0,0,0,0,
+        -4,0,-4,0,0,-4,0,0,-4,-4,-4,-4,
+        -8,0,-8,0,0,-8,0,0,-8,-8,-8,-8,
+        0,0,0,0,0,24,0,0,0,0,0,0,
+        0,0,0,-6,0,-6,0,0,0,0,0,0,
+        0,0,0,0,25,0,0,0,0,0,0,0,
+        0,0,0,-10,0,-10,0,0,0,0,0,0};
+    private static final int[] productionLabels = {0,0,3,4,4,1,1,2,2,3,3,3,3,3};
     @SuppressWarnings("Convert2Lambda")
     private static final Reductor[] reductions = {
         new Reductor() {
@@ -242,6 +247,18 @@ public final class GrxParser {
                 Object v;
                 {
                  v = new AlgoStatementNode(alg.id); 
+                }
+                return v;
+            }
+        },
+        new Reductor() {
+            @Override
+            public Object reduce(Stack<StackEntry> _grx_stack) {
+                IdToken target = (IdToken)_grx_stack.pop().payload;
+                _grx_stack.pop();
+                Object v;
+                {
+                 v = new TargetStatementNode(target.id); 
                 }
                 return v;
             }

@@ -176,6 +176,9 @@ public class Lexer {
                 else if (id.equals("algo")) {
                     return constructPrimitiveToken(GrxParser.T_ALGO);
                 }
+                else if (id.equals("target")) {
+                    return constructPrimitiveToken(GrxParser.T_TARGET);
+                }
                 else {
                     throw new LexerException("Unknown directive '" + id + "'", line);
                 }

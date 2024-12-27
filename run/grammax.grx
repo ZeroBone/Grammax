@@ -71,3 +71,6 @@ statement = NAME ID(name); { v = new NameStatementNode(name.id); }
 
 // %algo statement
 statement = ALGO ID(alg); { v = new AlgoStatementNode(alg.id); }
+
+// %target statement
+statement = TARGET ID(target); { v = new TargetStatementNode(target.id); }

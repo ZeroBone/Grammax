@@ -1,0 +1,158 @@
+%name ZeroLampParser
+%algo SLR
+%target cpp
+
+%top {
+    // test
+}
+
+// ==================================
+// GRAMMAR START
+// ==================================
+// terminals -> all uppercase
+// non terminals -> all lowercase
+
+%type root RootNode
+root = statement_list(SL); { v = new RootNode(std::move(SL)); }
+
+%type formal_parameters Vector_String
+formal_parameters = ID(NAME); { std::vector<std::string> v; v.push_back(NAME); FPS = std::move(v); }
+formal_parameters = formal_parameters(FPS) COMMA ID(NAME); { v = std::move(FPS); v.push_back(NAME); }
+
+%type actual_parameters Vector_ExpressionNode
+actual_parameters = expression(E); { v = [E]; }
+actual_parameters = actual_parameters(APS) COMMA expression(E); { APS.push_back(E); v = APS;  }
+
+%type statement_list Vector_StatementNode // {std::vector<StatementNode*>}
+statement_list = ; { v = [SL]; }
+statement_list = statement_list(SL) statement(S); { SL.push_back(S); v = std::move(SL); }
+
+// statements
+%type statement StatementNode
+
+// function statement
+statement = FN ID LEFT_BRACE statement_list(SL) RIGHT_BRACE; { v = new FunctionDefinitionNode(SL); }
+statement = FN ID LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE statement_list(SL) RIGHT_BRACE; { v = new FunctionDefinitionNode(SL); }
+statement = FN ID LEFT_PARENTHESIS formal_parameters(FP) RIGHT_PARENTHESIS LEFT_BRACE statement_list(SL) RIGHT_BRACE; { v = new FunctionDefinitionNode(FP, SL); }
+
+// event handler statement
+statement = ON ID LEFT_BRACE statement_list(SL) RIGHT_BRACE; { v = new EventHandlerDefinitionNode(SL); }
+statement = ON ID LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE statement_list(SL) RIGHT_BRACE; { v = new EventHandlerDefinitionNode(SL); }
+statement = ON ID LEFT_PARENTHESIS actual_parameters(AP) RIGHT_PARENTHESIS LEFT_BRACE statement_list(SL) RIGHT_BRACE; { v = EventHandlerDefinitionNode(AP, SL); }
+
+// function call
+statement = ID(FUNCTION_NAME) LEFT_PARENTHESIS RIGHT_PARENTHESIS; { v = new FunctionCallStatementNode(FUNCTION_NAME); }
+statement = ID(FUNCTION_NAME) LEFT_PARENTHESIS actual_parameters(APS) RIGHT_PARENTHESIS; { v = new FunctionCallStatementNode(FUNCTION_NAME, APS); }
+
+// push statement
+statement = ID(DISPLAY) ID(MODE) SEMICOLON; { v = new PushStatementNode(DISPLAY, MODE); }
+statement = ID(DISPLAY) ID(MODE) SEMICOLON IF expression(CONDITION); { v = new PushStatementNode(DISPLAY, MODE, CONDITION); }
+
+// expressions
+%type simple_expression ExpressionNode
+simple_expression = ID(T); { v = new IdExpressionNode(T.payload.string); }
+simple_expression = INT_V(T); { v = new IntLiteralExpressionNode(T.payload.TODO); }
+simple_expression = FLOAT_V(T); { v = new FloatLiteralExpressionNode(T.payload.TODO); }
+simple_expression = STRING_V(T); { v = new StringLiteralExpressionNode(T.payload.TODO); }
+simple_expression = TRUE; { v = new BooleanLiteralExpressionNode(true); }
+simple_expression = FALSE; { v = new BooleanLiteralExpressionNode(false); }
+simple_expression = LEFT_PARENTHESIS expression(E_INNER) RIGHT_PARENTHESIS; { v = E_INNER; }
+
+// postfix expressions
+%type postfix_expression ExpressionNode
+postfix_expression = simple_expression(E_INNER); { v = E_INNER; }
+postfix_expression = postfix_expression(BASE) LEFT_BRACKET expression(INDEX) RIGHT_BRACKET; { v = new IndexingExpressionNode(BASE, INDEX); }
+postfix_expression = postfix_expression(BASE) LEFT_PARENTHESIS RIGHT_PARENTHESIS; { v = new FunctionCallExpressionNode(BASE); }
+postfix_expression = postfix_expression(BASE) LEFT_PARENTHESIS actual_parameters(A_PARAMS) RIGHT_PARENTHESIS; { v = new FunctionCallExpressionNode(BASE, A_PARAMS); }
+postfix_expression = postfix_expression(BASE) DOT ID(MEMBER); { v = new MemberAccessExpressionNode(BASE, MEMBER); }
+
+// pow expression (right-accociative)
+%type pow_expression ExpressionNode
+pow_expression = postfix_expression(E_INNER); { v = E_INNER; }
+// a ** b // right-associative => right recursion, this is not good
+pow_expression = postfix_expression(BASE) POW pow_expression(EXPONENT); { v = new PowExpressionNode(BASE, EXPONENT); }
+
+// unary expressions
+%type unary_expression ExpressionNode
+unary_expression = pow_expression(E_INNER); { v = E_INNER; }
+unary_expression = MINUS unary_expression(BASE); { v = new UnaryExpressionNode(UnaryExpressionType::NEGATION, BASE); }
+unary_expression = BITWISE_INVERT unary_expression(BASE); { v = new UnaryExpressionNode(UnaryExpressionType::BITWISE_INVERT, BASE); }
+unary_expression = INVERT unary_expression(BASE); { v = new UnaryExpressionNode(UnaryExpressionType::INVERT, BASE); }
+
+// multiplicative expression
+%type multiplicative_expression ExpressionNode
+multiplicative_expression = unary_expression(E_INNER); { v = E_INNER; }
+multiplicative_expression = multiplicative_expression(L) MULTIPLY unary_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::MULTIPLICATION, L, R); }
+multiplicative_expression = multiplicative_expression(L) DIVIDE unary_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::DIVISION, L, R); }
+multiplicative_expression = multiplicative_expression(L) REMAINDER unary_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::REMAINDER, L, R); }
+
+// additive expression
+%type additive_expression ExpressionNode
+additive_expression = multiplicative_expression(E_INNER); { v = E_INNER; }
+additive_expression = additive_expression(L) PLUS multiplicative_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ADDITION, L, R); }
+additive_expression = additive_expression(L) MINUS multiplicative_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::SUBTRACTION, L, R); }
+
+// bitwise shift expression
+%type bitwise_shift_expression ExpressionNode
+bitwise_shift_expression = additive_expression(E_INNER); { v = E_INNER; }
+bitwise_shift_expression = bitwise_shift_expression(L) BITWISE_SHIFT_LEFT additive_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::BITWISE_SHIFT_LEFT, L, R); }
+bitwise_shift_expression = bitwise_shift_expression(L) BITWISE_SHIFT_RIGHT additive_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::BITWISE_SHIFT_RIGHT, L, R); }
+
+// comparison expression
+%type comparison_expression ExpressionNode
+comparison_expression = bitwise_shift_expression(E_INNER); { v = E_INNER; }
+comparison_expression = comparison_expression(L) LESS_THAN bitwise_shift_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::LESS_THAN, L, R); }
+comparison_expression = comparison_expression(L) GREATER_THAN bitwise_shift_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::GREATER_THAN, L, R); }
+comparison_expression = comparison_expression(L) LESS_THAN_OR_EQUALS bitwise_shift_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::LESS_THAN_OR_EQUAL, L, R); }
+comparison_expression = comparison_expression(L) GREATER_THAN_OR_EQUALS bitwise_shift_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::GREATER_THAN_OR_EQUAL, L, R); }
+
+// equality expression
+%type equality_expression ExpressionNode
+equality_expression = comparison_expression(E_INNER); { v = E_INNER; }
+equality_expression = equality_expression(L) EQUALS comparison_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::EQUAL, L, R); }
+equality_expression = equality_expression(L) NOT_EQUALS comparison_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::NOT_EQUAL, L, R); }
+
+// bitwise and expression
+%type bitwise_and_expression ExpressionNode
+bitwise_and_expression = equality_expression(E_INNER); { v = E_INNER; }
+bitwise_and_expression = bitwise_and_expression(L) BITWISE_AND equality_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::BITWISE_AND, L, R); }
+
+// bitwise xor expression
+%type bitwise_xor_expression ExpressionNode
+bitwise_xor_expression = bitwise_and_expression(E_INNER); { v = E_INNER; }
+bitwise_xor_expression = bitwise_xor_expression(L) BITWISE_XOR bitwise_and_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::BITWISE_XOR, L, R); }
+
+// bitwise or expression
+%type bitwise_or_expression ExpressionNode
+bitwise_or_expression = bitwise_xor_expression(E_INNER); { v = E_INNER; }
+bitwise_or_expression = bitwise_or_expression(L) BITWISE_OR bitwise_xor_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::BITWISE_OR, L, R); }
+
+// and expression (logical)
+%type and_expression ExpressionNode
+and_expression = bitwise_or_expression(E_INNER); { v = E_INNER; }
+and_expression = and_expression(L) AND bitwise_or_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::AND, L, R); }
+
+// or expression (logical)
+%type or_expression ExpressionNode
+or_expression = and_expression(E_INNER); { v = E_INNER; }
+or_expression = or_expression(L) OR and_expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::OR, L, R); }
+
+// ternary expression (right associative)
+%type ternary_expression ExpressionNode
+ternary_expression = or_expression(E_INNER); { v = E_INNER; }
+ternary_expression = or_expression(COND) QUESTION_MARK expression(IF) COLON ternary_expression(ELSE); { v = new TernaryExpressionNode(COND, IF, ELSE); }
+
+// expression
+%type expression ExpressionNode
+expression = ternary_expression(E_INNER); { v = E_INNER; }
+expression = unary_expression(L) ASSIGN expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN, L, R); }
+expression = unary_expression(L) ASSIGN_MULTIPLY expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_MULTIPLY, L, R); }
+expression = unary_expression(L) ASSIGN_DIVIDE expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_DIVIDE, L, R); }
+expression = unary_expression(L) ASSIGN_REMAINDER expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_REMAINDER, L, R); }
+expression = unary_expression(L) ASSIGN_PLUS expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_PLUS, L, R); }
+expression = unary_expression(L) ASSIGN_MINUS expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_MINUS, L, R); }
+expression = unary_expression(L) ASSIGN_BITWISE_SHIFT_LEFT expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_BITWISE_SHIFT_LEFT, L, R); }
+expression = unary_expression(L) ASSIGN_BITWISE_SHIFT_RIGHT expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_BITWISE_SHIFT_RIGHT, L, R); }
+expression = unary_expression(L) ASSIGN_BITWISE_AND expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_BITWISE_AND, L, R); }
+expression = unary_expression(L) ASSIGN_BITWISE_XOR expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_BITWISE_XOR, L, R); }
+expression = unary_expression(L) ASSIGN_BITWISE_OR expression(R); { v = new BinaryExpressionNode(BinaryExpressionType::ASSIGN_BITWISE_OR, L, R); }

@@ -18,6 +18,8 @@ public class GrammaxContext {
 
     private ParsingAlgorithm algorithm = null;
 
+    private TargetLanguage targetLanguage = null;
+
     private String topCode = null;
 
     private String name = null;
@@ -89,6 +91,10 @@ public class GrammaxContext {
         return algorithm == null ? ParsingAlgorithm.DEFAULT : algorithm;
     }
 
+    private TargetLanguage getTargetLanguage() {
+        return targetLanguage == null ? TargetLanguage.DEFAULT : targetLanguage;
+    }
+
     private Automation createAutomation() {
 
         switch (getAlgorithm()) {
@@ -116,6 +122,7 @@ public class GrammaxContext {
         return new GrammaxConfiguration(
             createAutomation(),
             getAlgorithm(),
+            getTargetLanguage(),
             topCode,
             name,
             typeMap
@@ -131,6 +138,17 @@ public class GrammaxContext {
         }
 
         this.algorithm = algorithm;
+
+    }
+
+    public void setTargetLanguage(TargetLanguage targetLanguage) {
+
+        if (this.targetLanguage != null) {
+            addError("Duplicate %target statement.");
+            return;
+        }
+
+        this.targetLanguage = targetLanguage;
 
     }
 
