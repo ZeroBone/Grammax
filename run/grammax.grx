@@ -62,6 +62,7 @@ productionStatementArgument = LEFT_PAREN ID(arg) RIGHT_PAREN; { v = arg; }
 
 // %type statement
 statement = TYPE ID(symbol) ID(type); { v = new TypeStatementNode(symbol.id, type.id); }
+statement = TYPE ID(symbol) CODE(c); { v = new TypeStatementNode(symbol.id, c.code); }
 
 // %top statement
 statement = TOP CODE(c); { v = new TopStatementNode(c.code); }
